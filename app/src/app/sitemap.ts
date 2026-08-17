@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { courses, site } from "@/lib/content";
+import { posts } from "@/lib/blog";
 
 // Required by `output: "export"` — the sitemap is generated at build time.
 export const dynamic = "force-static";
@@ -30,6 +31,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.8,
+    })),
+    ...posts.map((p) => ({
+      url: `${site.url}/blog/${p.slug}`,
+      lastModified: new Date(p.published),
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
     })),
   ];
 }

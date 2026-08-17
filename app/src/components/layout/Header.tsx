@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Mail, Menu, Phone, X } from "lucide-react";
+import { LogIn, Mail, Menu, Phone, X } from "lucide-react";
 import { nav, site } from "@/lib/content";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Section";
@@ -89,12 +89,15 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <a
-              href={site.portalUrl}
-              className="hidden rounded-full px-3 py-2 text-[15px] font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 transition-colors hover:text-teal sm:inline-block"
+            <Button
+              href="/admin/login"
+              variant="outline"
+              size="sm"
+              className="hidden sm:inline-flex"
             >
+              <LogIn className="size-4" aria-hidden="true" />
               Sign in
-            </a>
+            </Button>
             <Button href="/register" size="sm" className="hidden sm:inline-flex">
               Free trial
             </Button>
@@ -133,8 +136,9 @@ export function Header() {
               <Button href="/register" size="lg">
                 Start free trial
               </Button>
-              <Button href={site.portalUrl} variant="outline" size="lg">
-                Sign in to portal
+              <Button href="/admin/login" variant="outline" size="lg">
+                <LogIn className="size-5" aria-hidden="true" />
+                Sign in
               </Button>
             </div>
             <div className="mt-6 space-y-2 text-ink/75">

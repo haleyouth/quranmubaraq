@@ -125,12 +125,6 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            <a
-              href={site.portalUrl}
-              className="mt-6 inline-flex min-h-11 items-center rounded-full border-2 border-gold bg-gold px-5 py-2.5 font-bold text-ink transition-colors hover:bg-transparent hover:text-gold"
-            >
-              Student &amp; Teacher Portal
-            </a>
           </div>
         </div>
 

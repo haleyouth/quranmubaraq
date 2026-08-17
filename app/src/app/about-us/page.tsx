@@ -83,6 +83,49 @@ export default function AboutPage() {
         </Container>
       </Section>
 
+      <Section tone="white">
+        <Container>
+          <SectionHeading
+            eyebrow="Our teachers"
+            title={
+              <>
+                Taught by <span className="text-green-deep">qualified Huffaz.</span>
+              </>
+            }
+            body="Every teacher is a qualified hafiz or Islamic scholar, vetted before they teach and selected as much for their patience with children as for their credentials."
+          />
+
+          <div className="mx-auto mt-14 grid max-w-4xl gap-6 sm:grid-cols-2">
+            {[
+              {
+                title: "Qualified and certified",
+                body: "Our teachers hold formal qualifications in Quranic studies, and many carry an ijazah in recitation.",
+              },
+              {
+                title: "Male and female staff",
+                body: "Families may request the teacher they are comfortable with. Female students may always be taught by a female teacher.",
+              },
+              {
+                title: "Vetted before teaching",
+                body: "Every teacher is checked and must acknowledge our child safeguarding policy before they are assigned a single student.",
+              },
+              {
+                title: "Continuously reviewed",
+                body: "Teaching is monitored through attendance reliability, student progress and parent feedback — not left unchecked after hiring.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-[2rem] border-4 border-ink bg-cream p-7 hard-shadow"
+              >
+                <h3 className="font-display text-xl text-ink">{item.title}</h3>
+                <p className="mt-3 leading-relaxed text-ink/75">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
       <Features />
       <Testimonials />
       <CtaBand />

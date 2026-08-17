@@ -11,7 +11,8 @@ export const site = {
   founded: 2011,
   founder: "Qasim Shafiq Mir",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://quranmubarak.com",
-  portalUrl: "https://qmlearning.com/app/dashboard",
+  /** Legacy LMS being replaced by /admin. Retained for reference and migration. */
+  legacyPortalUrl: "https://qmlearning.com/app/dashboard",
   phone: "0345-5997954",
   phoneHref: "tel:+923455997954",
   email: "info@quranmubarak.com",
