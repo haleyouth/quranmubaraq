@@ -1,0 +1,145 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ---------------------------------------------------------------- */
+    /* Helpers                                                          */
+    /* ---------------------------------------------------------------- */
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Roles are set as custom claims by a Cloud Function, never by the client.
+    function hasRole(role) {
+      return isSignedIn() && request.auth.token.role == role;
+    }
+
+    function isStaff() {
+      return hasRole('super_admin') || hasRole('admin') || hasRole('principal');
+    }
+
+    function isTeacher() {
+      return hasRole('teacher');
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Leads — public trial registrations                               */
+    /* ---------------------------------------------------------------- */
+
+    match /leads/{leadId} {
+      // Anyone may submit a registration, but only with a well-formed
+      // payload and only as a brand-new 'new' lead. This prevents the public
+      // form being used to inject arbitrary documents.
+      allow create: if request.resource.data.keys().hasOnly([
+                         'name', 'email', 'phone', 'country',
+                         'course', 'teacherPreference',
+                         'status', 'source', 'createdAt'
+                       ])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() >= 2
+                    && request.resource.data.name.size() <= 120
+                    && request.resource.data.email is string
+                    && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$')
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() <= 40
+                    && request.resource.data.country is string
+                    && request.resource.data.country.size() <= 80
+                    && request.resource.data.status == 'new'
+                    && request.resource.data.source == 'website';
+
+      // Leads contain personal data — never publicly readable.
+      allow read, update: if isStaff();
+      allow delete: if hasRole('super_admin');
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Users & profiles                                                 */
+    /* ---------------------------------------------------------------- */
+
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isStaff();
+      // Users may edit their own profile but never their own role.
+      allow update: if (isSelf(userId)
+                        && !request.resource.data.diff(resource.data)
+                             .affectedKeys().hasAny(['role', 'status']))
+                    || isStaff();
+      allow create, delete: if isStaff();
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Classes, sessions, attendance                                    */
+    /* ---------------------------------------------------------------- */
+
+    match /classes/{classId} {
+      allow read: if isSignedIn();
+      allow write: if isStaff();
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if isSignedIn();
+      // Teachers may update the sessions they teach (notes, status);
+      // staff may write any.
+      allow update: if isStaff()
+                    || (isTeacher() && resource.data.teacherId == request.auth.uid);
+      allow create, delete: if isStaff();
+    }
+
+    match /attendance/{recordId} {
+      allow read: if isSignedIn();
+      allow create, update: if isStaff() || isTeacher();
+      allow delete: if isStaff();
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Complaints                                                       */
+    /* ---------------------------------------------------------------- */
+
+    match /complaints/{complaintId} {
+      allow create: if isSignedIn();
+      allow read: if isStaff() || isSelf(resource.data.raisedById);
+      allow update: if isStaff();
+      allow delete: if hasRole('super_admin');
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Leave requests                                                   */
+    /* ---------------------------------------------------------------- */
+
+    match /leaveRequests/{requestId} {
+      allow create: if isSignedIn();
+      allow read: if isStaff() || isSelf(resource.data.userId);
+      allow update: if isStaff();
+      allow delete: if hasRole('super_admin');
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Finance — staff only, never client-writable                      */
+    /* ---------------------------------------------------------------- */
+
+    match /invoices/{invoiceId} {
+      allow read: if isStaff() || isSelf(resource.data.studentId);
+      allow write: if isStaff();
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isStaff();
+      // Written exclusively by Cloud Functions via the Admin SDK,
+      // which bypasses these rules.
+      allow write: if false;
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Anything not matched above is denied                             */
+    /* ---------------------------------------------------------------- */
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
