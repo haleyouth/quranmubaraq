@@ -37,21 +37,22 @@ Open http://localhost:3000.
 ## Project structure
 
 ```
-app/                      Next.js application
+app/                        The web application (frontend + Firebase backend)
   src/
-    app/                  Routes (App Router)
+    app/                    Routes (App Router)
     components/
-      layout/             Header, Footer
-      sections/           Page sections (Hero, Courses, Pricing, …)
-      ui/                 Primitives (Button, Card, Section, …)
+      layout/               Header, Footer
+      sections/             Page sections (Hero, Courses, Pricing, …)
+      ui/                   Primitives (Button, Card, Section, …)
     lib/
-      content.ts          All site copy — single source of truth
-      firebase.ts         Firebase client SDK
-      leads.ts            Trial-registration writes
-planning/                 Implementation plans and specs
-firestore.rules           Firestore security rules
-storage.rules             Cloud Storage security rules
-firebase.json             Firebase project configuration
+      content.ts            All site copy — single source of truth
+      firebase.ts           Firebase client SDK
+      leads.ts              Trial-registration writes
+  firebase.json             Firebase project configuration
+  firestore.rules           Firestore security rules
+  firestore.indexes.json    Composite indexes
+  storage.rules             Cloud Storage security rules
+planning/                   Implementation plans and specs
 ```
 
 ## Design system
@@ -76,7 +77,10 @@ fills and borders, always with ink text on top.
 
 ## Deployment
 
+Run from inside `app/`, where `firebase.json` lives:
+
 ```bash
+cd app
 firebase deploy                       # everything
 firebase deploy --only hosting        # site only
 firebase deploy --only firestore:rules,storage
