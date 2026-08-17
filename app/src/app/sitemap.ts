@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { courses, site } from "@/lib/content";
 
+// Required by `output: "export"` — the sitemap is generated at build time.
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 

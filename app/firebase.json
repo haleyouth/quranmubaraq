@@ -1,9 +1,9 @@
 {
   "hosting": {
-    "source": ".",
-    "frameworksBackend": {
-      "region": "us-central1"
-    },
+    "public": "out",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "cleanUrls": true,
+    "trailingSlash": true,
     "headers": [
       {
         "source": "**/*.@(js|css|woff2)",
@@ -30,7 +30,8 @@
           }
         ]
       }
-    ]
+    ],
+    "rewrites": []
   },
   "firestore": {
     "rules": "firestore.rules",
