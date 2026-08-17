@@ -102,10 +102,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
         <nav aria-label="Portal" className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
           {items.map((item) => {
+            // trailingSlash: true means pathname is e.g. "/admin/teachers/"
+            const path = pathname.replace(/\/+$/, "") || "/";
             const active =
-              item.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(item.href);
+              item.href === "/admin" ? path === "/admin" : path.startsWith(item.href);
             const Icon = item.icon;
             return (
               <Link

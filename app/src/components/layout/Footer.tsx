@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   Facebook,
-  Lock,
   Mail,
   MessageCircle,
   Phone,
@@ -150,16 +149,6 @@ export function Footer() {
                 ThalamuxTech
               </a>
             </p>
-
-            {/* Discreet staff entry point */}
-            <Link
-              href="/admin/login"
-              aria-label="Staff portal login"
-              title="Staff portal"
-              className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-cream/25 text-cream/50 transition-colors hover:border-gold hover:bg-gold hover:text-ink"
-            >
-              <Lock className="size-4" aria-hidden="true" />
-            </Link>
           </div>
         </div>
       </Container>

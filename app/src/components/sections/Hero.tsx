@@ -120,7 +120,12 @@ export function Hero() {
               </div>
             </div>
 
-            <span className="font-display absolute -top-5 -left-5 grid size-20 -rotate-6 place-items-center rounded-2xl border-4 border-ink bg-green-deep text-3xl text-white hard-shadow">
+            {/* Spans the card width so it reads as a banner above the Bismillah */}
+            <span
+              lang="ar"
+              dir="rtl"
+              className="absolute -top-7 right-6 left-6 grid h-16 -rotate-2 place-items-center rounded-2xl border-4 border-ink bg-green-deep text-3xl text-white hard-shadow"
+            >
               ﷽
             </span>
           </div>

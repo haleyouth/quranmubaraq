@@ -15,12 +15,22 @@
    */
   --color-cream: #fef8ea;
   --color-cream-deep: #f5ecd3;
-  --color-ink: #1f3d23; /* deep green-black — text, borders, shadows */
-  --color-green: #47704c; /* logo green — primary */
-  --color-green-deep: #2f5c3a; /* CTAs, emphasis */
-  --color-gold: #c9a227; /* highlights (ink text on top) */
+  --color-ink: #2d1b4d; /* purple-black — text, borders, shadows */
+
+  /*
+   * Named for their role rather than their hue, so the palette can be
+   * retoned in this one block without touching a single component.
+   *   green      → primary        (badges, icon plates, accents)
+   *   green-deep → accent / CTA   (buttons, links, emphasis)
+   *   gold       → highlight fill (ink text on top)
+   */
+  --color-green: #6b46c1; /* purple — primary */
+  /* Magenta darkened from the reference #db2777, which scores only 4.34:1
+     on cream. This shade reads identically but passes AA at 5.06:1. */
+  --color-green-deep: #c9226a; /* magenta — CTAs, emphasis */
+  --color-gold: #f59e0b; /* amber — highlights (ink text on top) */
   --color-teal: #14b8a6; /* success, underline accents */
-  --color-sage: #7d9b81; /* muted secondary */
+  --color-sage: #9f8fd0; /* muted secondary */
 
   /* --- Semantic --- */
   --color-background: var(--color-cream);
