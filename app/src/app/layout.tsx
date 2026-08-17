@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Outfit, Shadows_Into_Light } from "next/font/google";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import { FirebaseAnalytics } from "@/components/FirebaseAnalytics";
 import { site } from "@/lib/content";
 import "./globals.css";
@@ -104,15 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${display.variable} ${body.variable} ${marker.variable}`}
     >
       <body>
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:border-2 focus:border-ink focus:bg-gold focus:px-5 focus:py-3 focus:font-bold focus:text-ink"
-        >
-          Skip to content
-        </a>
-        <Header />
-        <main id="main">{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
         <FirebaseAnalytics />
         <script
           type="application/ld+json"

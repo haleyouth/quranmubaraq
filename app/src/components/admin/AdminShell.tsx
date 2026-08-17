@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen, CalendarDays, ChartColumn, ClipboardList, CreditCard, FileText,
-  GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning, Plane,
-  Settings, ShieldAlert, UserRound, Users, X,
+  GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning,
+  PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
+  Users, X,
 } from "lucide-react";
 import { getSession, ROLE_NAV, signOut, type Session } from "@/lib/admin/demo-auth";
 import { Logo } from "@/components/ui/Logo";
@@ -35,12 +36,28 @@ const PORTAL_LABEL = {
   student: "Student Portal",
 } as const;
 
+const COLLAPSE_KEY = "qm_admin_sidebar_collapsed";
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Restore the collapsed preference across navigations and reloads
+  useEffect(() => {
+    setCollapsed(window.localStorage.getItem(COLLAPSE_KEY) === "1");
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((v) => {
+      const next = !v;
+      window.localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0");
+      return next;
+    });
+  }
 
   // Demo session lives in localStorage, so it can only be read after mount.
   useEffect(() => {
@@ -76,16 +93,35 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r-4 border-ink bg-ink transition-transform lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex flex-col border-r-4 border-ink bg-ink transition-all lg:translate-x-0",
+          collapsed ? "w-72 lg:w-20" : "w-72",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between border-b-2 border-cream/15 px-5 py-4">
-          <Logo
-            width={120}
+        <div
+          className={cn(
+            "flex items-center gap-2 border-b-2 border-cream/15 px-5 py-4",
+            collapsed ? "lg:justify-center lg:px-2" : "justify-between",
+          )}
+        >
+          <span className={collapsed ? "lg:hidden" : undefined}>
+            <Logo
+              width={120}
+              href="/admin"
+              plateClassName="border-cream/25 bg-transparent px-0 py-0"
+            />
+          </span>
+
+          {/* Compact mark shown only when collapsed on desktop */}
+          <Link
             href="/admin"
-            plateClassName="border-cream/25 bg-transparent px-0 py-0"
-          />
+            aria-label="Portal home"
+            className="font-display hidden size-10 place-items-center rounded-xl border-2 border-cream/30 bg-green text-sm text-white lg:data-[collapsed=true]:grid"
+            data-collapsed={collapsed}
+          >
+            QM
+          </Link>
+
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -94,9 +130,40 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           >
             <X className="size-4" />
           </button>
+
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
+            className={cn(
+              "hidden size-9 cursor-pointer place-items-center rounded-full border-2 border-cream/30 text-cream transition-colors hover:border-gold hover:bg-gold hover:text-ink lg:grid",
+              collapsed && "lg:hidden",
+            )}
+          >
+            <PanelLeftClose className="size-4" />
+          </button>
         </div>
 
-        <p className="px-5 pt-4 pb-2 text-xs font-bold tracking-[0.2em] text-gold uppercase">
+        {collapsed && (
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            aria-label="Expand sidebar"
+            title="Expand sidebar"
+            className="mx-auto mt-3 hidden size-9 cursor-pointer place-items-center rounded-full border-2 border-cream/30 text-cream transition-colors hover:border-gold hover:bg-gold hover:text-ink lg:grid"
+          >
+            <PanelLeftOpen className="size-4" />
+          </button>
+        )}
+
+        <p
+          className={cn(
+            "px-5 pt-4 pb-2 text-xs font-bold tracking-[0.2em] text-gold uppercase",
+            collapsed && "lg:hidden",
+          )}
+        >
           {PORTAL_LABEL[session.role]}
         </p>
 
@@ -112,26 +179,33 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 key={item.key}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
+                title={collapsed ? item.label : undefined}
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-colors",
+                  collapsed && "lg:justify-center lg:px-0",
                   active
                     ? "bg-gold text-ink"
                     : "text-cream/75 hover:bg-cream/10 hover:text-cream",
                 )}
               >
                 <Icon className="size-4 shrink-0" aria-hidden="true" />
-                {item.label}
+                <span className={collapsed ? "lg:sr-only" : undefined}>
+                  {item.label}
+                </span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t-2 border-cream/15 p-4">
-          <div className="flex items-center gap-3">
-            <span className="font-display grid size-10 shrink-0 place-items-center rounded-full border-2 border-cream/30 bg-green text-sm text-white">
+        <div className={cn("border-t-2 border-cream/15 p-4", collapsed && "lg:px-2")}>
+          <div className={cn("flex items-center gap-3", collapsed && "lg:justify-center")}>
+            <span
+              className="font-display grid size-10 shrink-0 place-items-center rounded-full border-2 border-cream/30 bg-green text-sm text-white"
+              title={collapsed ? session.name : undefined}
+            >
               {session.avatarInitials}
             </span>
-            <div className="min-w-0 flex-1">
+            <div className={cn("min-w-0 flex-1", collapsed && "lg:hidden")}>
               <p className="truncate text-sm font-bold text-cream">{session.name}</p>
               <p className="truncate text-xs text-cream/60">{session.title}</p>
             </div>
@@ -139,10 +213,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={handleSignOut}
-            className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-cream/30 px-4 py-2 text-sm font-bold text-cream/80 transition-colors hover:border-gold hover:bg-gold hover:text-ink"
+            title={collapsed ? "Sign out" : undefined}
+            className={cn(
+              "mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-cream/30 px-4 py-2 text-sm font-bold text-cream/80 transition-colors hover:border-gold hover:bg-gold hover:text-ink",
+              collapsed && "lg:px-0",
+            )}
           >
-            <LogOut className="size-4" aria-hidden="true" />
-            Sign out
+            <LogOut className="size-4 shrink-0" aria-hidden="true" />
+            <span className={collapsed ? "lg:sr-only" : undefined}>Sign out</span>
           </button>
         </div>
       </aside>
@@ -156,7 +234,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Content */}
-      <div className="lg:pl-72">
+      <div className={cn("transition-all", collapsed ? "lg:pl-20" : "lg:pl-72")}>
         <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b-2 border-ink bg-cream/95 px-5 py-3 backdrop-blur-sm">
           <button
             type="button"
