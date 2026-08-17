@@ -12,7 +12,7 @@ export function Courses() {
           eyebrow="What we teach"
           title={
             <>
-              Courses <span className="text-magenta">We Offer</span>
+              Courses <span className="text-green-deep">We Offer</span>
             </>
           }
           body="Every course is taught one-on-one and live, so the pace is set by your child — not by a class of thirty."

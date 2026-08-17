@@ -42,7 +42,7 @@ export default function AboutPage() {
         eyebrow="Since 2011"
         title={
           <>
-            About <span className="text-magenta">Quran Mubarak</span>
+            About <span className="text-green-deep">Quran Mubarak</span>
           </>
         }
         body={about.subheading}
@@ -57,7 +57,7 @@ export default function AboutPage() {
             eyebrow="Our story"
             title={
               <>
-                A decade of <span className="text-magenta">teaching.</span>
+                A decade of <span className="text-green-deep">teaching.</span>
               </>
             }
           />
@@ -66,7 +66,7 @@ export default function AboutPage() {
             {milestones.map((m, i) => (
               <li key={m.year} className="flex gap-6">
                 <div className="flex flex-col items-center">
-                  <span className="font-display grid size-16 shrink-0 place-items-center rounded-2xl border-4 border-ink bg-purple text-sm text-white hard-shadow">
+                  <span className="font-display grid size-16 shrink-0 place-items-center rounded-2xl border-4 border-ink bg-green text-sm text-white hard-shadow">
                     {m.year}
                   </span>
                   {i < milestones.length - 1 && (

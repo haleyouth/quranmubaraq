@@ -16,7 +16,7 @@ export default function RegisterPage() {
         eyebrow="Free trial"
         title={
           <>
-            Register for your <span className="text-magenta">free trial.</span>
+            Register for your <span className="text-green-deep">free trial.</span>
           </>
         }
         body="Three free 30-minute classes with a certified teacher. No card details, no obligation."

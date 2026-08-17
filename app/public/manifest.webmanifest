@@ -1,0 +1,29 @@
+{
+  "name": "Quran Mubarak — The Islamic Center",
+  "short_name": "Quran Mubarak",
+  "description": "Learn the Holy Quran online with certified teachers. One-on-one live classes since 2011.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fef8ea",
+  "theme_color": "#1f3d23",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -4,10 +4,10 @@ import type { Course } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 const accents = {
-  purple: { bar: "bg-purple", chip: "bg-purple", text: "text-purple" },
-  magenta: { bar: "bg-magenta", chip: "bg-magenta", text: "text-magenta" },
+  purple: { bar: "bg-green", chip: "bg-green", text: "text-green" },
+  magenta: { bar: "bg-green-deep", chip: "bg-green-deep", text: "text-green-deep" },
   teal: { bar: "bg-teal", chip: "bg-teal", text: "text-teal" },
-  amber: { bar: "bg-amber", chip: "bg-amber", text: "text-ink" },
+  amber: { bar: "bg-gold", chip: "bg-gold", text: "text-ink" },
 } as const;
 
 export function CourseCard({ course }: { course: Course }) {
@@ -58,7 +58,7 @@ export function CourseCard({ course }: { course: Course }) {
 
         <Link
           href={`/courses/${course.slug}`}
-          className="mt-7 inline-flex min-h-11 items-center gap-2 font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 transition-colors hover:text-magenta"
+          className="mt-7 inline-flex min-h-11 items-center gap-2 font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 transition-colors hover:text-green-deep"
         >
           Course details
           <ArrowRight

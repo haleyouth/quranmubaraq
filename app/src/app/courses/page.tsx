@@ -19,7 +19,7 @@ export default function CoursesPage() {
         eyebrow="What we teach"
         title={
           <>
-            Courses <span className="text-magenta">We Offer</span>
+            Courses <span className="text-green-deep">We Offer</span>
           </>
         }
         body="Five structured courses covering the complete journey — from recognising your first Arabic letter to understanding the Tafseer of the Holy Quran."

@@ -10,7 +10,7 @@ export function Faq() {
           eyebrow="FAQ"
           title={
             <>
-              Common <span className="text-magenta">questions.</span>
+              Common <span className="text-green-deep">questions.</span>
             </>
           }
         />
@@ -24,7 +24,7 @@ export function Faq() {
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 text-left [&::-webkit-details-marker]:hidden">
                 <h3 className="font-display text-lg text-ink md:text-xl">{faq.q}</h3>
-                <span className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-white transition-transform duration-200 group-open:rotate-180 group-open:bg-magenta group-open:text-white">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-white transition-transform duration-200 group-open:rotate-180 group-open:bg-green-deep group-open:text-white">
                   <ChevronDown className="size-5" aria-hidden="true" />
                 </span>
               </summary>

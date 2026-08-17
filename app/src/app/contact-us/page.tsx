@@ -17,7 +17,7 @@ const channels = [
     value: site.phone,
     href: site.phoneHref,
     note: "Call us during office hours",
-    accent: "bg-purple",
+    accent: "bg-green",
   },
   {
     icon: MessageCircle,
@@ -33,7 +33,7 @@ const channels = [
     value: site.email,
     href: `mailto:${site.email}`,
     note: "We reply within one working day",
-    accent: "bg-magenta",
+    accent: "bg-green-deep",
   },
 ] as const;
 
@@ -44,7 +44,7 @@ export default function ContactPage() {
         eyebrow="Get in touch"
         title={
           <>
-            We&rsquo;d love to <span className="text-magenta">hear from you.</span>
+            We&rsquo;d love to <span className="text-green-deep">hear from you.</span>
           </>
         }
         body="Questions about a course, timings, fees or teachers? Reach us on whichever channel suits you best."
@@ -69,15 +69,15 @@ export default function ContactPage() {
                   <Icon className="size-6 text-white" aria-hidden="true" />
                 </span>
                 <h2 className="font-display mt-6 text-xl text-ink">{label}</h2>
-                <p className="mt-2 text-lg font-bold text-magenta">{value}</p>
+                <p className="mt-2 text-lg font-bold text-green-deep">{value}</p>
                 <p className="mt-2 text-sm text-ink/65">{note}</p>
               </a>
             ))}
           </div>
 
-          <div className="mt-10 flex flex-col items-center gap-4 rounded-[2rem] border-4 border-ink bg-amber p-7 text-center hard-shadow-lg sm:flex-row sm:text-left">
+          <div className="mt-10 flex flex-col items-center gap-4 rounded-[2rem] border-4 border-ink bg-gold p-7 text-center hard-shadow-lg sm:flex-row sm:text-left">
             <span className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-ink bg-white hard-shadow">
-              <Clock className="size-7 text-purple" aria-hidden="true" />
+              <Clock className="size-7 text-green" aria-hidden="true" />
             </span>
             <div>
               <p className="font-display text-2xl text-ink">

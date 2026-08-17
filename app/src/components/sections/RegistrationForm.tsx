@@ -11,7 +11,7 @@ type Errors = Partial<Record<"name" | "email" | "phone" | "country", string>>;
 type Status = "idle" | "submitting" | "success" | "error";
 
 const fieldBase =
-  "w-full min-h-12 rounded-xl border-2 border-ink bg-white px-4 py-3 text-ink placeholder:text-ink/40 transition-colors focus:border-magenta";
+  "w-full min-h-12 rounded-xl border-2 border-ink bg-white px-4 py-3 text-ink placeholder:text-ink/40 transition-colors focus:border-green-deep";
 
 export function RegistrationForm() {
   const [status, setStatus] = useState<Status>("idle");
@@ -86,7 +86,7 @@ export function RegistrationForm() {
             <button
               type="button"
               onClick={() => setStatus("idle")}
-              className="mt-8 min-h-11 cursor-pointer font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 hover:text-magenta"
+              className="mt-8 min-h-11 cursor-pointer font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 hover:text-green-deep"
             >
               Register another student
             </button>
@@ -102,7 +102,7 @@ export function RegistrationForm() {
         <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
           {/* Pitch */}
           <div className="lg:sticky lg:top-32">
-            <p className="text-sm font-bold tracking-[0.25em] text-magenta uppercase">
+            <p className="text-sm font-bold tracking-[0.25em] text-green-deep uppercase">
               Free trial
             </p>
             <h2 className="font-display mt-4 text-4xl leading-[1.1] text-ink sm:text-5xl">
@@ -129,7 +129,7 @@ export function RegistrationForm() {
             </ul>
 
             <p className="mt-8 flex items-start gap-3 rounded-2xl border-2 border-ink bg-cream-deep p-5 text-sm text-ink/75">
-              <ShieldCheck className="mt-0.5 size-5 shrink-0 text-purple" aria-hidden="true" />
+              <ShieldCheck className="mt-0.5 size-5 shrink-0 text-green" aria-hidden="true" />
               Your details are used only to arrange your classes. We never sell or share
               your information.
             </p>
@@ -174,7 +174,7 @@ export function RegistrationForm() {
               {/* Country */}
               <div>
                 <label htmlFor="country" className="mb-2 block font-bold text-ink">
-                  Country <span className="text-magenta">*</span>
+                  Country <span className="text-green-deep">*</span>
                 </label>
                 <select
                   id="country"
@@ -245,14 +245,14 @@ export function RegistrationForm() {
                   {["No preference", "Male teacher", "Female teacher"].map((opt, i) => (
                     <label
                       key={opt}
-                      className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-2 border-ink bg-cream px-4 py-2 font-semibold text-ink transition-colors has-checked:bg-magenta has-checked:text-white"
+                      className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-2 border-ink bg-cream px-4 py-2 font-semibold text-ink transition-colors has-checked:bg-green-deep has-checked:text-white"
                     >
                       <input
                         type="radio"
                         name="teacherPreference"
                         value={opt}
                         defaultChecked={i === 0}
-                        className="size-4 accent-magenta"
+                        className="size-4 accent-green-deep"
                       />
                       {opt}
                     </label>
@@ -274,7 +274,7 @@ export function RegistrationForm() {
             <button
               type="submit"
               disabled={status === "submitting"}
-              className="group mt-8 inline-flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-ink bg-magenta px-8 py-4 text-lg font-bold text-white hard-shadow-lg press-lg disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="group mt-8 inline-flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-ink bg-green-deep px-8 py-4 text-lg font-bold text-white hard-shadow-lg press-lg disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
             >
               {status === "submitting" ? (
                 <>
@@ -327,7 +327,7 @@ function Field({
   return (
     <div>
       <label htmlFor={name} className="mb-2 block font-bold text-ink">
-        {label} {required && <span className="text-magenta">*</span>}
+        {label} {required && <span className="text-green-deep">*</span>}
       </label>
       <input
         id={name}

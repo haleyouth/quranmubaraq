@@ -18,7 +18,7 @@ export default function BlogPage() {
         eyebrow="Blog"
         title={
           <>
-            Guidance for <span className="text-magenta">learning families.</span>
+            Guidance for <span className="text-green-deep">learning families.</span>
           </>
         }
         body="Practical articles on teaching children the Quran, building consistency, and making the most of your classes."
@@ -29,7 +29,7 @@ export default function BlogPage() {
         <Container>
           {/* Empty state — the CMS-backed listing replaces this once content is migrated */}
           <div className="mx-auto max-w-2xl rounded-[2rem] border-4 border-ink bg-white p-10 text-center hard-shadow-lg md:p-14">
-            <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-ink bg-purple">
+            <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-ink bg-green">
               <PenLine className="size-9 text-white" aria-hidden="true" />
             </span>
             <h2 className="font-display mt-7 text-3xl text-ink">

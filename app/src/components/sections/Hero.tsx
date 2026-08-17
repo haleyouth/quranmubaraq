@@ -18,7 +18,7 @@ export function Hero() {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 -right-24 size-[28rem] rounded-full bg-amber/25 blur-3xl"
+        className="pointer-events-none absolute -top-24 -right-24 size-[28rem] rounded-full bg-gold/25 blur-3xl"
       />
       <div
         aria-hidden="true"
@@ -30,13 +30,13 @@ export function Hero() {
           {/* Copy */}
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-white px-4 py-2 text-sm font-bold text-ink hard-shadow">
-              <Sparkles className="size-4 text-magenta" aria-hidden="true" />
+              <Sparkles className="size-4 text-green-deep" aria-hidden="true" />
               {hero.eyebrow}
             </p>
 
             <h1 className="font-display mt-7 text-5xl leading-[1.05] text-ink sm:text-6xl md:text-7xl xl:text-8xl">
               {hero.headline.before}{" "}
-              <span className="relative inline-block text-magenta">
+              <span className="relative inline-block text-green-deep">
                 {hero.headline.highlight}
                 <svg
                   aria-hidden="true"
@@ -77,9 +77,9 @@ export function Hero() {
             </div>
 
             {/* Trust card — amber fill with ink text (8.9:1) */}
-            <div className="mt-12 inline-flex max-w-2xl -rotate-1 flex-col items-start gap-4 rounded-[2rem] border-4 border-ink bg-amber p-6 text-left hard-shadow-lg sm:flex-row sm:items-center md:p-8">
+            <div className="mt-12 inline-flex max-w-2xl -rotate-1 flex-col items-start gap-4 rounded-[2rem] border-4 border-ink bg-gold p-6 text-left hard-shadow-lg sm:flex-row sm:items-center md:p-8">
               <span className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-ink bg-white hard-shadow">
-                <BookOpen className="size-7 text-purple" aria-hidden="true" />
+                <BookOpen className="size-7 text-green" aria-hidden="true" />
               </span>
               <div>
                 <p className="font-display text-2xl text-ink">{hero.trustCard.title}</p>
@@ -91,7 +91,7 @@ export function Hero() {
           {/* Visual panel */}
           <div className="relative hidden lg:block">
             <div className="relative rotate-2 rounded-[3rem] border-4 border-ink bg-white p-8 hard-shadow-teal">
-              <p className="font-marker text-center text-2xl text-purple">
+              <p className="font-marker text-center text-2xl text-green">
                 Bismillahir Rahmanir Raheem
               </p>
               <p
@@ -104,23 +104,23 @@ export function Hero() {
               <p className="mt-6 text-center text-lg font-semibold text-ink/70">
                 &ldquo;Read! In the name of your Lord who created.&rdquo;
               </p>
-              <p className="mt-2 text-center text-sm font-bold tracking-[0.2em] text-magenta uppercase">
+              <p className="mt-2 text-center text-sm font-bold tracking-[0.2em] text-green-deep uppercase">
                 Surah Al-&lsquo;Alaq 96:1
               </p>
 
               <div className="mt-8 grid grid-cols-2 gap-4 border-t-2 border-ink/15 pt-8">
                 <div className="rounded-2xl border-2 border-ink bg-cream p-4 text-center">
-                  <p className="font-display text-3xl text-purple">{site.founded}</p>
+                  <p className="font-display text-3xl text-green">{site.founded}</p>
                   <p className="text-sm font-semibold text-ink/70">Teaching since</p>
                 </div>
                 <div className="rounded-2xl border-2 border-ink bg-cream p-4 text-center">
-                  <p className="font-display text-3xl text-magenta">1-on-1</p>
+                  <p className="font-display text-3xl text-green-deep">1-on-1</p>
                   <p className="text-sm font-semibold text-ink/70">Live classes</p>
                 </div>
               </div>
             </div>
 
-            <span className="font-display absolute -top-5 -left-5 grid size-20 -rotate-6 place-items-center rounded-2xl border-4 border-ink bg-magenta text-3xl text-white hard-shadow">
+            <span className="font-display absolute -top-5 -left-5 grid size-20 -rotate-6 place-items-center rounded-2xl border-4 border-ink bg-green-deep text-3xl text-white hard-shadow">
               ﷽
             </span>
           </div>

@@ -7,10 +7,10 @@ export default function NotFound() {
     <Section tone="cream" className="py-28 md:py-36">
       <Container>
         <div className="mx-auto max-w-2xl rounded-[2rem] border-4 border-ink bg-white p-10 text-center hard-shadow-lg md:p-14">
-          <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-ink bg-magenta">
+          <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-ink bg-green-deep">
             <Compass className="size-9 text-white" aria-hidden="true" />
           </span>
-          <p className="font-display mt-7 text-6xl text-purple">404</p>
+          <p className="font-display mt-7 text-6xl text-green">404</p>
           <h1 className="font-display mt-3 text-3xl text-ink">
             We couldn&rsquo;t find that page
           </h1>

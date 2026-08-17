@@ -104,7 +104,7 @@ export default async function CoursePage({
                       className="flex items-center gap-4 rounded-xl border-2 border-ink bg-cream px-4 py-3"
                     >
                       <span className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-ink bg-white">
-                        <Icon className="size-4 text-purple" aria-hidden="true" />
+                        <Icon className="size-4 text-green" aria-hidden="true" />
                       </span>
                       <div>
                         <dt className="text-xs font-bold tracking-wider text-ink/55 uppercase">
@@ -116,7 +116,7 @@ export default async function CoursePage({
                   ))}
                 </dl>
 
-                <div className="mt-7 rounded-2xl border-2 border-ink bg-amber p-5 text-center">
+                <div className="mt-7 rounded-2xl border-2 border-ink bg-gold p-5 text-center">
                   <p className="font-display text-xl text-ink">First week free</p>
                   <p className="mt-1 text-sm font-medium text-ink/80">
                     Three trial classes, no card required.
@@ -133,7 +133,7 @@ export default async function CoursePage({
 
                 <Link
                   href="/fees"
-                  className="mt-4 block text-center font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 hover:text-magenta"
+                  className="mt-4 block text-center font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 hover:text-green-deep"
                 >
                   See fees structure
                 </Link>

@@ -6,8 +6,8 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   // Magenta on white text = 4.6:1 — passes AA for normal text
-  primary: "bg-magenta text-white border-2 border-ink hard-shadow press hover:bg-magenta/95",
-  secondary: "bg-amber text-ink border-2 border-ink hard-shadow press hover:bg-amber/90",
+  primary: "bg-green-deep text-white border-2 border-ink hard-shadow press hover:bg-green-deep/95",
+  secondary: "bg-gold text-ink border-2 border-ink hard-shadow press hover:bg-gold/90",
   outline: "bg-white text-ink border-2 border-ink hard-shadow press hover:bg-cream-deep",
   ghost: "bg-transparent text-ink border-2 border-transparent hover:bg-cream-deep",
 };

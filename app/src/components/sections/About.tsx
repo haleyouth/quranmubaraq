@@ -9,11 +9,11 @@ export function About() {
       <Container>
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <div>
-            <p className="font-marker text-3xl text-purple">{about.bismillah}</p>
+            <p className="font-marker text-3xl text-green">{about.bismillah}</p>
             <h2 className="font-display mt-4 text-4xl leading-[1.1] text-ink sm:text-5xl md:text-6xl">
               {about.heading}
             </h2>
-            <p className="mt-4 text-xl font-semibold text-magenta">{about.subheading}</p>
+            <p className="mt-4 text-xl font-semibold text-green-deep">{about.subheading}</p>
 
             <div className="mt-8 space-y-5 text-lg leading-relaxed text-ink/75">
               {about.body.map((para) => (
@@ -39,7 +39,7 @@ export function About() {
                     i % 2 === 0 ? "bg-white" : "bg-cream-deep"
                   }`}
                 >
-                  <p className="font-display text-4xl text-purple">{stat.value}</p>
+                  <p className="font-display text-4xl text-green">{stat.value}</p>
                   <p className="mt-2 font-semibold text-ink/70">{stat.label}</p>
                 </div>
               ))}
@@ -49,13 +49,13 @@ export function About() {
               {[
                 {
                   icon: Heart,
-                  color: "text-magenta",
+                  color: "text-green-deep",
                   title: "Taught with care",
                   body: "Patient teachers who build confidence, not pressure.",
                 },
                 {
                   icon: Award,
-                  color: "text-purple",
+                  color: "text-green",
                   title: "Qualified Huffaz",
                   body: "Every teacher is certified and vetted before they teach.",
                 },

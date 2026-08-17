@@ -30,7 +30,7 @@ export function PageHeader({
           <nav aria-label="Breadcrumb" className="mb-6">
             <ol className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink/60">
               <li>
-                <Link href="/" className="transition-colors hover:text-magenta">
+                <Link href="/" className="transition-colors hover:text-green-deep">
                   Home
                 </Link>
               </li>
@@ -38,7 +38,7 @@ export function PageHeader({
                 <li key={crumb.label} className="flex items-center gap-2">
                   <ChevronRight className="size-4" aria-hidden="true" />
                   {crumb.href ? (
-                    <Link href={crumb.href} className="transition-colors hover:text-magenta">
+                    <Link href={crumb.href} className="transition-colors hover:text-green-deep">
                       {crumb.label}
                     </Link>
                   ) : (
@@ -53,7 +53,7 @@ export function PageHeader({
         )}
 
         {eyebrow && (
-          <p className="text-sm font-bold tracking-[0.25em] text-magenta uppercase">
+          <p className="text-sm font-bold tracking-[0.25em] text-green-deep uppercase">
             {eyebrow}
           </p>
         )}

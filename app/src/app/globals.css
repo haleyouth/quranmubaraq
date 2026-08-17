@@ -6,21 +6,28 @@
    ========================================================================== */
 
 @theme {
-  /* --- Brand core --- */
+  /*
+   * Brand core.
+   *
+   * Structure (cream ground, ink borders, hard offset shadows) is taken from
+   * summercamp.amaujunior.com. The hues are Quran Mubarak's own: --green is
+   * sampled directly from the logo file, whose palette encodes #47704c.
+   */
   --color-cream: #fef8ea;
   --color-cream-deep: #f5ecd3;
-  --color-ink: #2d1b4d;
-  --color-purple: #6b46c1;
-  --color-teal: #14b8a6;
-  --color-magenta: #db2777;
-  --color-amber: #f59e0b;
+  --color-ink: #1f3d23; /* deep green-black — text, borders, shadows */
+  --color-green: #47704c; /* logo green — primary */
+  --color-green-deep: #2f5c3a; /* CTAs, emphasis */
+  --color-gold: #c9a227; /* highlights (ink text on top) */
+  --color-teal: #14b8a6; /* success, underline accents */
+  --color-sage: #7d9b81; /* muted secondary */
 
   /* --- Semantic --- */
   --color-background: var(--color-cream);
   --color-foreground: var(--color-ink);
   --color-card: #ffffff;
-  --color-primary: var(--color-purple);
-  --color-accent: var(--color-magenta);
+  --color-primary: var(--color-green);
+  --color-accent: var(--color-green-deep);
   --color-muted: var(--color-cream-deep);
 
   /* --- Typography (families injected by next/font in layout.tsx) --- */

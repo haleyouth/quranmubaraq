@@ -22,7 +22,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
           eyebrow="Fees Structure"
           title={
             <>
-              Simple pricing. <span className="text-magenta">Free admission.</span>
+              Simple pricing. <span className="text-green-deep">Free admission.</span>
             </>
           }
           body="No admission fee, no contract, and 10% off for every additional sibling. Cancel or pause whenever you need to."
@@ -45,7 +45,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
                   aria-pressed={active}
                   className={cn(
                     "min-h-11 cursor-pointer rounded-full px-6 py-2 font-bold transition-colors",
-                    active ? "bg-magenta text-white" : "text-ink hover:bg-cream-deep",
+                    active ? "bg-green-deep text-white" : "text-ink hover:bg-cream-deep",
                   )}
                 >
                   {c.symbol} {c.code}
@@ -71,7 +71,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
                 )}
               >
                 {plan.highlighted && (
-                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border-2 border-ink bg-amber px-4 py-1.5 text-xs font-bold tracking-wider text-ink uppercase whitespace-nowrap">
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border-2 border-ink bg-gold px-4 py-1.5 text-xs font-bold tracking-wider text-ink uppercase whitespace-nowrap">
                     Most popular
                   </span>
                 )}
@@ -89,7 +89,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
                   <span
                     className={cn(
                       "font-display text-6xl",
-                      plan.highlighted ? "text-amber" : "text-purple",
+                      plan.highlighted ? "text-gold" : "text-green",
                     )}
                   >
                     {currency.symbol}
@@ -123,7 +123,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
                       <Check
                         className={cn(
                           "mt-0.5 size-5 shrink-0",
-                          plan.highlighted ? "text-teal" : "text-magenta",
+                          plan.highlighted ? "text-teal" : "text-green-deep",
                         )}
                         aria-hidden="true"
                       />
@@ -155,9 +155,9 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
         </div>
 
         {!compact && (
-          <div className="mt-14 flex flex-col items-center gap-4 rounded-[2rem] border-4 border-ink bg-amber p-7 text-center hard-shadow-lg sm:flex-row sm:text-left md:p-8">
+          <div className="mt-14 flex flex-col items-center gap-4 rounded-[2rem] border-4 border-ink bg-gold p-7 text-center hard-shadow-lg sm:flex-row sm:text-left md:p-8">
             <span className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-ink bg-white hard-shadow">
-              <Users className="size-7 text-purple" aria-hidden="true" />
+              <Users className="size-7 text-green" aria-hidden="true" />
             </span>
             <div className="flex-1">
               <p className="font-display text-2xl text-ink">Enrolling more than one child?</p>

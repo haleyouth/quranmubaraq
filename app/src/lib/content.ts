@@ -28,11 +28,69 @@ export const nav = [
   { label: "Contact Us", href: "/contact-us" },
 ] as const;
 
+/**
+ * Verified against the live quranmubarak.com markup.
+ * Note: the source site's Skype href is malformed (`skype:https://join.skype…`),
+ * which browsers cannot resolve. The correct join URL is used here.
+ */
 export const socials = [
-  { label: "Facebook", href: "https://facebook.com/quranmubarak", icon: "facebook" },
-  { label: "Twitter", href: "https://twitter.com/quranmubarak", icon: "twitter" },
-  { label: "YouTube", href: "https://youtube.com/@quranmubarak", icon: "youtube" },
-  { label: "Skype", href: "skype:quranmubarak?chat", icon: "skype" },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/quranmubarak1/",
+    icon: "facebook",
+  },
+  {
+    label: "Twitter",
+    href: "https://twitter.com/Quran_Academy11",
+    icon: "twitter",
+  },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/channel/UCP9o1zZ736TKmz4q3OiA9wA",
+    icon: "youtube",
+  },
+  {
+    label: "Skype",
+    href: "https://join.skype.com/invite/JTuXyugdOhww",
+    icon: "skype",
+  },
+] as const;
+
+/** Free resources mirrored from the academy's existing downloads page. */
+export const downloads = [
+  {
+    title: "Basic Qaida (English)",
+    description:
+      "The complete Noorani Qaida with English instruction — the foundational primer for learning to read Arabic letters and words.",
+    file: "/downloads/Basic-Qaida-English.pdf",
+    size: "9.4 MB",
+    accent: "bg-green",
+  },
+  {
+    title: "Basic Qaida (Urdu)",
+    description:
+      "The same foundational Qaida with Urdu instruction, for families who prefer to study in Urdu at home.",
+    file: "/downloads/Basic-Qaida-Urdu.pdf",
+    size: "10.8 MB",
+    accent: "bg-green-deep",
+  },
+  {
+    title: "Essential Duas",
+    description:
+      "Everyday supplications every Muslim should know, with Arabic text, transliteration and translation.",
+    file: "/downloads/Essential-Duas.pdf",
+    size: "10.0 MB",
+    accent: "bg-teal",
+  },
+  {
+    title: "Tajweedi Colour Quran",
+    description:
+      "The complete Holy Quran with colour-coded Tajweed rules. Hosted externally due to its size (150 MB).",
+    file: "https://quranmubarak.com/wp-content/uploads/2021/07/Tajweedi-colour-Quran.pdf",
+    size: "150 MB",
+    accent: "bg-gold",
+    external: true,
+  },
 ] as const;
 
 /* -------------------------------------------------------------------------- */

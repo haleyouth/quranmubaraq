@@ -19,7 +19,7 @@ const icons = {
 } as const;
 
 // Rotate accent colours so the grid reads as one system without repeating
-const accentCycle = ["bg-purple", "bg-magenta", "bg-teal", "bg-amber"] as const;
+const accentCycle = ["bg-green", "bg-green-deep", "bg-teal", "bg-gold"] as const;
 
 export function Features() {
   return (
@@ -29,7 +29,7 @@ export function Features() {
           eyebrow="Why families choose us"
           title={
             <>
-              Built around <span className="text-magenta">your family.</span>
+              Built around <span className="text-green-deep">your family.</span>
             </>
           }
           body="Over a decade of teaching Muslim families online has taught us what actually matters — and what does not."
@@ -39,7 +39,7 @@ export function Features() {
           {features.map((feature, i) => {
             const Icon = icons[feature.icon as keyof typeof icons];
             const accent = accentCycle[i % accentCycle.length];
-            const iconColor = accent === "bg-amber" ? "text-ink" : "text-white";
+            const iconColor = accent === "bg-gold" ? "text-ink" : "text-white";
 
             return (
               <div

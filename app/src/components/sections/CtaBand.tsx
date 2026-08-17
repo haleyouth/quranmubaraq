@@ -8,16 +8,16 @@ export function CtaBand() {
     <Section tone="ink" className="relative overflow-hidden">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 -right-24 size-[26rem] rounded-full bg-purple/40 blur-3xl"
+        className="pointer-events-none absolute -top-24 -right-24 size-[26rem] rounded-full bg-green/40 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -left-24 size-[22rem] rounded-full bg-magenta/30 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -left-24 size-[22rem] rounded-full bg-green-deep/30 blur-3xl"
       />
 
       <Container className="relative">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="font-marker text-3xl text-amber">Start with the Name of Allah</p>
+          <p className="font-marker text-3xl text-gold">Start with the Name of Allah</p>
           <h2 className="font-display mt-5 text-4xl leading-[1.1] text-cream sm:text-5xl md:text-6xl">
             {cta.heading}
           </h2>

@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/Button";
 import { ArrowRight } from "lucide-react";
 
 const accents = {
-  purple: { badge: "bg-purple", shadow: "hard-shadow" },
-  magenta: { badge: "bg-magenta", shadow: "hard-shadow" },
+  purple: { badge: "bg-green", shadow: "hard-shadow" },
+  magenta: { badge: "bg-green-deep", shadow: "hard-shadow" },
   teal: { badge: "bg-teal", shadow: "hard-shadow" },
 } as const;
 
@@ -17,7 +17,7 @@ export function Steps() {
           eyebrow="How it works"
           title={
             <>
-              Start in <span className="text-magenta">3 easy steps.</span>
+              Start in <span className="text-green-deep">3 easy steps.</span>
             </>
           }
           body="From first enquiry to your first class, the whole process takes a day or two — and costs nothing until you decide to continue."
@@ -42,7 +42,7 @@ export function Steps() {
 
                 <div className="mt-6 w-full flex-1 rounded-[2rem] border-4 border-ink bg-white p-7 text-center hard-shadow">
                   <h3 className="font-display text-2xl text-ink">{step.title}</h3>
-                  <p className="mt-1 text-sm font-bold tracking-[0.15em] text-magenta uppercase">
+                  <p className="mt-1 text-sm font-bold tracking-[0.15em] text-green-deep uppercase">
                     {step.subtitle}
                   </p>
                   <p className="mt-4 leading-relaxed text-ink/75">{step.body}</p>

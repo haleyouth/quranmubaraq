@@ -17,7 +17,7 @@ export default function FeesPage() {
         eyebrow="Fees Structure"
         title={
           <>
-            Fair, transparent <span className="text-magenta">pricing.</span>
+            Fair, transparent <span className="text-green-deep">pricing.</span>
           </>
         }
         body="Admission is free, there is no contract, and your first week of classes costs nothing at all."

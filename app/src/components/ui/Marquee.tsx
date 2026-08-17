@@ -6,7 +6,7 @@ export function Marquee({ items }: { items: readonly string[] }) {
 
   return (
     <div
-      className="overflow-hidden border-y-4 border-ink bg-amber py-4"
+      className="overflow-hidden border-y-4 border-ink bg-gold py-4"
       role="presentation"
       aria-hidden="true"
     >

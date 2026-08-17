@@ -13,7 +13,7 @@ export function Testimonials() {
           eyebrow="Parent voices"
           title={
             <>
-              Trusted by families <span className="text-magenta">worldwide.</span>
+              Trusted by families <span className="text-green-deep">worldwide.</span>
             </>
           }
         />
@@ -24,12 +24,12 @@ export function Testimonials() {
               key={t.name}
               className={`flex h-full flex-col rounded-[2rem] border-4 border-ink p-7 hard-shadow ${fills[i % fills.length]} ${tilts[i % tilts.length]}`}
             >
-              <Quote className="size-9 shrink-0 text-magenta" aria-hidden="true" />
+              <Quote className="size-9 shrink-0 text-green-deep" aria-hidden="true" />
               <blockquote className="mt-5 flex-1 text-lg leading-relaxed text-ink/80">
                 {t.quote}
               </blockquote>
               <figcaption className="mt-6 flex items-center gap-3 border-t-2 border-ink/15 pt-5">
-                <span className="font-display grid size-12 shrink-0 place-items-center rounded-full border-2 border-ink bg-purple text-lg text-white">
+                <span className="font-display grid size-12 shrink-0 place-items-center rounded-full border-2 border-ink bg-green text-lg text-white">
                   {t.name.charAt(0)}
                 </span>
                 <span>
