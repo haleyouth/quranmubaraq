@@ -17,11 +17,11 @@ export function CtaBand() {
 
       <Container className="relative">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="font-marker text-3xl text-gold">Start with the Name of Allah</p>
-          <h2 className="font-display mt-5 text-4xl leading-[1.1] text-cream sm:text-5xl md:text-6xl">
+          <p className="font-marker text-2xl text-gold">Start with the Name of Allah</p>
+          <h2 className="font-display mt-5 text-3xl leading-[1.1] text-cream sm:text-4xl md:text-4xl">
             {cta.heading}
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/80">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-cream/80">
             {cta.body}
           </p>
 
@@ -42,7 +42,7 @@ export function CtaBand() {
               href={cta.secondary.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 text-lg font-bold text-cream underline decoration-teal decoration-2 underline-offset-8 transition-colors hover:text-teal"
+              className="inline-flex min-h-11 items-center gap-2 text-base font-bold text-cream underline decoration-teal decoration-2 underline-offset-8 transition-colors hover:text-teal"
             >
               <MessageCircle className="size-5" aria-hidden="true" />
               {cta.secondary.label}

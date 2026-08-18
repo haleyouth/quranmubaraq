@@ -1,14 +1,17 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Mail, MessageCircle, Phone, Clock } from "lucide-react";
 import { site } from "@/lib/content";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section } from "@/components/ui/Section";
 import { RegistrationForm } from "@/components/sections/RegistrationForm";
 
-export const metadata: Metadata = {
-  title: "Contact us",
-  description: `Get in touch with ${site.name} by phone, email or WhatsApp. We reply within one working day.`,
-};
+export const metadata = pageMetadata({
+  title: "Contact Quran Mubarak — Phone, Email & WhatsApp",
+  description:
+    "Get in touch about courses, timings, fees or teachers. Reach the Quran Mubarak team by phone, email or WhatsApp. We reply within one working day.",
+  path: "/contact-us",
+  keywords: ["contact Quran Mubarak", "online Quran academy contact"],
+});
 
 const channels = [
   {
@@ -68,8 +71,8 @@ export default function ContactPage() {
                 >
                   <Icon className="size-6 text-white" aria-hidden="true" />
                 </span>
-                <h2 className="font-display mt-6 text-xl text-ink">{label}</h2>
-                <p className="mt-2 text-lg font-bold text-green-deep">{value}</p>
+                <h2 className="font-display mt-6 text-lg text-ink">{label}</h2>
+                <p className="mt-2 text-base font-bold text-green-deep">{value}</p>
                 <p className="mt-2 text-sm text-ink/65">{note}</p>
               </a>
             ))}
@@ -80,7 +83,7 @@ export default function ContactPage() {
               <Clock className="size-7 text-green" aria-hidden="true" />
             </span>
             <div>
-              <p className="font-display text-2xl text-ink">
+              <p className="font-display text-xl text-ink">
                 Classes run seven days a week
               </p>
               <p className="mt-1 font-medium text-ink/80">

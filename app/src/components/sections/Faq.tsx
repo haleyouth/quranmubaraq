@@ -23,7 +23,7 @@ export function Faq() {
               className="group rounded-2xl border-4 border-ink bg-cream hard-shadow open:bg-white"
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 text-left [&::-webkit-details-marker]:hidden">
-                <h3 className="font-display text-lg text-ink md:text-xl">{faq.q}</h3>
+                <h3 className="font-display text-base text-ink md:text-lg">{faq.q}</h3>
                 <span className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-white transition-transform duration-200 group-open:rotate-180 group-open:bg-green-deep group-open:text-white">
                   <ChevronDown className="size-5" aria-hidden="true" />
                 </span>

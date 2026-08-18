@@ -78,7 +78,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
 
                 <h3
                   className={cn(
-                    "font-display text-2xl",
+                    "font-display text-xl",
                     plan.highlighted ? "text-cream" : "text-ink",
                   )}
                 >
@@ -88,7 +88,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
                 <p className="mt-5 flex items-baseline gap-1">
                   <span
                     className={cn(
-                      "font-display text-6xl",
+                      "font-display text-4xl",
                       plan.highlighted ? "text-gold" : "text-green",
                     )}
                   >
@@ -98,7 +98,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
                   {!isFree && (
                     <span
                       className={cn(
-                        "text-lg font-semibold",
+                        "text-base font-semibold",
                         plan.highlighted ? "text-cream/70" : "text-ink/60",
                       )}
                     >
@@ -160,7 +160,7 @@ export function Pricing({ compact = false }: { compact?: boolean }) {
               <Users className="size-7 text-green" aria-hidden="true" />
             </span>
             <div className="flex-1">
-              <p className="font-display text-2xl text-ink">Enrolling more than one child?</p>
+              <p className="font-display text-xl text-ink">Enrolling more than one child?</p>
               <p className="mt-1 font-medium text-ink/80">
                 Every additional sibling receives 10% off their plan, and admission is
                 always free.

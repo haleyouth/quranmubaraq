@@ -10,11 +10,11 @@ export default function NotFound() {
           <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-ink bg-green-deep">
             <Compass className="size-9 text-white" aria-hidden="true" />
           </span>
-          <p className="font-display mt-7 text-6xl text-green">404</p>
-          <h1 className="font-display mt-3 text-3xl text-ink">
+          <p className="font-display mt-7 text-4xl text-green">404</p>
+          <h1 className="font-display mt-3 text-2xl text-ink">
             We couldn&rsquo;t find that page
           </h1>
-          <p className="mt-4 text-lg leading-relaxed text-ink/75">
+          <p className="mt-4 text-base leading-relaxed text-ink/75">
             The page you are looking for may have moved or no longer exists. Let&rsquo;s
             get you back on track.
           </p>

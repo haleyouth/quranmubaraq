@@ -180,6 +180,8 @@ export type Course = {
   title: string;
   short: string;
   description: string;
+  /** Search-result description, kept to 120-160 characters. */
+  metaDescription: string;
   daily: string;
   duration: string;
   level: string;
@@ -191,6 +193,7 @@ export type Course = {
 export const courses: readonly Course[] = [
   {
     slug: "quran-reading",
+    metaDescription: "Learn to read the Holy Quran fluently with 100% Tajweed. One-to-one live classes, 30 minutes daily over 6 months, for complete beginners.",
     title: "Quran Reading Course",
     short: "All basic rules of Quran Reading with 100% Tajweed",
     description:
@@ -209,6 +212,7 @@ export const courses: readonly Course[] = [
   },
   {
     slug: "quran-memorization",
+    metaDescription: "Structured online Hifz programme using daily sabaq, sabqi and manzil. One hour daily with a qualified hafiz, at a pace your child can sustain.",
     title: "Quran Memorization Course",
     short: "Easy way to memorize part of The Quran or whole Quran",
     description:
@@ -227,6 +231,7 @@ export const courses: readonly Course[] = [
   },
   {
     slug: "quran-recitation",
+    metaDescription: "Learn beautiful Quran recitation with the maqamat and the styles of renowned Qurra. Live one-to-one classes, 30 minutes daily over 6 months.",
     title: "Quran Recitation Course",
     short: "Helps students to Recite The Holy Quran with Amazing Voices",
     description:
@@ -245,6 +250,7 @@ export const courses: readonly Course[] = [
   },
   {
     slug: "quran-translation",
+    metaDescription: "Understand what you recite. Word-by-word Quran translation with Tafseer and context, taught live one-to-one over two years.",
     title: "Quran Translation Course",
     short: "Complete The Holy Quran Translation and Tafseer",
     description:
@@ -263,6 +269,7 @@ export const courses: readonly Course[] = [
   },
   {
     slug: "islamic-education",
+    metaDescription: "Learn Aqeeda, the six Kalimas, Salah, daily Duas and authentic Ahadees. Live one-to-one Islamic studies, 30 minutes daily over 6 months.",
     title: "Islamic Education Course",
     short: "Aqeeda, Kalima, Salah, Dua's, Basic Ahadees etc.",
     description:

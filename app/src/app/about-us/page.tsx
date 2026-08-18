@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { about, site } from "@/lib/content";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section, SectionHeading } from "@/components/ui/Section";
@@ -7,10 +7,13 @@ import { Features } from "@/components/sections/Features";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { CtaBand } from "@/components/sections/CtaBand";
 
-export const metadata: Metadata = {
-  title: "About us",
-  description: about.body[0],
-};
+export const metadata = pageMetadata({
+  title: "About Quran Mubarak — Online Islamic Academy Since 2011",
+  description:
+    "Founded in 2011 by Qasim Shafiq Mir, Quran Mubarak teaches the Holy Quran online with qualified Huffaz and Islamic scholars. Male and female teachers, families worldwide.",
+  path: "/about-us",
+  keywords: ["about Quran Mubarak", "online Islamic academy", "qualified Quran teachers"],
+});
 
 const milestones = [
   {
@@ -74,7 +77,7 @@ export default function AboutPage() {
                   )}
                 </div>
                 <div className="flex-1 rounded-[2rem] border-4 border-ink bg-white p-7 hard-shadow">
-                  <h3 className="font-display text-2xl text-ink">{m.title}</h3>
+                  <h3 className="font-display text-xl text-ink">{m.title}</h3>
                   <p className="mt-3 leading-relaxed text-ink/75">{m.body}</p>
                 </div>
               </li>
@@ -118,7 +121,7 @@ export default function AboutPage() {
                 key={item.title}
                 className="rounded-[2rem] border-4 border-ink bg-cream p-7 hard-shadow"
               >
-                <h3 className="font-display text-xl text-ink">{item.title}</h3>
+                <h3 className="font-display text-lg text-ink">{item.title}</h3>
                 <p className="mt-3 leading-relaxed text-ink/75">{item.body}</p>
               </div>
             ))}

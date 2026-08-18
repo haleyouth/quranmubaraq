@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { JsonLd, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { courses } from "@/lib/content";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section } from "@/components/ui/Section";
@@ -6,11 +6,13 @@ import { CourseCard } from "@/components/ui/CourseCard";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
 
-export const metadata: Metadata = {
-  title: "Courses",
+export const metadata = pageMetadata({
+  title: "Online Quran Courses — Reading, Hifz, Tajweed & Tafseer",
   description:
-    "Quran Reading, Memorization, Recitation, Translation and Islamic Education — taught one-on-one, live, with certified male and female tutors.",
-};
+    "Five structured online courses: Quran Reading with 100% Tajweed, Memorization (Hifz), Recitation, Translation with Tafseer, and Islamic Education. One-to-one live classes.",
+  path: "/courses",
+  keywords: ["online Quran course", "Hifz course online", "Tajweed classes", "Quran Tafseer course"],
+});
 
 export default function CoursesPage() {
   return (
@@ -38,6 +40,7 @@ export default function CoursesPage() {
 
       <CtaBand />
       <Faq />
+      <JsonLd data={breadcrumbSchema([{ name: "Courses", path: "courses" }])} />
     </>
   );
 }

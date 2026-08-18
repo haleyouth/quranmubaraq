@@ -25,7 +25,7 @@ export function Hero() {
               {hero.eyebrow}
             </p>
 
-            <h1 className="font-display mt-7 text-5xl leading-[1.05] text-ink sm:text-6xl md:text-7xl xl:text-8xl">
+            <h1 className="font-display mt-7 text-4xl leading-[1.05] text-ink sm:text-4xl md:text-5xl xl:text-6xl">
               {hero.headline.before}{" "}
               <span className="relative inline-block text-green-deep">
                 {hero.headline.highlight}
@@ -47,7 +47,7 @@ export function Hero() {
               {hero.headline.after}
             </h1>
 
-            <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink/75 md:text-xl">
+            <p className="mt-8 max-w-xl text-base leading-relaxed text-ink/75 md:text-lg">
               {hero.subtext}
             </p>
 
@@ -61,7 +61,7 @@ export function Hero() {
               </Button>
               <a
                 href={hero.secondaryCta.href}
-                className="text-lg font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 transition-colors hover:text-teal"
+                className="text-base font-bold text-ink underline decoration-teal decoration-2 underline-offset-8 transition-colors hover:text-teal"
               >
                 {hero.secondaryCta.label}
               </a>
@@ -73,7 +73,7 @@ export function Hero() {
                 <BookOpen className="size-7 text-green" aria-hidden="true" />
               </span>
               <div>
-                <p className="font-display text-2xl text-ink">{hero.trustCard.title}</p>
+                <p className="font-display text-xl text-ink">{hero.trustCard.title}</p>
                 <p className="mt-1 font-medium text-ink/80">{hero.trustCard.body}</p>
               </div>
             </div>
@@ -82,17 +82,17 @@ export function Hero() {
           {/* Visual panel */}
           <div className="relative hidden lg:block">
             <div className="relative rotate-2 rounded-[3rem] border-4 border-ink bg-white p-8 hard-shadow-teal">
-              <p className="font-marker text-center text-2xl text-green">
+              <p className="font-marker text-center text-xl text-green">
                 Bismillahir Rahmanir Raheem
               </p>
               <p
                 dir="rtl"
                 lang="ar"
-                className="mt-8 text-center text-4xl leading-[1.9] text-ink"
+                className="mt-8 text-center text-3xl leading-[1.9] text-ink"
               >
                 اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ
               </p>
-              <p className="mt-6 text-center text-lg font-semibold text-ink/70">
+              <p className="mt-6 text-center text-base font-semibold text-ink/70">
                 &ldquo;Read! In the name of your Lord who created.&rdquo;
               </p>
               <p className="mt-2 text-center text-sm font-bold tracking-[0.2em] text-green-deep uppercase">
@@ -101,11 +101,11 @@ export function Hero() {
 
               <div className="mt-8 grid grid-cols-2 gap-4 border-t-2 border-ink/15 pt-8">
                 <div className="rounded-2xl border-2 border-ink bg-cream p-4 text-center">
-                  <p className="font-display text-3xl text-green">{site.founded}</p>
+                  <p className="font-display text-2xl text-green">{site.founded}</p>
                   <p className="text-sm font-semibold text-ink/70">Teaching since</p>
                 </div>
                 <div className="rounded-2xl border-2 border-ink bg-cream p-4 text-center">
-                  <p className="font-display text-3xl text-green-deep">1-on-1</p>
+                  <p className="font-display text-2xl text-green-deep">1-on-1</p>
                   <p className="text-sm font-semibold text-ink/70">Live classes</p>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export function Hero() {
             <span
               lang="ar"
               dir="rtl"
-              className="absolute -top-10 right-6 left-6 grid h-16 place-items-center rounded-2xl border-4 border-ink bg-green-deep text-3xl text-white hard-shadow [animation:bob_3.5s_ease-in-out_infinite,bismillah-shift_5s_ease-in-out_infinite]"
+              className="absolute -top-10 right-6 left-6 grid h-16 place-items-center rounded-2xl border-4 border-ink bg-green-deep text-2xl text-white hard-shadow [animation:bob_3.5s_ease-in-out_infinite,bismillah-shift_5s_ease-in-out_infinite]"
             >
               ﷽
             </span>

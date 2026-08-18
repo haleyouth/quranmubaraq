@@ -174,13 +174,18 @@ export function sessionForPerson(
 /** Navigation entries each role is permitted to see. */
 export const ROLE_NAV: Record<Role, readonly string[]> = {
   admin: [
-    "dashboard", "today", "leads", "students", "teachers", "classes",
+    "dashboard", "today", "messages", "leads", "students", "teachers", "classes",
     "attendance", "complaints", "leave", "finance", "reports", "policies", "settings",
   ],
   principal: [
-    "dashboard", "today", "leads", "students", "teachers", "classes",
+    "dashboard", "today", "messages", "leads", "students", "teachers", "classes",
     "attendance", "complaints", "leave", "reports", "policies",
   ],
-  teacher: ["dashboard", "today", "students", "classes", "attendance", "leave", "policies"],
-  student: ["dashboard", "classes", "attendance", "finance", "complaints"],
+  teacher: [
+    "dashboard", "today", "messages", "students", "classes",
+    "attendance", "leave", "reports", "policies",
+  ],
+  student: [
+    "dashboard", "messages", "classes", "attendance", "reports", "finance", "complaints",
+  ],
 };

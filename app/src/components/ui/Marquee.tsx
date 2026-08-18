@@ -14,7 +14,7 @@ export function Marquee({ items }: { items: readonly string[] }) {
         {track.map((item, i) => (
           <span
             key={`${item}-${i}`}
-            className="font-display flex items-center gap-10 text-xl text-ink md:gap-14 md:text-2xl"
+            className="font-display flex items-center gap-10 text-lg text-ink md:gap-14 md:text-xl"
           >
             {item}
             <Star className="size-4 shrink-0 fill-ink" strokeWidth={0} />

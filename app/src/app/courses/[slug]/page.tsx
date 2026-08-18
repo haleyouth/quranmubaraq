@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, CalendarRange, Check, Clock, GraduationCap } from "lucide-react";
-import { courses, site } from "@/lib/content";
+import { courses } from "@/lib/content";
+import { JsonLd, breadcrumbSchema, courseSchema, pageMetadata } from "@/lib/seo";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
@@ -22,11 +23,11 @@ export async function generateMetadata({
   const course = courses.find((c) => c.slug === slug);
   if (!course) return { title: "Course not found" };
 
-  return {
-    title: course.title,
-    description: course.description,
-    openGraph: { title: course.title, description: course.description },
-  };
+  return pageMetadata({
+    title: `${course.title} — Online, One-to-One`,
+    description: course.metaDescription,
+    path: `/courses/${course.slug}`,
+  });
 }
 
 export default async function CoursePage({
@@ -40,17 +41,6 @@ export default async function CoursePage({
 
   const related = courses.filter((c) => c.slug !== course.slug).slice(0, 3);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: course.title,
-    description: course.description,
-    provider: {
-      "@type": "EducationalOrganization",
-      name: site.name,
-      sameAs: site.url,
-    },
-  };
 
   return (
     <>
@@ -65,12 +55,12 @@ export default async function CoursePage({
         <Container>
           <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr]">
             <div>
-              <h2 className="font-display text-3xl text-ink">About this course</h2>
-              <p className="mt-5 text-lg leading-relaxed text-ink/75">
+              <h2 className="font-display text-2xl text-ink">About this course</h2>
+              <p className="mt-5 text-base leading-relaxed text-ink/75">
                 {course.description}
               </p>
 
-              <h2 className="font-display mt-12 text-3xl text-ink">
+              <h2 className="font-display mt-12 text-2xl text-ink">
                 What your child will achieve
               </h2>
               <ul className="mt-6 space-y-4">
@@ -91,7 +81,7 @@ export default async function CoursePage({
             {/* Sticky summary */}
             <aside className="lg:sticky lg:top-32 lg:self-start">
               <div className="rounded-[2rem] border-4 border-ink bg-white p-8 hard-shadow-lg">
-                <h2 className="font-display text-2xl text-ink">Course at a glance</h2>
+                <h2 className="font-display text-xl text-ink">Course at a glance</h2>
 
                 <dl className="mt-6 space-y-4">
                   {[
@@ -110,14 +100,14 @@ export default async function CoursePage({
                         <dt className="text-xs font-bold tracking-wider text-ink/55 uppercase">
                           {label}
                         </dt>
-                        <dd className="font-display text-lg text-ink">{value}</dd>
+                        <dd className="font-display text-base text-ink">{value}</dd>
                       </div>
                     </div>
                   ))}
                 </dl>
 
                 <div className="mt-7 rounded-2xl border-2 border-ink bg-gold p-5 text-center">
-                  <p className="font-display text-xl text-ink">First week free</p>
+                  <p className="font-display text-lg text-ink">First week free</p>
                   <p className="mt-1 text-sm font-medium text-ink/80">
                     Three trial classes, no card required.
                   </p>
@@ -145,7 +135,7 @@ export default async function CoursePage({
 
       <Section tone="white">
         <Container>
-          <h2 className="font-display text-3xl text-ink">Other courses</h2>
+          <h2 className="font-display text-2xl text-ink">Other courses</h2>
           <div className="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {related.map((c) => (
               <CourseCard key={c.slug} course={c} />
@@ -156,9 +146,14 @@ export default async function CoursePage({
 
       <CtaBand />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <JsonLd
+        data={[
+          courseSchema(course),
+          breadcrumbSchema([
+            { name: "Courses", path: "courses" },
+            { name: course.title, path: `courses/${course.slug}` },
+          ]),
+        ]}
       />
     </>
   );

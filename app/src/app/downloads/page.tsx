@@ -1,15 +1,17 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BookOpen, Download, ExternalLink, FileText } from "lucide-react";
 import { downloads } from "@/lib/content";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section } from "@/components/ui/Section";
 import { CtaBand } from "@/components/sections/CtaBand";
 
-export const metadata: Metadata = {
-  title: "Downloads",
+export const metadata = pageMetadata({
+  title: "Free Quran Learning Downloads — Qaida, Duas & Tajweed Quran",
   description:
-    "Free learning resources — Noorani Qaida in English and Urdu, Essential Duas, and the Tajweedi colour-coded Quran.",
-};
+    "Free PDF resources: Noorani Qaida in English and Urdu, Essential Duas with transliteration, and the colour-coded Tajweedi Quran. Read online or download.",
+  path: "/downloads",
+  keywords: ["Noorani Qaida PDF", "free Islamic PDF download", "Tajweed Quran PDF", "Islamic duas PDF"],
+});
 
 export default function DownloadsPage() {
   return (
@@ -48,7 +50,7 @@ export default function DownloadsPage() {
                     </span>
                   </div>
 
-                  <h2 className="font-display mt-6 text-2xl text-ink">{r.title}</h2>
+                  <h2 className="font-display mt-6 text-xl text-ink">{r.title}</h2>
                   <p className="mt-3 flex-1 leading-relaxed text-ink/75">
                     {r.description}
                   </p>

@@ -47,11 +47,11 @@ export function PageHeader({
             {eyebrow}
           </p>
         )}
-        <h1 className="font-display mt-4 max-w-4xl text-4xl leading-[1.05] text-ink sm:text-5xl md:text-6xl">
+        <h1 className="font-display mt-4 max-w-4xl text-3xl leading-[1.05] text-ink sm:text-4xl md:text-4xl">
           {title}
         </h1>
         {body && (
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink/75">{body}</p>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink/75">{body}</p>
         )}
       </Container>
     </section>

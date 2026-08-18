@@ -51,7 +51,7 @@ export function Features() {
                 >
                   <Icon className={`size-6 ${iconColor}`} aria-hidden="true" />
                 </span>
-                <h3 className="font-display mt-6 text-xl text-ink">{feature.title}</h3>
+                <h3 className="font-display mt-6 text-lg text-ink">{feature.title}</h3>
                 <p className="mt-3 leading-relaxed text-ink/75">{feature.body}</p>
               </div>
             );

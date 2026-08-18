@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Outfit, Shadows_Into_Light } from "next/font/googl
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { FirebaseAnalytics } from "@/components/FirebaseAnalytics";
 import { site } from "@/lib/content";
+import { JsonLd, canonical, organizationSchema } from "@/lib/seo";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -74,7 +75,18 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   manifest: "/manifest.webmanifest",
-  robots: { index: true, follow: true },
+  alternates: { canonical: canonical("/") },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export const viewport: Viewport = {
@@ -83,18 +95,6 @@ export const viewport: Viewport = {
   themeColor: "#2d1b4d",
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  name: site.name,
-  description: site.description,
-  url: site.url,
-  foundingDate: String(site.founded),
-  founder: { "@type": "Person", name: site.founder },
-  telephone: site.phone,
-  email: site.email,
-  areaServed: "Worldwide",
-};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -105,10 +105,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SiteChrome>{children}</SiteChrome>
         <FirebaseAnalytics />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <JsonLd data={organizationSchema()} />
       </body>
     </html>
   );

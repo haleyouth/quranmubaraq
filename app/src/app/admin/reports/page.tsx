@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { CheckCircle2, Download, Eye, FileText, Printer, Send } from "lucide-react";
 import { getSession, type Session } from "@/lib/admin/demo-auth";
-import { site } from "@/lib/content";
 import {
   REPORTS, buildReport, downloadCsv, type ReportData, type ReportDef,
 } from "@/lib/admin/reports";
@@ -14,6 +12,7 @@ import {
   Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
+import { ReportSheet } from "@/components/admin/ReportSheet";
 
 /** Requests from students awaiting principal approval before release. */
 type Request = {
@@ -39,12 +38,14 @@ export default function ReportsPage() {
   const [preview, setPreview] = useState<{ def: ReportDef; data: ReportData } | null>(null);
   const [requests, setRequests] = useState<Request[]>(SEED_REQUESTS);
   const [toast, setToast] = useState("");
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
     setSession(getSession());
-    const now = new Date();
-    setFrom(addDays(now, -30).toISOString().slice(0, 10));
-    setTo(now.toISOString().slice(0, 10));
+    const n = new Date();
+    setNow(n);
+    setFrom(addDays(n, -30).toISOString().slice(0, 10));
+    setTo(n.toISOString().slice(0, 10));
   }, []);
 
   const isStudent = session?.role === "student";
@@ -271,82 +272,12 @@ export default function ReportsPage() {
           )
         }
       >
-        {preview && (
-          <div id="report-print" className="space-y-5">
-            {/* Letterhead */}
-            <header className="flex flex-wrap items-center justify-between gap-4 border-b-4 border-ink pb-4">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center rounded-xl border-2 border-ink bg-ink px-3 py-2">
-                  <Image
-                    src="/brand/logo.png"
-                    alt={site.name}
-                    width={110}
-                    height={58}
-                    className="h-auto w-[110px]"
-                  />
-                </span>
-                <div>
-                  <p className="font-display text-lg text-ink">{site.name}</p>
-                  <p className="text-xs text-ink/60">{site.tagline}</p>
-                </div>
-              </div>
-              <div className="text-right text-xs text-ink/60">
-                <p className="font-bold text-ink">{preview.data.title}</p>
-                <p>{preview.data.subtitle}</p>
-                <p>Generated {new Date().toLocaleString("en-GB")}</p>
-                <p>By {session?.name}</p>
-              </div>
-            </header>
-
-            {/* Summary */}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {preview.data.summary.map((s) => (
-                <StatTile key={s.label} label={s.label} value={s.value} />
-              ))}
-            </div>
-
-            {/* Rows */}
-            <div className="overflow-x-auto rounded-xl border-2 border-ink">
-              <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b-2 border-ink bg-cream-deep">
-                    {preview.data.columns.map((c) => (
-                      <th key={c} scope="col" className="px-3 py-2.5 text-xs font-bold tracking-wider text-ink uppercase">
-                        {c}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink/10">
-                  {preview.data.rows.map((row, i) => (
-                    <tr key={i} className={i % 2 ? "bg-cream/50" : "bg-white"}>
-                      {preview.data.columns.map((c) => (
-                        <td key={c} className="px-3 py-2.5 align-top text-ink/80">
-                          {String(row[c] ?? "—")}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                  {preview.data.rows.length === 0 && (
-                    <tr>
-                      <td colSpan={preview.data.columns.length} className="px-3 py-8 text-center text-ink/55">
-                        No data in this period.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <footer className="border-t-2 border-ink/15 pt-3 text-xs text-ink/55">
-              <p>
-                {site.name} · {site.phone} · {site.email}
-              </p>
-              <p className="mt-0.5">
-                This report is confidential and intended only for the named recipient.
-              </p>
-            </footer>
-          </div>
+        {preview && now && (
+          <ReportSheet
+            data={preview.data}
+            generatedBy={session?.name ?? ""}
+            now={now}
+          />
         )}
       </Modal>
     </AdminPage>

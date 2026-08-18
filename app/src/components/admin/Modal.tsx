@@ -45,12 +45,12 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center p-0 print:static print:block print:p-0 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={title}
     >
-      <div className="absolute inset-0 bg-ink/60" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-ink/60 print:hidden" onClick={onClose} aria-hidden="true" />
 
       <div
         ref={panelRef}
@@ -59,7 +59,7 @@ export function Modal({
           size === "lg" ? "sm:max-w-4xl" : "sm:max-w-lg"
         }`}
       >
-        <header className="flex items-start justify-between gap-4 border-b-2 border-ink/12 px-5 py-4">
+        <header className="flex items-start justify-between gap-4 border-b-2 border-ink/12 px-5 py-4 print:hidden">
           <div>
             <h2 className="font-display text-xl text-ink">{title}</h2>
             {description && <p className="mt-0.5 text-sm text-ink/65">{description}</p>}
@@ -77,7 +77,7 @@ export function Modal({
         <div className="px-5 py-5">{children}</div>
 
         {footer && (
-          <footer className="flex flex-wrap justify-end gap-3 border-t-2 border-ink/12 px-5 py-4">
+          <footer className="flex flex-wrap justify-end gap-3 border-t-2 border-ink/12 px-5 py-4 print:hidden">
             {footer}
           </footer>
         )}

@@ -127,7 +127,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-2xl border-2 border-ink bg-white px-5 py-4 text-lg font-bold text-ink hard-shadow press"
+                className="rounded-2xl border-2 border-ink bg-white px-5 py-4 text-base font-bold text-ink hard-shadow press"
               >
                 {item.label}
               </Link>

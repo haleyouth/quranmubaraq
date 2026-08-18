@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { JsonLd, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
 import { posts } from "@/lib/blog";
@@ -6,11 +6,13 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section } from "@/components/ui/Section";
 import { CtaBand } from "@/components/sections/CtaBand";
 
-export const metadata: Metadata = {
-  title: "Blog",
+export const metadata = pageMetadata({
+  title: "Blog — Guidance on Teaching Children the Quran",
   description:
-    "Guidance for Muslim families on learning the Quran, teaching children, Tajweed, and starting Hifz.",
-};
+    "Practical articles for Muslim families: helping children love the Quran, what Tajweed really is, choosing an online academy, and what to expect when starting Hifz.",
+  path: "/blog",
+  keywords: ["Quran learning blog", "teaching children Quran", "Hifz advice for parents"],
+});
 
 const accents = {
   green: "bg-green",
@@ -52,7 +54,7 @@ export default function BlogPage() {
               </span>
             </div>
 
-            <h2 className="font-display mt-5 text-3xl leading-tight text-ink md:text-4xl">
+            <h2 className="font-display mt-5 text-2xl leading-tight text-ink md:text-3xl">
               <Link
                 href={`/blog/${featured.slug}`}
                 className="hover:text-green-deep hover:underline hover:decoration-teal hover:decoration-2 hover:underline-offset-8"
@@ -61,7 +63,7 @@ export default function BlogPage() {
               </Link>
             </h2>
 
-            <p className="mt-4 max-w-3xl text-lg leading-relaxed text-ink/75">
+            <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink/75">
               {featured.excerpt}
             </p>
 
@@ -99,7 +101,7 @@ export default function BlogPage() {
                     </span>
                   </div>
 
-                  <h2 className="font-display mt-5 text-2xl leading-tight text-ink">
+                  <h2 className="font-display mt-5 text-xl leading-tight text-ink">
                     <Link href={`/blog/${post.slug}`} className="hover:text-green-deep">
                       {post.title}
                     </Link>
@@ -127,6 +129,7 @@ export default function BlogPage() {
       </Section>
 
       <CtaBand />
+      <JsonLd data={breadcrumbSchema([{ name: "Blog", path: "blog" }])} />
     </>
   );
 }

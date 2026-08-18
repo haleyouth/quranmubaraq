@@ -9,13 +9,13 @@ export function About() {
       <Container>
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <div>
-            <p className="font-marker text-3xl text-green">{about.bismillah}</p>
-            <h2 className="font-display mt-4 text-4xl leading-[1.1] text-ink sm:text-5xl md:text-6xl">
+            <p className="font-marker text-2xl text-green">{about.bismillah}</p>
+            <h2 className="font-display mt-4 text-3xl leading-[1.1] text-ink sm:text-4xl md:text-4xl">
               {about.heading}
             </h2>
-            <p className="mt-4 text-xl font-semibold text-green-deep">{about.subheading}</p>
+            <p className="mt-4 text-lg font-semibold text-green-deep">{about.subheading}</p>
 
-            <div className="mt-8 space-y-5 text-lg leading-relaxed text-ink/75">
+            <div className="mt-8 space-y-5 text-base leading-relaxed text-ink/75">
               {about.body.map((para) => (
                 <p key={para.slice(0, 40)}>{para}</p>
               ))}
@@ -39,7 +39,7 @@ export function About() {
                     i % 2 === 0 ? "bg-white" : "bg-cream-deep"
                   }`}
                 >
-                  <p className="font-display text-4xl text-green">{stat.value}</p>
+                  <p className="font-display text-3xl text-green">{stat.value}</p>
                   <p className="mt-2 font-semibold text-ink/70">{stat.label}</p>
                 </div>
               ))}
@@ -74,7 +74,7 @@ export function About() {
                     <Icon className={`size-5 ${color}`} aria-hidden="true" />
                   </span>
                   <div>
-                    <p className="font-display text-lg text-ink">{title}</p>
+                    <p className="font-display text-base text-ink">{title}</p>
                     <p className="text-ink/70">{body}</p>
                   </div>
                 </li>

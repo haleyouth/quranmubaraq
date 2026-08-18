@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { getPost, posts } from "@/lib/blog";
-import { site } from "@/lib/content";
+import { JsonLd, articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
@@ -22,16 +22,12 @@ export async function generateMetadata({
   const post = getPost(slug);
   if (!post) return { title: "Article not found" };
 
-  return {
+  return pageMetadata({
     title: post.title,
     description: post.excerpt,
-    openGraph: {
-      type: "article",
-      title: post.title,
-      description: post.excerpt,
-      publishedTime: post.published,
-    },
-  };
+    path: `/blog/${post.slug}`,
+    type: "article",
+  });
 }
 
 export default async function BlogPostPage({
@@ -45,15 +41,6 @@ export default async function BlogPostPage({
 
   const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    datePublished: post.published,
-    author: { "@type": "Organization", name: site.name },
-    publisher: { "@type": "Organization", name: site.name },
-  };
 
   return (
     <>
@@ -85,7 +72,7 @@ export default async function BlogPostPage({
                 <span>By {post.author}</span>
               </div>
 
-              <p className="mt-7 text-xl leading-relaxed font-medium text-ink/85">
+              <p className="mt-7 text-lg leading-relaxed font-medium text-ink/85">
                 {post.excerpt}
               </p>
 
@@ -93,13 +80,13 @@ export default async function BlogPostPage({
                 {post.body.map((block, i) => (
                   <section key={i}>
                     {block.heading && (
-                      <h2 className="font-display mt-10 text-2xl text-ink md:text-3xl">
+                      <h2 className="font-display mt-10 text-xl text-ink md:text-2xl">
                         {block.heading}
                       </h2>
                     )}
                     <div className="mt-4 space-y-5">
                       {block.paragraphs.map((p, j) => (
-                        <p key={j} className="text-lg leading-relaxed text-ink/75">
+                        <p key={j} className="text-base leading-relaxed text-ink/75">
                           {p}
                         </p>
                       ))}
@@ -109,7 +96,7 @@ export default async function BlogPostPage({
               </div>
 
               <div className="mt-12 rounded-[2rem] border-4 border-ink bg-gold p-7 hard-shadow-lg">
-                <p className="font-display text-2xl text-ink">
+                <p className="font-display text-xl text-ink">
                   Ready to start your child&rsquo;s journey?
                 </p>
                 <p className="mt-2 font-medium text-ink/80">
@@ -129,7 +116,7 @@ export default async function BlogPostPage({
             {/* Sidebar */}
             <aside className="lg:sticky lg:top-32 lg:self-start">
               <div className="rounded-[2rem] border-4 border-ink bg-white p-7 hard-shadow">
-                <h2 className="font-display text-xl text-ink">More articles</h2>
+                <h2 className="font-display text-lg text-ink">More articles</h2>
                 <ul className="mt-5 space-y-4">
                   {related.map((p) => (
                     <li key={p.slug} className="border-b-2 border-ink/10 pb-4 last:border-0 last:pb-0">
@@ -160,9 +147,14 @@ export default async function BlogPostPage({
 
       <CtaBand />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <JsonLd
+        data={[
+          articleSchema(post),
+          breadcrumbSchema([
+            { name: "Blog", path: "blog" },
+            { name: post.title, path: `blog/${post.slug}` },
+          ]),
+        ]}
       />
     </>
   );

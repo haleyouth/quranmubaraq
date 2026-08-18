@@ -133,13 +133,13 @@
 
   /* Visible focus ring on every interactive element — magenta, 2px offset */
   :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 3px solid var(--color-magenta);
+    outline: 3px solid var(--color-green-deep);
     outline-offset: 2px;
     border-radius: 4px;
   }
 
   ::selection {
-    background-color: var(--color-amber);
+    background-color: var(--color-gold);
     color: var(--color-ink);
   }
 }
@@ -160,12 +160,12 @@
   box-shadow: 8px 8px 0 0 var(--color-teal);
 }
 
-@utility hard-shadow-magenta {
-  box-shadow: 4px 4px 0 0 var(--color-magenta);
+@utility hard-shadow-accent {
+  box-shadow: 4px 4px 0 0 var(--color-green-deep);
 }
 
-@utility hard-shadow-amber {
-  box-shadow: 8px 8px 0 0 var(--color-amber);
+@utility hard-shadow-gold {
+  box-shadow: 8px 8px 0 0 var(--color-gold);
 }
 
 /*
@@ -298,5 +298,71 @@
   .press:hover,
   .press-lg:hover {
     transform: none;
+  }
+}
+
+/* ==========================================================================
+   Printable reports — true A4
+   ========================================================================== */
+
+@page {
+  size: A4 portrait;
+  margin: 14mm 12mm;
+}
+
+/* On-screen preview of the printable sheet */
+.a4-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm 12mm;
+  background: #fff;
+  color: var(--color-ink);
+  box-sizing: border-box;
+}
+
+@media print {
+  /* Hide everything except the report, without unmounting React */
+  body * {
+    visibility: hidden !important;
+  }
+  .print-root,
+  .print-root * {
+    visibility: visible !important;
+  }
+  .print-root {
+    position: absolute !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .a4-sheet {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+  /* Keep table rows and headings intact across page breaks */
+  tr,
+  img,
+  h1,
+  h2,
+  h3 {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
+  }
+  a[href]::after {
+    content: "";
   }
 }

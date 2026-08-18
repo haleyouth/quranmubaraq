@@ -35,13 +35,13 @@ export function Steps() {
             return (
               <li key={step.number} className="relative flex flex-col items-center">
                 <span
-                  className={`font-display relative z-10 grid size-20 place-items-center rounded-2xl border-4 border-ink text-3xl text-white ${accent.badge} ${accent.shadow}`}
+                  className={`font-display relative z-10 grid size-20 place-items-center rounded-2xl border-4 border-ink text-2xl text-white ${accent.badge} ${accent.shadow}`}
                 >
                   {step.number}
                 </span>
 
                 <div className="mt-6 w-full flex-1 rounded-[2rem] border-4 border-ink bg-white p-7 text-center hard-shadow">
-                  <h3 className="font-display text-2xl text-ink">{step.title}</h3>
+                  <h3 className="font-display text-xl text-ink">{step.title}</h3>
                   <p className="mt-1 text-sm font-bold tracking-[0.15em] text-green-deep uppercase">
                     {step.subtitle}
                   </p>

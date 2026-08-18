@@ -1,18 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CalendarDays, Moon, Sun } from "lucide-react";
-import { formatHijri, toHijri } from "@/lib/hijri";
-import { MONTH_LABEL, WEEKDAY_LABEL } from "@/lib/admin/schedule";
+import { useEffect, useMemo, useState } from "react";
+import { CalendarDays, ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
+import {
+  HIJRI_MONTHS,
+  formatHijri,
+  fromHijri,
+  hijriMonthLength,
+  toHijri,
+} from "@/lib/hijri";
+import { MONTH_LABEL, addDays, ymd } from "@/lib/admin/schedule";
+import { cn } from "@/lib/utils";
+
+const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /**
- * Gregorian date, Hijri date and a live local clock.
+ * Date and time panel.
  *
- * Rendered only after mount: the server has no access to the viewer's
- * timezone, so painting a time during SSR guarantees a hydration mismatch.
+ * Renders only after mount: the server has no access to the viewer's clock or
+ * timezone, so painting a date during SSR guarantees a hydration mismatch —
+ * and with `output: "export"` the HTML is built long before it is viewed.
  */
 export function DateTimePanel() {
   const [now, setNow] = useState<Date | null>(null);
+  const [tab, setTab] = useState<"gregorian" | "hijri">("gregorian");
+  const [monthCursor, setMonthCursor] = useState(0);
 
   useEffect(() => {
     setNow(new Date());
@@ -21,57 +33,305 @@ export function DateTimePanel() {
   }, []);
 
   if (!now) {
-    // Reserve the same height to avoid layout shift on hydration
-    return <div className="h-[104px] rounded-2xl border-2 border-ink bg-white hard-shadow" />;
+    return (
+      <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+        <div className="h-[360px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
+        <div className="h-[360px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
+      </div>
+    );
   }
 
-  const hijri = toHijri(now);
-  const hh = String(now.getHours()).padStart(2, "0");
-  const mm = String(now.getMinutes()).padStart(2, "0");
-  const ss = String(now.getSeconds()).padStart(2, "0");
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const isDay = now.getHours() >= 6 && now.getHours() < 18;
+  return (
+    <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+      <CalendarCard
+        now={now}
+        tab={tab}
+        setTab={setTab}
+        monthCursor={monthCursor}
+        setMonthCursor={setMonthCursor}
+      />
+      <PremiumClock now={now} />
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          Switchable full calendar                          */
+/* -------------------------------------------------------------------------- */
+
+function CalendarCard({
+  now,
+  tab,
+  setTab,
+  monthCursor,
+  setMonthCursor,
+}: {
+  now: Date;
+  tab: "gregorian" | "hijri";
+  setTab: (t: "gregorian" | "hijri") => void;
+  monthCursor: number;
+  setMonthCursor: (n: number) => void;
+}) {
+  const hijriToday = toHijri(now);
+  const todayKey = ymd(now);
+
+  // Both calendars are laid out as Gregorian day cells; only the header,
+  // the numbering and the month boundaries differ between tabs.
+  const { cells, heading, subheading } = useMemo(() => {
+    if (tab === "gregorian") {
+      const anchor = new Date(now.getFullYear(), now.getMonth() + monthCursor, 1);
+      const lead = (anchor.getDay() + 6) % 7;
+      const start = addDays(anchor, -lead);
+      const days = Array.from({ length: 42 }, (_, i) => addDays(start, i));
+      return {
+        cells: days.map((d) => ({
+          date: d,
+          primary: d.getDate(),
+          secondary: toHijri(d).day,
+          inMonth: d.getMonth() === anchor.getMonth(),
+        })),
+        heading: `${MONTH_LABEL[anchor.getMonth()]} ${anchor.getFullYear()}`,
+        subheading: (() => {
+          const a = toHijri(anchor);
+          const b = toHijri(new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0));
+          return a.monthName === b.monthName
+            ? `${a.monthName} ${a.year} AH`
+            : `${a.monthName} – ${b.monthName} ${b.year} AH`;
+        })(),
+      };
+    }
+
+    // Hijri tab: walk the Hijri month, converting each day back to Gregorian
+    let hy = hijriToday.year;
+    let hm = hijriToday.month + monthCursor;
+    while (hm > 12) { hm -= 12; hy += 1; }
+    while (hm < 1) { hm += 12; hy -= 1; }
+
+    const len = hijriMonthLength(hy, hm);
+    const first = fromHijri(hy, hm, 1);
+    const lead = (first.getDay() + 6) % 7;
+
+    const days: {
+      date: Date; primary: number; secondary: number; inMonth: boolean;
+    }[] = [];
+
+    for (let i = 0; i < lead; i++) {
+      const d = addDays(first, i - lead);
+      days.push({ date: d, primary: toHijri(d).day, secondary: d.getDate(), inMonth: false });
+    }
+    for (let i = 0; i < len; i++) {
+      const d = fromHijri(hy, hm, i + 1);
+      days.push({ date: d, primary: i + 1, secondary: d.getDate(), inMonth: true });
+    }
+    while (days.length < 42) {
+      const d = addDays(days[days.length - 1].date, 1);
+      days.push({ date: d, primary: toHijri(d).day, secondary: d.getDate(), inMonth: false });
+    }
+
+    return {
+      cells: days.slice(0, 42),
+      heading: `${HIJRI_MONTHS[hm - 1]} ${hy} AH`,
+      subheading: `${MONTH_LABEL[first.getMonth()]} ${first.getFullYear()}`,
+    };
+  }, [tab, monthCursor, now, hijriToday.year, hijriToday.month]);
 
   return (
-    <div className="grid gap-5 sm:grid-cols-3">
-      {/* Gregorian */}
-      <div className="rounded-2xl border-2 border-ink bg-white p-5 hard-shadow">
-        <p className="flex items-center gap-2 text-xs font-bold tracking-wider text-ink/55 uppercase">
-          <CalendarDays className="size-3.5" aria-hidden="true" />
-          Gregorian
-        </p>
-        <p className="font-display mt-2 text-2xl leading-tight text-ink">
-          {now.getDate()} {MONTH_LABEL[now.getMonth()]}
-        </p>
-        <p className="mt-0.5 text-sm font-semibold text-ink/60">
-          {WEEKDAY_LABEL[now.getDay()]}day, {now.getFullYear()}
-        </p>
+    <section className="rounded-2xl border-2 border-ink bg-white hard-shadow">
+      {/* Today summary */}
+      <header className="border-b-2 border-ink/12 p-5">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border-2 border-ink bg-cream p-4">
+            <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink/55 uppercase">
+              <CalendarDays className="size-3.5" aria-hidden="true" />
+              Gregorian
+            </p>
+            <p className="font-display mt-1.5 text-xl leading-tight text-ink">
+              {now.getDate()} {MONTH_LABEL[now.getMonth()]}
+            </p>
+            <p className="text-sm font-semibold text-ink/60">
+              {now.toLocaleDateString("en-GB", { weekday: "long" })}, {now.getFullYear()}
+            </p>
+          </div>
+
+          <div className="rounded-xl border-2 border-ink bg-green p-4 text-white">
+            <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-white/80 uppercase">
+              <Moon className="size-3.5" aria-hidden="true" />
+              Hijri
+            </p>
+            <p className="font-display mt-1.5 text-xl leading-tight">
+              {hijriToday.day} {hijriToday.monthName}
+            </p>
+            <p className="text-sm font-semibold text-white/80">
+              {hijriToday.year} AH
+              <span
+                className="ml-1 text-white/60"
+                title="Tabular calculation — local moon sighting may differ by a day"
+              >
+                (approx.)
+              </span>
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Tabs + month navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink/12 px-5 py-3">
+        <div
+          role="tablist"
+          aria-label="Calendar system"
+          className="inline-flex gap-1 rounded-full border-2 border-ink bg-cream p-1"
+        >
+          {(["gregorian", "hijri"] as const).map((t) => (
+            <button
+              key={t}
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => { setTab(t); setMonthCursor(0); }}
+              className={cn(
+                "min-h-8 cursor-pointer rounded-full px-4 text-sm font-bold capitalize transition-colors",
+                tab === t ? "bg-green-deep text-white" : "text-ink hover:bg-cream-deep",
+              )}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMonthCursor(monthCursor - 1)}
+            aria-label="Previous month"
+            className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+          >
+            <ChevronLeft className="size-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setMonthCursor(0)}
+            className="min-h-8 cursor-pointer rounded-full border-2 border-ink bg-white px-3 text-sm font-bold transition-colors hover:bg-cream-deep"
+          >
+            Today
+          </button>
+          <button
+            type="button"
+            onClick={() => setMonthCursor(monthCursor + 1)}
+            aria-label="Next month"
+            className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+          >
+            <ChevronRight className="size-4" />
+          </button>
+        </div>
       </div>
 
-      {/* Hijri */}
-      <div className="rounded-2xl border-2 border-ink bg-green p-5 text-white hard-shadow">
-        <p className="flex items-center gap-2 text-xs font-bold tracking-wider text-white/80 uppercase">
-          <Moon className="size-3.5" aria-hidden="true" />
-          Hijri
-        </p>
-        <p className="font-display mt-2 text-2xl leading-tight">
-          {hijri.day} {hijri.monthName}
-        </p>
-        <p className="mt-0.5 text-sm font-semibold text-white/80">
-          {hijri.year} AH
-          <span className="ml-1 text-white/60" title="Tabular calculation — local sighting may differ by a day">
-            (approx.)
+      {/* Grid */}
+      <div className="p-5">
+        <div className="mb-3">
+          <h3 className="font-display text-lg text-ink">{heading}</h3>
+          <p className="text-sm text-ink/55">{subheading}</p>
+        </div>
+
+        <div className="grid grid-cols-7 gap-1">
+          {DOW.map((d) => (
+            <div
+              key={d}
+              className="pb-1 text-center text-[10px] font-bold tracking-wider text-ink/50 uppercase"
+            >
+              {d}
+            </div>
+          ))}
+
+          {cells.map((c, i) => {
+            const isToday = ymd(c.date) === todayKey;
+            const isFriday = c.date.getDay() === 5;
+            return (
+              <div
+                key={i}
+                aria-current={isToday ? "date" : undefined}
+                className={cn(
+                  "flex aspect-square flex-col items-center justify-center rounded-lg border-2 transition-colors",
+                  c.inMonth ? "bg-white" : "bg-cream-deep/30",
+                  isToday
+                    ? "border-green-deep bg-green-deep text-white ring-2 ring-green-deep/25"
+                    : isFriday && c.inMonth
+                      ? "border-teal/40 bg-teal/10"
+                      : "border-ink/10",
+                )}
+              >
+                <span
+                  className={cn(
+                    "font-display text-sm leading-none",
+                    isToday ? "text-white" : c.inMonth ? "text-ink" : "text-ink/30",
+                  )}
+                >
+                  {c.primary}
+                </span>
+                <span
+                  className={cn(
+                    "mt-0.5 text-[9px] leading-none",
+                    isToday ? "text-white/70" : c.inMonth ? "text-ink/40" : "text-ink/20",
+                  )}
+                >
+                  {c.secondary}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="mt-3 flex flex-wrap items-center gap-3 text-xs text-ink/55">
+          <span className="flex items-center gap-1.5">
+            <span className="size-3 rounded border-2 border-green-deep bg-green-deep" />
+            Today
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-3 rounded border-2 border-teal/40 bg-teal/10" />
+            Jumu&rsquo;ah
+          </span>
+          <span>
+            Large number: {tab === "gregorian" ? "Gregorian" : "Hijri"} · small:{" "}
+            {tab === "gregorian" ? "Hijri" : "Gregorian"}
           </span>
         </p>
       </div>
+    </section>
+  );
+}
 
-      {/* Live clock */}
-      <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-ink p-5 text-cream hard-shadow">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-8 -right-8 size-28 rounded-full bg-gold/25 blur-2xl"
-        />
-        <p className="relative flex items-center gap-2 text-xs font-bold tracking-wider text-cream/65 uppercase">
+/* -------------------------------------------------------------------------- */
+/*                               Premium clock                                */
+/* -------------------------------------------------------------------------- */
+
+function PremiumClock({ now }: { now: Date }) {
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+  const isDay = h >= 6 && h < 18;
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const hijri = toHijri(now);
+
+  const hh = String(h).padStart(2, "0");
+  const mm = String(m).padStart(2, "0");
+  const ss = String(s).padStart(2, "0");
+
+  // Analogue hand angles
+  const secDeg = s * 6;
+  const minDeg = m * 6 + s * 0.1;
+  const hourDeg = (h % 12) * 30 + m * 0.5;
+
+  return (
+    <section className="islamic-pattern-strong relative overflow-hidden rounded-2xl border-2 border-ink bg-ink p-5 text-cream hard-shadow">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-16 -right-16 size-56 rounded-full bg-gold/20 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-20 -left-16 size-48 rounded-full bg-green/30 blur-3xl"
+      />
+
+      <div className="relative flex items-center justify-between">
+        <p className="flex items-center gap-2 text-xs font-bold tracking-wider text-cream/65 uppercase">
           {isDay ? (
             <Sun className="size-3.5 text-gold" aria-hidden="true" />
           ) : (
@@ -79,18 +339,61 @@ export function DateTimePanel() {
           )}
           Local time
         </p>
-        <p
-          className="font-display relative mt-2 text-3xl leading-none tabular-nums"
-          aria-live="off"
-        >
-          {hh}
-          <span className="animate-pulse text-gold">:</span>
-          {mm}
-          <span className="text-xl text-cream/60">:{ss}</span>
-        </p>
-        <p className="relative mt-1 truncate text-xs font-semibold text-cream/55">{tz}</p>
+        <p className="text-xs font-semibold text-cream/45">{isDay ? "Day" : "Night"}</p>
       </div>
-    </div>
+
+      {/* Analogue face */}
+      <div className="relative mx-auto mt-4 aspect-square w-40">
+        <svg viewBox="0 0 200 200" className="size-full" role="img" aria-label={`Analogue clock showing ${hh}:${mm}`}>
+          <circle cx="100" cy="100" r="94" fill="none" stroke="currentColor" strokeOpacity="0.14" strokeWidth="2" />
+          <circle
+            cx="100" cy="100" r="94" fill="none"
+            stroke="var(--color-gold)" strokeWidth="3" strokeLinecap="round"
+            strokeDasharray={`${(s / 60) * 590.6} 590.6`}
+            transform="rotate(-90 100 100)"
+            className="transition-all duration-300"
+          />
+          {Array.from({ length: 12 }, (_, i) => {
+            const a = (i * 30 * Math.PI) / 180;
+            const r1 = i % 3 === 0 ? 72 : 78;
+            return (
+              <line
+                key={i}
+                x1={100 + r1 * Math.sin(a)} y1={100 - r1 * Math.cos(a)}
+                x2={100 + 84 * Math.sin(a)} y2={100 - 84 * Math.cos(a)}
+                stroke="currentColor"
+                strokeOpacity={i % 3 === 0 ? 0.55 : 0.22}
+                strokeWidth={i % 3 === 0 ? 3 : 2}
+                strokeLinecap="round"
+              />
+            );
+          })}
+          <line x1="100" y1="100" x2="100" y2="52" stroke="currentColor" strokeWidth="6" strokeLinecap="round"
+                transform={`rotate(${hourDeg} 100 100)`} className="transition-transform duration-500" />
+          <line x1="100" y1="100" x2="100" y2="34" stroke="currentColor" strokeWidth="4" strokeLinecap="round"
+                transform={`rotate(${minDeg} 100 100)`} className="transition-transform duration-500" />
+          <line x1="100" y1="112" x2="100" y2="28" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round"
+                transform={`rotate(${secDeg} 100 100)`} />
+          <circle cx="100" cy="100" r="6" fill="var(--color-gold)" />
+          <circle cx="100" cy="100" r="2.5" fill="var(--color-ink)" />
+        </svg>
+      </div>
+
+      {/* Digital readout */}
+      <p className="font-display relative mt-4 text-center text-3xl leading-none tabular-nums">
+        {hh}
+        <span className="animate-pulse text-gold">:</span>
+        {mm}
+        <span className="text-lg text-cream/55">:{ss}</span>
+      </p>
+
+      <p className="relative mt-2 truncate text-center text-xs font-semibold text-cream/50">
+        {tz}
+      </p>
+      <p className="relative mt-1 text-center text-xs text-gold/80">
+        {hijri.day} {hijri.monthName} {hijri.year} AH
+      </p>
+    </section>
   );
 }
 
@@ -112,9 +415,7 @@ export function InlineClock() {
   return (
     <span className="hidden items-center gap-3 text-sm font-semibold text-ink/65 md:flex">
       <span className="tabular-nums">{time}</span>
-      <span aria-hidden="true" className="text-ink/25">
-        |
-      </span>
+      <span aria-hidden="true" className="text-ink/25">|</span>
       <span title={formatHijri(hijri)}>
         {hijri.day} {hijri.monthName}
       </span>

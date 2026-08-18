@@ -76,10 +76,10 @@ export function RegistrationForm() {
             <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-ink bg-teal">
               <CheckCircle2 className="size-10 text-white" aria-hidden="true" />
             </span>
-            <h2 className="font-display mt-7 text-4xl text-ink">
+            <h2 className="font-display mt-7 text-3xl text-ink">
               Jazakum Allahu Khairan!
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-ink/75">
+            <p className="mt-4 text-base leading-relaxed text-ink/75">
               Your registration has been received. Our team will contact you within one
               working day to arrange your three free trial classes.
             </p>
@@ -105,10 +105,10 @@ export function RegistrationForm() {
             <p className="text-sm font-bold tracking-[0.25em] text-green-deep uppercase">
               Free trial
             </p>
-            <h2 className="font-display mt-4 text-4xl leading-[1.1] text-ink sm:text-5xl">
+            <h2 className="font-display mt-4 text-3xl leading-[1.1] text-ink sm:text-4xl">
               {registrationForm.heading}
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-ink/75">
+            <p className="mt-6 text-base leading-relaxed text-ink/75">
               {registrationForm.body}
             </p>
 
@@ -274,7 +274,7 @@ export function RegistrationForm() {
             <button
               type="submit"
               disabled={status === "submitting"}
-              className="group mt-8 inline-flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-ink bg-green-deep px-8 py-4 text-lg font-bold text-white hard-shadow-lg press-lg disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="group mt-8 inline-flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-ink bg-green-deep px-8 py-4 text-base font-bold text-white hard-shadow-lg press-lg disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
             >
               {status === "submitting" ? (
                 <>

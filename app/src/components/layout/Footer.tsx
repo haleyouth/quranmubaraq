@@ -54,7 +54,7 @@ export function Footer() {
 
           {/* Quick links */}
           <nav aria-labelledby="footer-links">
-            <h2 id="footer-links" className="font-display text-lg text-gold">
+            <h2 id="footer-links" className="font-display text-base text-gold">
               Quick Links
             </h2>
             <ul className="mt-5 space-y-3">
@@ -73,7 +73,7 @@ export function Footer() {
 
           {/* Courses */}
           <nav aria-labelledby="footer-courses">
-            <h2 id="footer-courses" className="font-display text-lg text-gold">
+            <h2 id="footer-courses" className="font-display text-base text-gold">
               Our Courses
             </h2>
             <ul className="mt-5 space-y-3">
@@ -92,7 +92,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h2 className="font-display text-lg text-gold">Get in Touch</h2>
+            <h2 className="font-display text-base text-gold">Get in Touch</h2>
             <ul className="mt-5 space-y-4">
               <li>
                 <a
@@ -128,7 +128,7 @@ export function Footer() {
         </div>
 
         <div className="mt-14 border-t-2 border-cream/20 pt-8">
-          <p className="font-marker text-center text-lg text-gold">
+          <p className="font-marker text-center text-base text-gold">
             Start with the Name of Allah
           </p>
 

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen, CalendarDays, ChartColumn, ClipboardList, CreditCard, FileText,
   Eye, GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning,
-  PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
+  MessageCircle, PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
   Users, X,
 } from "lucide-react";
 import {
@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { key: "dashboard", label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { key: "today", label: "Today's Classes", href: "/admin/today", icon: CalendarDays },
+  { key: "messages", label: "Messages", href: "/admin/messages", icon: MessageCircle },
   { key: "leads", label: "Leads", href: "/admin/leads", icon: ClipboardList },
   { key: "students", label: "Students", href: "/admin/students", icon: Users },
   { key: "teachers", label: "Teachers", href: "/admin/teachers", icon: GraduationCap },

@@ -34,7 +34,7 @@ export function CourseCard({ course }: { course: Course }) {
           </span>
         </div>
 
-        <h3 className="font-display mt-6 text-2xl leading-tight text-ink">
+        <h3 className="font-display mt-6 text-xl leading-tight text-ink">
           {course.title}
         </h3>
         <p className="mt-3 flex-1 leading-relaxed text-ink/75">{course.short}</p>
@@ -45,14 +45,14 @@ export function CourseCard({ course }: { course: Course }) {
               <Clock className="size-3.5" aria-hidden="true" />
               Daily
             </dt>
-            <dd className="font-display mt-1 text-lg text-ink">{course.daily}</dd>
+            <dd className="font-display mt-1 text-base text-ink">{course.daily}</dd>
           </div>
           <div className="rounded-xl border-2 border-ink bg-cream px-4 py-3">
             <dt className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink/60 uppercase">
               <CalendarRange className="size-3.5" aria-hidden="true" />
               Duration
             </dt>
-            <dd className="font-display mt-1 text-lg text-ink">{course.duration}</dd>
+            <dd className="font-display mt-1 text-base text-ink">{course.duration}</dd>
           </div>
         </dl>
 
