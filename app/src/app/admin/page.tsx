@@ -66,7 +66,7 @@ export default function AdminDashboard() {
         title={`Assalamu alaikum, ${session.name.split(" ")[0]}`}
         description="Your classes, progress and invoices."
       >
-        <DateTimePanel />
+        <DateTimePanel filter={(x) => x.studentName === session.name} />
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile label="Classes today" value={String(mine.length)} delta={`${done} completed`} />
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
         <Panel title="My calendar" description="Click any day to see your classes.">
           <CalendarView
             title="Your class schedule"
-            filter={(s) => s.studentName === "Yusuf Ibrahim"}
+            filter={(s) => s.studentName === session.name}
             onJoin={setJoining}
           />
         </Panel>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
         title={`Assalamu alaikum, ${session.name.split(" ").slice(-1)[0]}`}
         description="Your classes today, attendance to mark, and student progress."
       >
-        <DateTimePanel />
+        <DateTimePanel filter={(x) => x.teacherName === session.name} />
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile label="Classes today" value={String(mine.length)} delta={`${completed} completed`} />

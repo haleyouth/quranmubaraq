@@ -259,9 +259,11 @@ export function filterForRole(
 ): ClassSession[] {
   if (role === "teacher") return sessions.filter((s) => s.teacherName === name);
   if (role === "student") {
-    // The demo student account maps to the first student record
-    const me = students[0];
-    return sessions.filter((s) => s.studentId === me.id);
+    // Match by name so impersonating another student shows THEIR classes,
+    // not the demo account's. Falls back to the first record only if the
+    // signed-in name matches no student.
+    const me = students.find((s) => s.name === name) ?? students[0];
+    return sessions.filter((s) => s.studentName === me.name);
   }
   return sessions;
 }

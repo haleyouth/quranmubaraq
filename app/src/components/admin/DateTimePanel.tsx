@@ -9,7 +9,9 @@ import {
   hijriMonthLength,
   toHijri,
 } from "@/lib/hijri";
-import { MONTH_LABEL, addDays, ymd } from "@/lib/admin/schedule";
+import {
+  MONTH_LABEL, addDays, sessionsForRange, ymd, type ClassSession,
+} from "@/lib/admin/schedule";
 import { cn } from "@/lib/utils";
 
 const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -21,34 +23,41 @@ const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
  * timezone, so painting a date during SSR guarantees a hydration mismatch —
  * and with `output: "export"` the HTML is built long before it is viewed.
  */
-export function DateTimePanel() {
+export function DateTimePanel({
+  /** Narrows the day counts to one person's classes. */
+  filter,
+}: {
+  filter?: (s: ClassSession) => boolean;
+} = {}) {
   const [now, setNow] = useState<Date | null>(null);
   const [tab, setTab] = useState<"gregorian" | "hijri">("gregorian");
   const [monthCursor, setMonthCursor] = useState(0);
 
   useEffect(() => {
     setNow(new Date());
-    const id = window.setInterval(() => setNow(new Date()), 1000);
+    // 200ms so the analogue second hand sweeps rather than stutters
+    const id = window.setInterval(() => setNow(new Date()), 200);
     return () => window.clearInterval(id);
   }, []);
 
   if (!now) {
     return (
-      <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
-        <div className="h-[360px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
-        <div className="h-[360px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
+      <div className="grid gap-5 lg:grid-cols-[1.9fr_1fr]">
+        <div className="h-[420px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
+        <div className="h-[420px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
       </div>
     );
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+    <div className="grid gap-5 lg:grid-cols-[1.9fr_1fr]">
       <CalendarCard
         now={now}
         tab={tab}
         setTab={setTab}
         monthCursor={monthCursor}
         setMonthCursor={setMonthCursor}
+        filter={filter}
       />
       <PremiumClock now={now} />
     </div>
@@ -65,18 +74,30 @@ function CalendarCard({
   setTab,
   monthCursor,
   setMonthCursor,
+  filter,
 }: {
   now: Date;
   tab: "gregorian" | "hijri";
   setTab: (t: "gregorian" | "hijri") => void;
   monthCursor: number;
   setMonthCursor: (n: number) => void;
+  filter?: (s: ClassSession) => boolean;
 }) {
   const hijriToday = toHijri(now);
   const todayKey = ymd(now);
 
   // Both calendars are laid out as Gregorian day cells; only the header,
   // the numbering and the month boundaries differ between tabs.
+  const byDay = useMemo(() => {
+    const from = addDays(now, -75);
+    const to = addDays(now, 75);
+    const all = sessionsForRange(from, to, now);
+    const mine = filter ? all.filter(filter) : all;
+    const map = new Map<string, number>();
+    for (const s2 of mine) map.set(s2.date, (map.get(s2.date) ?? 0) + 1);
+    return map;
+  }, [now, filter]);
+
   const { cells, heading, subheading } = useMemo(() => {
     if (tab === "gregorian") {
       const anchor = new Date(now.getFullYear(), now.getMonth() + monthCursor, 1);
@@ -242,14 +263,23 @@ function CalendarCard({
           ))}
 
           {cells.map((c, i) => {
-            const isToday = ymd(c.date) === todayKey;
+            const key = ymd(c.date);
+            const isToday = key === todayKey;
             const isFriday = c.date.getDay() === 5;
+            const classes = byDay.get(key) ?? 0;
+            const isPast = c.date < new Date(todayKey);
+
             return (
               <div
                 key={i}
                 aria-current={isToday ? "date" : undefined}
+                title={
+                  classes > 0
+                    ? `${c.date.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} — ${classes} class${classes === 1 ? "" : "es"}`
+                    : undefined
+                }
                 className={cn(
-                  "flex aspect-square flex-col items-center justify-center rounded-lg border-2 transition-colors",
+                  "relative flex aspect-square flex-col items-center justify-center rounded-lg border-2 transition-colors",
                   c.inMonth ? "bg-white" : "bg-cream-deep/30",
                   isToday
                     ? "border-green-deep bg-green-deep text-white ring-2 ring-green-deep/25"
@@ -274,6 +304,21 @@ function CalendarCard({
                 >
                   {c.secondary}
                 </span>
+
+                {classes > 0 && c.inMonth && (
+                  <span
+                    className={cn(
+                      "mt-1 inline-flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-1 text-[8px] font-bold leading-none",
+                      isToday
+                        ? "bg-white text-green-deep"
+                        : isPast
+                          ? "bg-ink/15 text-ink/60"
+                          : "bg-green text-white",
+                    )}
+                  >
+                    {classes}
+                  </span>
+                )}
               </div>
             );
           })}
@@ -287,6 +332,12 @@ function CalendarCard({
           <span className="flex items-center gap-1.5">
             <span className="size-3 rounded border-2 border-teal/40 bg-teal/10" />
             Jumu&rsquo;ah
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-green px-1 text-[8px] font-bold text-white">
+              3
+            </span>
+            Classes that day
           </span>
           <span>
             Large number: {tab === "gregorian" ? "Gregorian" : "Hijri"} · small:{" "}
@@ -305,33 +356,36 @@ function CalendarCard({
 function PremiumClock({ now }: { now: Date }) {
   const h = now.getHours();
   const m = now.getMinutes();
-  const s = now.getSeconds();
+  const sec = now.getSeconds();
   const isDay = h >= 6 && h < 18;
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const hijri = toHijri(now);
 
   const hh = String(h).padStart(2, "0");
   const mm = String(m).padStart(2, "0");
-  const ss = String(s).padStart(2, "0");
+  const ss = String(sec).padStart(2, "0");
 
-  // Analogue hand angles
-  const secDeg = s * 6;
-  const minDeg = m * 6 + s * 0.1;
+  // Smooth sweep rather than a tick, so the hands never look frozen
+  const ms = now.getMilliseconds();
+  const secDeg = (sec + ms / 1000) * 6;
+  const minDeg = m * 6 + sec * 0.1;
   const hourDeg = (h % 12) * 30 + m * 0.5;
 
+  const CIRC = 2 * Math.PI * 88;
+
   return (
-    <section className="islamic-pattern-strong relative overflow-hidden rounded-2xl border-2 border-ink bg-ink p-5 text-cream hard-shadow">
+    <section className="islamic-pattern-strong relative flex flex-col self-start overflow-hidden rounded-2xl border-2 border-ink bg-ink px-4 py-4 text-cream hard-shadow">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-16 -right-16 size-56 rounded-full bg-gold/20 blur-3xl"
+        className="pointer-events-none absolute -top-20 -right-20 size-60 rounded-full bg-gold/20 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-20 -left-16 size-48 rounded-full bg-green/30 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -left-20 size-52 rounded-full bg-green/30 blur-3xl"
       />
 
       <div className="relative flex items-center justify-between">
-        <p className="flex items-center gap-2 text-xs font-bold tracking-wider text-cream/65 uppercase">
+        <p className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-cream/65 uppercase">
           {isDay ? (
             <Sun className="size-3.5 text-gold" aria-hidden="true" />
           ) : (
@@ -339,58 +393,83 @@ function PremiumClock({ now }: { now: Date }) {
           )}
           Local time
         </p>
-        <p className="text-xs font-semibold text-cream/45">{isDay ? "Day" : "Night"}</p>
+        <p className="text-[11px] font-semibold text-cream/40">{isDay ? "Day" : "Night"}</p>
       </div>
 
-      {/* Analogue face */}
-      <div className="relative mx-auto mt-4 aspect-square w-40">
-        <svg viewBox="0 0 200 200" className="size-full" role="img" aria-label={`Analogue clock showing ${hh}:${mm}`}>
-          <circle cx="100" cy="100" r="94" fill="none" stroke="currentColor" strokeOpacity="0.14" strokeWidth="2" />
+      {/* Analogue face — fills the panel, capped so it never dominates */}
+      <div className="relative mx-auto my-3 w-full max-w-[16rem]">
+        <svg
+          viewBox="0 0 200 200"
+          className="aspect-square w-full"
+          role="img"
+          aria-label={`Clock showing ${hh}:${mm}:${ss}`}
+        >
+          <circle cx="100" cy="100" r="88" fill="none" stroke="currentColor" strokeOpacity="0.12" strokeWidth="1.5" />
           <circle
-            cx="100" cy="100" r="94" fill="none"
+            cx="100" cy="100" r="88" fill="none"
             stroke="var(--color-gold)" strokeWidth="3" strokeLinecap="round"
-            strokeDasharray={`${(s / 60) * 590.6} 590.6`}
+            strokeDasharray={`${((sec + ms / 1000) / 60) * CIRC} ${CIRC}`}
             transform="rotate(-90 100 100)"
-            className="transition-all duration-300"
           />
-          {Array.from({ length: 12 }, (_, i) => {
-            const a = (i * 30 * Math.PI) / 180;
-            const r1 = i % 3 === 0 ? 72 : 78;
+
+          {Array.from({ length: 60 }, (_, i) => {
+            const a = (i * 6 * Math.PI) / 180;
+            const major = i % 5 === 0;
+            const r1 = major ? 68 : 74;
             return (
               <line
                 key={i}
                 x1={100 + r1 * Math.sin(a)} y1={100 - r1 * Math.cos(a)}
-                x2={100 + 84 * Math.sin(a)} y2={100 - 84 * Math.cos(a)}
+                x2={100 + 79 * Math.sin(a)} y2={100 - 79 * Math.cos(a)}
                 stroke="currentColor"
-                strokeOpacity={i % 3 === 0 ? 0.55 : 0.22}
-                strokeWidth={i % 3 === 0 ? 3 : 2}
+                strokeOpacity={major ? 0.5 : 0.16}
+                strokeWidth={major ? 3 : 1.2}
                 strokeLinecap="round"
               />
             );
           })}
-          <line x1="100" y1="100" x2="100" y2="52" stroke="currentColor" strokeWidth="6" strokeLinecap="round"
-                transform={`rotate(${hourDeg} 100 100)`} className="transition-transform duration-500" />
-          <line x1="100" y1="100" x2="100" y2="34" stroke="currentColor" strokeWidth="4" strokeLinecap="round"
-                transform={`rotate(${minDeg} 100 100)`} className="transition-transform duration-500" />
-          <line x1="100" y1="112" x2="100" y2="28" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round"
+
+          {[12, 3, 6, 9].map((n, i) => {
+            const a = (i * 90 * Math.PI) / 180;
+            return (
+              <text
+                key={n}
+                x={100 + 54 * Math.sin(a)}
+                y={100 - 54 * Math.cos(a) + 5}
+                textAnchor="middle"
+                className="font-display"
+                fill="currentColor"
+                fillOpacity="0.45"
+                fontSize="13"
+              >
+                {n}
+              </text>
+            );
+          })}
+
+          <line x1="100" y1="108" x2="100" y2="50" stroke="currentColor" strokeWidth="6" strokeLinecap="round"
+                transform={`rotate(${hourDeg} 100 100)`} />
+          <line x1="100" y1="110" x2="100" y2="32" stroke="currentColor" strokeWidth="4" strokeLinecap="round"
+                transform={`rotate(${minDeg} 100 100)`} />
+          <line x1="100" y1="116" x2="100" y2="26" stroke="var(--color-gold)" strokeWidth="1.8" strokeLinecap="round"
                 transform={`rotate(${secDeg} 100 100)`} />
-          <circle cx="100" cy="100" r="6" fill="var(--color-gold)" />
-          <circle cx="100" cy="100" r="2.5" fill="var(--color-ink)" />
+          <circle cx="100" cy="100" r="5.5" fill="var(--color-gold)" />
+          <circle cx="100" cy="100" r="2" fill="var(--color-ink)" />
         </svg>
       </div>
 
       {/* Digital readout */}
-      <p className="font-display relative mt-4 text-center text-3xl leading-none tabular-nums">
+      <p className="font-display relative text-center text-3xl leading-none tabular-nums">
         {hh}
         <span className="animate-pulse text-gold">:</span>
         {mm}
         <span className="text-lg text-cream/55">:{ss}</span>
       </p>
 
-      <p className="relative mt-2 truncate text-center text-xs font-semibold text-cream/50">
+      <p className="relative mt-1 truncate text-center text-[11px] font-semibold text-cream/45">
         {tz}
       </p>
-      <p className="relative mt-1 text-center text-xs text-gold/80">
+      <p className="relative text-center text-[11px] text-gold/80">
         {hijri.day} {hijri.monthName} {hijri.year} AH
       </p>
     </section>
@@ -410,7 +489,12 @@ export function InlineClock() {
   if (!now) return null;
 
   const hijri = toHijri(now);
-  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // Seconds included; tabular-nums stops the width jittering each tick
+  const time = now.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 
   return (
     <span className="hidden items-center gap-3 text-sm font-semibold text-ink/65 md:flex">
