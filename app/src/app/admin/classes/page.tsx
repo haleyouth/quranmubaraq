@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Plus, Video } from "lucide-react";
-import { todaySessions, teachers, students } from "@/lib/admin/demo-data";
+import { teachers, students } from "@/lib/admin/demo-data";
+import { classDefs, WEEKDAY_LABEL, type Weekday } from "@/lib/admin/schedule";
+import { getSession, type Session } from "@/lib/admin/demo-auth";
 import { courses } from "@/lib/content";
 import {
   AdminButton, AdminPage, Badge, DemoNotice, Field, Panel, StatTile,
@@ -10,10 +12,13 @@ import {
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const SLOTS = ["07:00", "08:00", "09:00", "10:00", "11:00", "17:00", "18:00", "19:00"];
+/** Monday-first, matching the weekday numbers used by the schedule engine. */
+const DAY_ORDER: Weekday[] = [1, 2, 3, 4, 5, 6, 0];
 
 export default function ClassesPage() {
+  const [session, setSession] = useState<Session | null>(null);
+  useEffect(() => setSession(getSession()), []);
+
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>(["Mon", "Wed", "Fri"]);
@@ -23,15 +28,29 @@ export default function ClassesPage() {
     window.setTimeout(() => setToast(""), 3500);
   }
 
-  // Deterministic pseudo-schedule so the grid renders consistently
-  const grid = SLOTS.map((slot, si) => ({
-    slot,
-    cells: DAYS.map((day, di) => {
-      const idx = (si * 7 + di) % todaySessions.length;
-      const busy = (si + di) % 3 !== 0;
-      return busy ? todaySessions[idx] : null;
-    }),
-  }));
+  /**
+   * Real weekly grid, built from the class definitions rather than a formula.
+   * Rows are only the times that actually have a class, so the table shows
+   * exactly what is scheduled and nothing invented.
+   */
+  const grid = useMemo(() => {
+    const mine = classDefs.filter((c) => {
+      if (c.status !== "active") return false;
+      if (!session) return true;
+      if (session.role === "teacher") return c.teacherName === session.name;
+      if (session.role === "student") return c.studentName === session.name;
+      return true;
+    });
+
+    const slots = Array.from(new Set(mine.map((c) => c.start))).sort();
+
+    return slots.map((slot) => ({
+      slot,
+      cells: DAY_ORDER.map((dow) =>
+        mine.filter((c) => c.start === slot && c.days.includes(dow)),
+      ),
+    }));
+  }, [session]);
 
   return (
     <AdminPage
@@ -71,9 +90,9 @@ export default function ClassesPage() {
                 <th scope="col" className="px-2 py-2 text-left text-xs font-bold text-ink/55 uppercase">
                   Time
                 </th>
-                {DAYS.map((d) => (
+                {DAY_ORDER.map((d) => (
                   <th key={d} scope="col" className="px-2 py-2 text-center text-xs font-bold text-ink/55 uppercase">
-                    {d}
+                    {WEEKDAY_LABEL[d]}
                   </th>
                 ))}
               </tr>
@@ -84,12 +103,22 @@ export default function ClassesPage() {
                   <th scope="row" className="px-2 py-1.5 text-left font-display text-sm text-ink">
                     {slot}
                   </th>
-                  {cells.map((cell, i) => (
-                    <td key={i} className="p-1">
-                      {cell ? (
-                        <div className="rounded-lg border-2 border-ink bg-green px-2 py-1.5 text-xs text-white">
-                          <p className="truncate font-bold">{cell.student}</p>
-                          <p className="truncate opacity-85">{cell.course}</p>
+                  {cells.map((classesHere, i) => (
+                    <td key={i} className="p-1 align-top">
+                      {classesHere.length > 0 ? (
+                        <div className="space-y-1">
+                          {classesHere.map((c) => (
+                            <div
+                              key={c.id}
+                              className="rounded-lg border-2 border-ink bg-green px-2 py-1.5 text-xs text-white"
+                              title={`${c.studentName} — ${c.course} with ${c.teacherName}, ${c.durationMin} min`}
+                            >
+                              <p className="truncate font-bold">{c.studentName}</p>
+                              <p className="truncate opacity-85">
+                                {c.course.replace("Quran ", "")}
+                              </p>
+                            </div>
+                          ))}
                         </div>
                       ) : (
                         <div className="rounded-lg border-2 border-dashed border-ink/20 px-2 py-1.5 text-center text-xs text-ink/35">
@@ -176,7 +205,8 @@ export default function ClassesPage() {
           </Field>
           <Field label="Repeats on">
             <div className="flex flex-wrap gap-2">
-              {DAYS.map((d) => {
+              {DAY_ORDER.map((dow) => {
+                const d = WEEKDAY_LABEL[dow];
                 const on = selectedDays.includes(d);
                 return (
                   <button

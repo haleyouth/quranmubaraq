@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Download, Send } from "lucide-react";
 import { invoices as invSeed, payouts as poSeed, revenueByMonth, type Invoice } from "@/lib/admin/demo-data";
 import { plans } from "@/lib/content";
+import { getSession, type Session } from "@/lib/admin/demo-auth";
 import {
   AdminButton, AdminPage, DemoNotice, Panel, StatTile, StatusBadge, Table, Td, Tr,
 } from "@/components/admin/ui";
@@ -12,6 +13,9 @@ import { LineChart } from "@/components/admin/Charts";
 const TABS = ["invoices", "payouts", "plans"] as const;
 
 export default function FinancePage() {
+  const [session, setSession] = useState<Session | null>(null);
+  useEffect(() => setSession(getSession()), []);
+
   const [tab, setTab] = useState<(typeof TABS)[number]>("invoices");
   const [invoices, setInvoices] = useState<Invoice[]>([...invSeed]);
   const [toast, setToast] = useState("");
@@ -28,10 +32,27 @@ export default function FinancePage() {
     flash(`${inv.id} marked paid.`);
   }
 
+  // Nav hiding is not a boundary — guard the page itself. Students and
+  // teachers have no business in the academy ledger.
+  const allowed = session?.role === "admin" || session?.role === "principal";
+
   const outstanding = invoices
     .filter((i) => i.status !== "paid")
     .reduce((a, i) => a + Number(i.amount), 0);
   const overdue = invoices.filter((i) => i.status === "overdue").length;
+
+  if (session && !allowed) {
+    return (
+      <AdminPage title="Finance" description="Restricted area.">
+        <Panel title="Not available">
+          <p className="py-6 text-center text-ink/70">
+            Finance is limited to administration and principals. Your own
+            invoices are shown on your dashboard.
+          </p>
+        </Panel>
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage

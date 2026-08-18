@@ -19,6 +19,7 @@ import {
   type Session,
 } from "@/lib/admin/demo-auth";
 import { InlineClock } from "@/components/admin/DateTimePanel";
+import { AyahBar } from "@/components/admin/AyahBar";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
@@ -274,6 +275,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <div className="p-5 md:p-7">
+          <AyahBar />
+
           {/* Impersonation takes priority — it must never be missed */}
           {impersonation ? (
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-ink bg-green-deep px-4 py-3 text-white">

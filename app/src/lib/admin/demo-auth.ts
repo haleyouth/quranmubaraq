@@ -186,6 +186,6 @@ export const ROLE_NAV: Record<Role, readonly string[]> = {
     "attendance", "leave", "reports", "policies",
   ],
   student: [
-    "dashboard", "messages", "classes", "attendance", "reports", "finance", "complaints",
+    "dashboard", "messages", "classes", "attendance", "reports", "complaints",
   ],
 };

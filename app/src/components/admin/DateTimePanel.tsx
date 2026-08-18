@@ -42,7 +42,7 @@ export function DateTimePanel({
 
   if (!now) {
     return (
-      <div className="grid gap-5 lg:grid-cols-[1.9fr_1fr]">
+      <div className="grid items-start gap-5 lg:grid-cols-[1.7fr_1fr]">
         <div className="h-[420px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
         <div className="h-[420px] animate-pulse rounded-2xl border-2 border-ink bg-white" />
       </div>
@@ -50,7 +50,7 @@ export function DateTimePanel({
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.9fr_1fr]">
+    <div className="grid items-stretch gap-5 lg:grid-cols-[1.7fr_1fr]">
       <CalendarCard
         now={now}
         tab={tab}
@@ -159,44 +159,37 @@ function CalendarCard({
   return (
     <section className="rounded-2xl border-2 border-ink bg-white hard-shadow">
       {/* Today summary */}
-      <header className="border-b-2 border-ink/12 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border-2 border-ink bg-cream p-4">
-            <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink/55 uppercase">
-              <CalendarDays className="size-3.5" aria-hidden="true" />
-              Gregorian
+      <header className="grid gap-2 border-b-2 border-ink/12 p-3 sm:grid-cols-2">
+        <div className="flex items-center gap-2.5 rounded-xl border-2 border-ink bg-cream px-3 py-2">
+          <CalendarDays className="size-4 shrink-0 text-ink/50" aria-hidden="true" />
+          <div className="min-w-0">
+            <p className="font-display truncate text-base leading-tight text-ink">
+              {now.getDate()} {MONTH_LABEL[now.getMonth()]} {now.getFullYear()}
             </p>
-            <p className="font-display mt-1.5 text-xl leading-tight text-ink">
-              {now.getDate()} {MONTH_LABEL[now.getMonth()]}
-            </p>
-            <p className="text-sm font-semibold text-ink/60">
-              {now.toLocaleDateString("en-GB", { weekday: "long" })}, {now.getFullYear()}
+            <p className="truncate text-xs font-semibold text-ink/55">
+              {now.toLocaleDateString("en-GB", { weekday: "long" })}
             </p>
           </div>
+        </div>
 
-          <div className="rounded-xl border-2 border-ink bg-green p-4 text-white">
-            <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-white/80 uppercase">
-              <Moon className="size-3.5" aria-hidden="true" />
-              Hijri
+        <div className="flex items-center gap-2.5 rounded-xl border-2 border-ink bg-green px-3 py-2 text-white">
+          <Moon className="size-4 shrink-0 text-white/70" aria-hidden="true" />
+          <div className="min-w-0">
+            <p className="font-display truncate text-base leading-tight">
+              {hijriToday.day} {hijriToday.monthName} {hijriToday.year} AH
             </p>
-            <p className="font-display mt-1.5 text-xl leading-tight">
-              {hijriToday.day} {hijriToday.monthName}
-            </p>
-            <p className="text-sm font-semibold text-white/80">
-              {hijriToday.year} AH
-              <span
-                className="ml-1 text-white/60"
-                title="Tabular calculation — local moon sighting may differ by a day"
-              >
-                (approx.)
-              </span>
+            <p
+              className="truncate text-xs font-semibold text-white/70"
+              title="Tabular calculation — local moon sighting may differ by a day"
+            >
+              Hijri (approx.)
             </p>
           </div>
         </div>
       </header>
 
       {/* Tabs + month navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink/12 px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-ink/12 px-3 py-2">
         <div
           role="tablist"
           aria-label="Calendar system"
@@ -246,10 +239,10 @@ function CalendarCard({
       </div>
 
       {/* Grid */}
-      <div className="p-4">
-        <div className="mb-3">
-          <h3 className="font-display text-lg text-ink">{heading}</h3>
-          <p className="text-sm text-ink/55">{subheading}</p>
+      <div className="p-3">
+        <div className="mb-2 flex flex-wrap items-baseline gap-x-2">
+          <h3 className="font-display text-base text-ink">{heading}</h3>
+          <p className="text-xs text-ink/50">{subheading}</p>
         </div>
 
         <div className="grid grid-cols-7 gap-1">
@@ -279,7 +272,7 @@ function CalendarCard({
                     : undefined
                 }
                 className={cn(
-                  "relative flex h-14 flex-col items-center justify-center rounded-lg border-2 transition-colors",
+                  "relative flex h-12 flex-col items-center justify-center rounded-lg border-2 transition-colors",
                   c.inMonth ? "bg-white" : "bg-cream-deep/30",
                   isToday
                     ? "border-green-deep bg-green-deep text-white ring-2 ring-green-deep/25"
@@ -324,7 +317,7 @@ function CalendarCard({
           })}
         </div>
 
-        <p className="mt-3 flex flex-wrap items-center gap-3 text-xs text-ink/55">
+        <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink/55">
           <span className="flex items-center gap-1.5">
             <span className="size-3 rounded border-2 border-green-deep bg-green-deep" />
             Today
@@ -374,7 +367,7 @@ function PremiumClock({ now }: { now: Date }) {
   const CIRC = 2 * Math.PI * 88;
 
   return (
-    <section className="islamic-pattern-strong relative flex flex-col self-start overflow-hidden rounded-2xl border-2 border-ink bg-ink px-4 py-4 text-cream hard-shadow">
+    <section className="islamic-pattern-strong relative flex flex-col overflow-hidden rounded-2xl border-2 border-ink bg-ink px-4 py-4 text-cream hard-shadow">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-20 -right-20 size-60 rounded-full bg-gold/20 blur-3xl"
@@ -397,10 +390,10 @@ function PremiumClock({ now }: { now: Date }) {
       </div>
 
       {/* Analogue face — fills the panel, capped so it never dominates */}
-      <div className="relative mx-auto my-3 w-full max-w-[16rem]">
+      <div className="relative mx-auto flex min-h-0 w-full flex-1 items-center justify-center py-2">
         <svg
           viewBox="0 0 200 200"
-          className="aspect-square w-full"
+          className="aspect-square h-full max-h-[17rem] w-auto max-w-full"
           role="img"
           aria-label={`Clock showing ${hh}:${mm}:${ss}`}
         >
