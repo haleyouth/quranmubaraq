@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Info, MessageSquarePlus, Search, Send, ShieldCheck } from "lucide-react";
 import { getSession, type Role, type Session } from "@/lib/admin/demo-auth";
 import {
-  canMessage, contactsFor, seedMessages, threadId, timeAgo,
+  canMessage, contactsFor, loadMessages, markThreadRead, persistMessage,
+  resetMessages, subscribeMessages, threadId, timeAgo,
   type Message, type Party,
 } from "@/lib/admin/messages";
 import {
@@ -22,14 +23,27 @@ const ROLE_TONE = {
 
 export default function MessagesPage() {
   const [session, setSession] = useState<Session | null>(null);
-  const [messages, setMessages] = useState<Message[]>([...seedMessages]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [active, setActive] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
   const [composing, setComposing] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setSession(getSession()), []);
+  // Messages live in a shared store, so a message sent by one account is
+  // visible when you sign in as the other — and updates live across tabs.
+  useEffect(() => {
+    setSession(getSession());
+    const refresh = () => setMessages(loadMessages());
+    refresh();
+    const unsubscribe = subscribeMessages(refresh);
+    // Keeps the relative timestamps ("34m ago") honest
+    const tick = window.setInterval(refresh, 30_000);
+    return () => {
+      unsubscribe();
+      window.clearInterval(tick);
+    };
+  }, []);
 
   const contacts = useMemo(
     () => (session ? contactsFor(session.role, session.name) : []),
@@ -65,15 +79,11 @@ export default function MessagesPage() {
     endRef.current?.scrollIntoView({ block: "end" });
   }, [active, messages]);
 
-  // Mark the open thread as read
+  // Mark the open thread as read for this reader only
   useEffect(() => {
     if (!active || !session) return;
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.threadId === active && m.fromName !== session.name ? { ...m, read: true } : m,
-      ),
-    );
-  }, [active, session]);
+    markThreadRead(active, session.name);
+  }, [active, session, messages.length]);
 
   if (!session) return null;
 
@@ -81,18 +91,15 @@ export default function MessagesPage() {
     if (!session || !current || !draft.trim()) return;
     if (!canMessage(session.role, session.name, current.contact.name)) return;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: `M-${Date.now()}`,
-        threadId: current.id,
-        fromName: session.name,
-        fromRole: session.role,
-        body: draft.trim(),
-        minutesAgo: 0,
-        read: true,
-      },
-    ]);
+    persistMessage({
+      id: `M-${Date.now()}-${Math.round(Math.random() * 1e6)}`,
+      threadId: current.id,
+      fromName: session.name,
+      fromRole: session.role,
+      body: draft.trim(),
+      read: false, // unread for the recipient until they open the thread
+    });
+    setMessages(loadMessages());
     setDraft("");
   }
 
@@ -109,13 +116,30 @@ export default function MessagesPage() {
       title="Messages"
       description={permissionNote(session.role)}
       actions={
-        <AdminButton onClick={() => setComposing(true)}>
-          <MessageSquarePlus className="size-4" aria-hidden="true" />
-          New message
-        </AdminButton>
+        <>
+          <AdminButton
+            variant="outline"
+            onClick={() => {
+              resetMessages();
+              setMessages(loadMessages());
+              setActive(null);
+            }}
+            title="Restore the seeded conversations"
+          >
+            Reset demo
+          </AdminButton>
+          <AdminButton onClick={() => setComposing(true)}>
+            <MessageSquarePlus className="size-4" aria-hidden="true" />
+            New message
+          </AdminButton>
+        </>
       }
     >
-      <DemoNotice />
+      <DemoNotice>
+        Messages are shared between the demo accounts on this browser, so a
+        message sent as one role appears when you sign in as the other. Stored
+        locally only — replaced by Firestore when the backend lands.
+      </DemoNotice>
 
       <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
         {/* Conversation list */}

@@ -209,3 +209,102 @@ export function timeAgo(minutes: number): string {
   const d = Math.floor(h / 24);
   return d === 1 ? "yesterday" : `${d}d ago`;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                            Shared message store                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Messages are persisted to localStorage under one shared key, so a message
+ * sent by a teacher is visible when you sign in as that student — including
+ * in another browser tab, via the `storage` event.
+ *
+ * This is a demo stand-in for Firestore. When the backend lands, replace the
+ * read/write pair below with a collection query and an addDoc; the component
+ * API does not change.
+ */
+
+const STORE_KEY = "qm_messages_v1";
+
+type Stored = Omit<Message, "minutesAgo"> & { sentAt: number };
+
+function toStored(m: Message, now: number): Stored {
+  const { minutesAgo, ...rest } = m;
+  return { ...rest, sentAt: now - minutesAgo * 60_000 };
+}
+
+function fromStored(s: Stored, now: number): Message {
+  return { ...s, minutesAgo: Math.max(0, (now - s.sentAt) / 60_000) };
+}
+
+/** Seeds the store on first run, then returns every message. */
+export function loadMessages(now = Date.now()): Message[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const raw = window.localStorage.getItem(STORE_KEY);
+    if (!raw) {
+      const seeded = seedMessages.map((m) => toStored(m, now));
+      window.localStorage.setItem(STORE_KEY, JSON.stringify(seeded));
+      return seeded.map((s) => fromStored(s, now));
+    }
+    return (JSON.parse(raw) as Stored[])
+      .map((s) => fromStored(s, now))
+      .sort((a, b) => b.minutesAgo - a.minutesAgo);
+  } catch {
+    return seedMessages.map((m) => ({ ...m }));
+  }
+}
+
+/** Appends a message and notifies other tabs. */
+export function persistMessage(msg: Omit<Message, "minutesAgo">): void {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.localStorage.getItem(STORE_KEY);
+    const list: Stored[] = raw ? JSON.parse(raw) : [];
+    list.push({ ...msg, sentAt: Date.now() });
+    window.localStorage.setItem(STORE_KEY, JSON.stringify(list));
+    // Same-tab listeners; the storage event only fires in *other* tabs
+    window.dispatchEvent(new CustomEvent("qm-messages-changed"));
+  } catch {
+    /* storage unavailable — the message stays in memory for this session */
+  }
+}
+
+/** Marks a thread read for one person, so unread badges clear correctly. */
+export function markThreadRead(threadIdValue: string, readerName: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const list = (JSON.parse(raw) as Stored[]).map((s) =>
+      s.threadId === threadIdValue && s.fromName !== readerName
+        ? { ...s, read: true }
+        : s,
+    );
+    window.localStorage.setItem(STORE_KEY, JSON.stringify(list));
+    window.dispatchEvent(new CustomEvent("qm-messages-changed"));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Subscribes to changes from this tab and others. Returns an unsubscribe. */
+export function subscribeMessages(fn: () => void): () => void {
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === STORE_KEY) fn();
+  };
+  window.addEventListener("storage", onStorage);
+  window.addEventListener("qm-messages-changed", fn);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener("qm-messages-changed", fn);
+  };
+}
+
+/** Clears the store, restoring the seeded conversations. */
+export function resetMessages(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(STORE_KEY);
+  window.dispatchEvent(new CustomEvent("qm-messages-changed"));
+}

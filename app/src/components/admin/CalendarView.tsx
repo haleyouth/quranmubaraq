@@ -139,7 +139,7 @@ export function CalendarView({
                   disabled={list.length === 0}
                   aria-label={`${day.getDate()} ${MONTH_LABEL[day.getMonth()]}, ${list.length} classes`}
                   className={cn(
-                    "min-h-[64px] rounded-lg border-2 p-1.5 text-left transition-colors sm:min-h-[92px] sm:rounded-xl sm:p-2",
+                    "h-[76px] rounded-lg border-2 p-1.5 text-left transition-colors sm:h-[92px] sm:rounded-xl sm:p-2",
                     inMonth ? "bg-white" : "bg-cream-deep/40",
                     isToday ? "border-green-deep ring-2 ring-green-deep/25" : "border-ink/15",
                     list.length > 0
@@ -150,14 +150,19 @@ export function CalendarView({
                   <span className="flex items-baseline justify-between">
                     <span
                       className={cn(
-                        "font-display text-sm",
+                        "font-display text-lg leading-none",
                         inMonth ? "text-ink" : "text-ink/35",
                         isToday && "text-green-deep",
                       )}
                     >
                       {day.getDate()}
                     </span>
-                    <span className={cn("text-[10px]", inMonth ? "text-ink/40" : "text-ink/20")}>
+                    <span
+                      className={cn(
+                        "text-[11px] font-semibold leading-none",
+                        inMonth ? "text-ink/45" : "text-ink/25",
+                      )}
+                    >
                       {hijri.day}
                     </span>
                   </span>

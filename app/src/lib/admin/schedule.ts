@@ -68,23 +68,46 @@ export type ClassSession = {
 const MWF: readonly Weekday[] = [1, 3, 5];
 const TTH: readonly Weekday[] = [2, 4];
 const FIVE: readonly Weekday[] = [1, 2, 3, 4, 5];
+const SAT_SUN: readonly Weekday[] = [6, 0];
 
 function zoom(id: string) {
   // Placeholder rooms until the Zoom Server-to-Server integration lands.
   return `https://zoom.us/j/${id}`;
 }
 
+/**
+ * Teacher-student assignments.
+ *
+ * Each student belongs to one or two named teachers, and no two students
+ * share an identical timetable — start times, weekdays and durations all
+ * differ, so a schedule is genuinely personal rather than a shared template.
+ *
+ * Ayesha  T-101 : Yusuf, Maryam, Omar         (Tajweed, Hifz)
+ * Bilal   T-102 : Ahmad, Zainab               (Tajweed, Recitation)
+ * Zainab  T-103 : Bilal Hassan, Yusuf         (Islamic Studies)
+ * Yusuf Q T-104 : Aisha, Maryam               (Tafseer, Arabic)
+ * Imran   T-105 : Fatima                      (Tajweed)
+ */
 export const classDefs: readonly ClassDef[] = [
-  { id: "C-001", studentId: "ST-401", studentName: "Yusuf Ibrahim", teacherId: "T-101", teacherName: "Ustadha Ayesha Siddiqa", course: "Quran Reading", days: FIVE, start: "07:00", durationMin: 30, zoomUrl: zoom("98211100401"), status: "active" },
-  { id: "C-002", studentId: "ST-402", studentName: "Maryam Khan", teacherId: "T-101", teacherName: "Ustadha Ayesha Siddiqa", course: "Quran Memorization", days: FIVE, start: "07:30", durationMin: 60, zoomUrl: zoom("98211100402"), status: "active" },
-  { id: "C-003", studentId: "ST-403", studentName: "Ahmad Raza", teacherId: "T-102", teacherName: "Ustadh Bilal Ahmed", course: "Quran Recitation", days: MWF, start: "08:00", durationMin: 30, zoomUrl: zoom("98211100403"), status: "active" },
-  { id: "C-004", studentId: "ST-404", studentName: "Fatima Noor", teacherId: "T-105", teacherName: "Ustadh Imran Malik", course: "Quran Reading", days: MWF, start: "08:30", durationMin: 30, zoomUrl: zoom("98211100404"), status: "active" },
-  { id: "C-005", studentId: "ST-405", studentName: "Bilal Hassan", teacherId: "T-103", teacherName: "Ustadha Zainab Ali", course: "Islamic Education", days: TTH, start: "09:00", durationMin: 30, zoomUrl: zoom("98211100405"), status: "active" },
-  { id: "C-006", studentId: "ST-406", studentName: "Aisha Siddiq", teacherId: "T-104", teacherName: "Ustadh Yusuf Qadri", course: "Quran Translation", days: FIVE, start: "09:00", durationMin: 60, zoomUrl: zoom("98211100406"), status: "active" },
-  { id: "C-007", studentId: "ST-407", studentName: "Omar Farooq", teacherId: "T-101", teacherName: "Ustadha Ayesha Siddiqa", course: "Quran Memorization", days: FIVE, start: "09:30", durationMin: 60, zoomUrl: zoom("98211100407"), status: "active" },
-  { id: "C-008", studentId: "ST-408", studentName: "Zainab Tariq", teacherId: "T-102", teacherName: "Ustadh Bilal Ahmed", course: "Quran Reading", days: MWF, start: "10:00", durationMin: 30, zoomUrl: zoom("98211100408"), status: "active" },
-  { id: "C-009", studentId: "ST-401", studentName: "Yusuf Ibrahim", teacherId: "T-103", teacherName: "Ustadha Zainab Ali", course: "Islamic Education", days: TTH, start: "17:00", durationMin: 30, zoomUrl: zoom("98211100409"), status: "active" },
+  // --- Ustadha Ayesha Siddiqa (T-101) ---
+  { id: "C-001", studentId: "ST-401", studentName: "Yusuf Ibrahim", teacherId: "T-101", teacherName: "Ustadha Ayesha Siddiqa", course: "Quran Reading", days: MWF, start: "07:00", durationMin: 30, zoomUrl: zoom("98211100401"), status: "active" },
+  { id: "C-002", studentId: "ST-402", studentName: "Maryam Khan", teacherId: "T-101", teacherName: "Ustadha Ayesha Siddiqa", course: "Quran Memorization", days: FIVE, start: "07:45", durationMin: 60, zoomUrl: zoom("98211100402"), status: "active" },
+  { id: "C-007", studentId: "ST-407", studentName: "Omar Farooq", teacherId: "T-101", teacherName: "Ustadha Ayesha Siddiqa", course: "Quran Memorization", days: SAT_SUN, start: "09:00", durationMin: 60, zoomUrl: zoom("98211100407"), status: "active" },
+
+  // --- Ustadh Bilal Ahmed (T-102) ---
+  { id: "C-003", studentId: "ST-403", studentName: "Ahmad Raza", teacherId: "T-102", teacherName: "Ustadh Bilal Ahmed", course: "Quran Recitation", days: TTH, start: "08:15", durationMin: 30, zoomUrl: zoom("98211100403"), status: "active" },
+  { id: "C-008", studentId: "ST-408", studentName: "Zainab Tariq", teacherId: "T-102", teacherName: "Ustadh Bilal Ahmed", course: "Quran Reading", days: MWF, start: "10:30", durationMin: 30, zoomUrl: zoom("98211100408"), status: "active" },
+
+  // --- Ustadha Zainab Ali (T-103) ---
+  { id: "C-005", studentId: "ST-405", studentName: "Bilal Hassan", teacherId: "T-103", teacherName: "Ustadha Zainab Ali", course: "Islamic Education", days: TTH, start: "09:30", durationMin: 30, zoomUrl: zoom("98211100405"), status: "active" },
+  { id: "C-009", studentId: "ST-401", studentName: "Yusuf Ibrahim", teacherId: "T-103", teacherName: "Ustadha Zainab Ali", course: "Islamic Education", days: SAT_SUN, start: "17:00", durationMin: 30, zoomUrl: zoom("98211100409"), status: "active" },
+
+  // --- Ustadh Yusuf Qadri (T-104) ---
+  { id: "C-006", studentId: "ST-406", studentName: "Aisha Siddiq", teacherId: "T-104", teacherName: "Ustadh Yusuf Qadri", course: "Quran Translation", days: MWF, start: "11:00", durationMin: 60, zoomUrl: zoom("98211100406"), status: "active" },
   { id: "C-010", studentId: "ST-402", studentName: "Maryam Khan", teacherId: "T-104", teacherName: "Ustadh Yusuf Qadri", course: "Quran Translation", days: TTH, start: "18:00", durationMin: 60, zoomUrl: zoom("98211100410"), status: "active" },
+
+  // --- Ustadh Imran Malik (T-105) ---
+  { id: "C-004", studentId: "ST-404", studentName: "Fatima Noor", teacherId: "T-105", teacherName: "Ustadh Imran Malik", course: "Quran Reading", days: TTH, start: "08:45", durationMin: 30, zoomUrl: zoom("98211100404"), status: "active" },
 ] as const;
 
 /* -------------------------------------------------------------------------- */

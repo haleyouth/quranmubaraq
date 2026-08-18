@@ -159,7 +159,7 @@ function CalendarCard({
   return (
     <section className="rounded-2xl border-2 border-ink bg-white hard-shadow">
       {/* Today summary */}
-      <header className="border-b-2 border-ink/12 p-5">
+      <header className="border-b-2 border-ink/12 p-4">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border-2 border-ink bg-cream p-4">
             <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink/55 uppercase">
@@ -246,7 +246,7 @@ function CalendarCard({
       </div>
 
       {/* Grid */}
-      <div className="p-5">
+      <div className="p-4">
         <div className="mb-3">
           <h3 className="font-display text-lg text-ink">{heading}</h3>
           <p className="text-sm text-ink/55">{subheading}</p>
@@ -279,7 +279,7 @@ function CalendarCard({
                     : undefined
                 }
                 className={cn(
-                  "relative flex aspect-square flex-col items-center justify-center rounded-lg border-2 transition-colors",
+                  "relative flex h-14 flex-col items-center justify-center rounded-lg border-2 transition-colors",
                   c.inMonth ? "bg-white" : "bg-cream-deep/30",
                   isToday
                     ? "border-green-deep bg-green-deep text-white ring-2 ring-green-deep/25"
@@ -290,7 +290,7 @@ function CalendarCard({
               >
                 <span
                   className={cn(
-                    "font-display text-sm leading-none",
+                    "font-display text-lg leading-none",
                     isToday ? "text-white" : c.inMonth ? "text-ink" : "text-ink/30",
                   )}
                 >
@@ -298,8 +298,8 @@ function CalendarCard({
                 </span>
                 <span
                   className={cn(
-                    "mt-0.5 text-[9px] leading-none",
-                    isToday ? "text-white/70" : c.inMonth ? "text-ink/40" : "text-ink/20",
+                    "mt-0.5 text-[11px] leading-none font-semibold",
+                    isToday ? "text-white/75" : c.inMonth ? "text-ink/45" : "text-ink/25",
                   )}
                 >
                   {c.secondary}
@@ -308,7 +308,7 @@ function CalendarCard({
                 {classes > 0 && c.inMonth && (
                   <span
                     className={cn(
-                      "mt-1 inline-flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-1 text-[8px] font-bold leading-none",
+                      "absolute top-1 right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold leading-none",
                       isToday
                         ? "bg-white text-green-deep"
                         : isPast
