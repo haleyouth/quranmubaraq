@@ -5,9 +5,10 @@ import { ArrowRight, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { courses, registrationForm } from "@/lib/content";
 import { countries, popularCountries } from "@/lib/countries";
 import { Container, Section } from "@/components/ui/Section";
+import { DateRoller, calculateAge } from "@/components/ui/DateRoller";
 import { cn } from "@/lib/utils";
 
-type Errors = Partial<Record<"name" | "email" | "phone" | "country", string>>;
+type Errors = Partial<Record<"name" | "email" | "phone" | "country" | "dob", string>>;
 type Status = "idle" | "submitting" | "success" | "error";
 
 const fieldBase =
@@ -16,6 +17,7 @@ const fieldBase =
 export function RegistrationForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Errors>({});
+  const [dob, setDob] = useState("");
 
   function validate(data: FormData): Errors {
     const next: Errors = {};
@@ -31,6 +33,14 @@ export function RegistrationForm() {
     if (phone.replace(/\D/g, "").length < 7)
       next.phone = "Please enter a valid phone number, including country code.";
     if (!country) next.country = "Please select your country.";
+
+    // Age drives cohort placement and teacher matching, so the date is
+    // required and validated here rather than inferred later.
+    const age = calculateAge(dob);
+    if (!dob) next.dob = "Please select the student's date of birth.";
+    else if (age === null) next.dob = "That date does not look right.";
+    else if (age < 3) next.dob = "Students must be at least 3 years old.";
+    else if (age > 90) next.dob = "Please check the year of birth.";
 
     return next;
   }
@@ -59,9 +69,12 @@ export function RegistrationForm() {
         country: String(data.get("country")),
         course: String(data.get("course") ?? ""),
         teacherPreference: String(data.get("teacherPreference") ?? ""),
+        dateOfBirth: dob,
+        age: calculateAge(dob) ?? undefined,
       });
       setStatus("success");
       form.reset();
+      setDob("");
     } catch (err) {
       console.error("Lead submission failed:", err);
       setStatus("error");
@@ -169,6 +182,15 @@ export function RegistrationForm() {
                 hint="Include your country code so we can reach you."
                 error={errors.phone}
                 required
+              />
+
+              <DateRoller
+                name="dateOfBirth"
+                value={dob}
+                onChange={setDob}
+                error={errors.dob}
+                required
+                label="Student's date of birth"
               />
 
               {/* Country */}

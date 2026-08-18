@@ -26,6 +26,7 @@ export const nav = [
   { label: "Fees Structure", href: "/fees" },
   { label: "Downloads", href: "/downloads" },
   { label: "Blog", href: "/blog" },
+  { label: "Careers", href: "/careers" },
   { label: "Contact Us", href: "/contact-us" },
 ] as const;
 

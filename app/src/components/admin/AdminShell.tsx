@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  BookOpen, CalendarDays, ChartColumn, ClipboardList, CreditCard, FileText,
+  BookOpen, Briefcase, CalendarDays, ChartColumn, ClipboardList, CreditCard, FileText,
   Eye, GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning,
   MessageCircle, PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
   Users, X,
@@ -28,6 +28,7 @@ const NAV = [
   { key: "today", label: "Today's Classes", href: "/admin/today", icon: CalendarDays },
   { key: "messages", label: "Messages", href: "/admin/messages", icon: MessageCircle },
   { key: "leads", label: "Leads", href: "/admin/leads", icon: ClipboardList },
+  { key: "applications", label: "Applications", href: "/admin/applications", icon: Briefcase },
   { key: "students", label: "Students", href: "/admin/students", icon: Users },
   { key: "teachers", label: "Teachers", href: "/admin/teachers", icon: GraduationCap },
   { key: "classes", label: "Classes", href: "/admin/classes", icon: BookOpen },

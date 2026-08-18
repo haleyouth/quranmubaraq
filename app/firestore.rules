@@ -36,9 +36,12 @@ service cloud.firestore {
       // Anyone may submit a registration, but only with a well-formed
       // payload and only as a brand-new 'new' lead. This prevents the public
       // form being used to inject arbitrary documents.
+      // hasOnly permits a subset, so the public form's payload is fixed:
+      // staff-only fields (note, owner) can never arrive from the website.
       allow create: if request.resource.data.keys().hasOnly([
                          'name', 'email', 'phone', 'country',
                          'course', 'teacherPreference',
+                         'dateOfBirth', 'age',
                          'status', 'source', 'createdAt'
                        ])
                     && request.resource.data.name is string
@@ -54,8 +57,66 @@ service cloud.firestore {
                     && request.resource.data.source == 'website';
 
       // Leads contain personal data — never publicly readable.
-      allow read, update: if isStaff();
-      allow delete: if hasRole('super_admin');
+      allow read: if isStaff();
+
+      // Staff may correct the enquiry and move it through the pipeline, but
+      // never rewrite its provenance: source and createdAt are immutable.
+      allow update: if isStaff()
+                    && request.resource.data.diff(resource.data)
+                         .affectedKeys().hasOnly([
+                           'name', 'email', 'phone', 'country', 'course',
+                           'teacherPreference', 'dateOfBirth', 'age',
+                           'status', 'note', 'owner'
+                         ])
+                    && request.resource.data.source == resource.data.source
+                    && request.resource.data.createdAt == resource.data.createdAt;
+
+      // Admin and principal may delete: a lead is a contact enquiry, and a
+      // parent asking to be removed should be removed.
+      allow delete: if hasRole('super_admin') || hasRole('admin') || hasRole('principal');
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Job applications — public careers form                           */
+    /* ---------------------------------------------------------------- */
+
+    match /applications/{applicationId} {
+      // Anyone may apply, but only with a well-formed payload and only as a
+      // brand-new 'new' application, so the form cannot inject documents.
+      allow create: if request.resource.data.keys().hasOnly([
+                         'name', 'email', 'phone', 'country', 'role', 'gender',
+                         'dateOfBirth', 'age', 'qualifications',
+                         'experienceYears', 'availability', 'message',
+                         'status', 'source', 'createdAt'
+                       ])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() >= 2
+                    && request.resource.data.name.size() <= 120
+                    && request.resource.data.email is string
+                    && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$')
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() <= 40
+                    && request.resource.data.qualifications is string
+                    && request.resource.data.qualifications.size() <= 2000
+                    && request.resource.data.message.size() <= 2000
+                    && request.resource.data.status == 'new'
+                    && request.resource.data.source == 'careers';
+
+      // Applications contain personal data — staff only.
+      allow read: if isStaff();
+
+      allow update: if isStaff()
+                    && request.resource.data.diff(resource.data)
+                         .affectedKeys().hasOnly([
+                           'name', 'email', 'phone', 'country', 'role',
+                           'gender', 'dateOfBirth', 'age', 'qualifications',
+                           'experienceYears', 'availability', 'message',
+                           'status', 'note'
+                         ])
+                    && request.resource.data.source == resource.data.source
+                    && request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if hasRole('super_admin') || hasRole('admin') || hasRole('principal');
     }
 
     /* ---------------------------------------------------------------- */
