@@ -116,7 +116,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex flex-col border-r-4 border-ink bg-ink transition-all lg:translate-x-0",
+          "islamic-pattern-subtle fixed inset-y-0 left-0 z-40 flex flex-col border-r-4 border-ink bg-ink transition-all lg:translate-x-0",
           collapsed ? "w-72 lg:w-20" : "w-72",
           open ? "translate-x-0" : "-translate-x-full",
         )}
@@ -127,12 +127,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             collapsed ? "lg:justify-center lg:px-2" : "justify-between",
           )}
         >
-          {/* Full logo always — it scales down rather than being replaced */}
-          <Logo
-            width={collapsed ? 56 : 120}
-            href="/admin"
-            plateClassName="border-cream/25 bg-transparent px-0 py-0"
-          />
+          {/*
+            Hidden on desktop once collapsed — at 20 units wide the rail has
+            room for the toggle only. Still shown in the mobile drawer, which
+            is always full width.
+          */}
+          <span className={cn(collapsed && "lg:hidden")}>
+            <Logo
+              width={120}
+              href="/admin"
+              plateClassName="border-transparent bg-transparent px-0 py-0"
+            />
+          </span>
 
           <button
             type="button"
@@ -149,26 +155,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-expanded={!collapsed}
-            className={cn(
-              "hidden size-9 cursor-pointer place-items-center rounded-full border-2 border-cream/30 text-cream transition-colors hover:border-gold hover:bg-gold hover:text-ink lg:grid",
-              collapsed && "lg:hidden",
-            )}
+            className="hidden size-9 cursor-pointer place-items-center rounded-full border-2 border-cream/30 text-cream transition-colors hover:border-gold hover:bg-gold hover:text-ink lg:grid"
           >
-            <PanelLeftClose className="size-4" />
+            {collapsed ? (
+              <PanelLeftOpen className="size-4" />
+            ) : (
+              <PanelLeftClose className="size-4" />
+            )}
           </button>
         </div>
-
-        {collapsed && (
-          <button
-            type="button"
-            onClick={toggleCollapsed}
-            aria-label="Expand sidebar"
-            title="Expand sidebar"
-            className="mx-auto mt-3 hidden size-9 cursor-pointer place-items-center rounded-full border-2 border-cream/30 text-cream transition-colors hover:border-gold hover:bg-gold hover:text-ink lg:grid"
-          >
-            <PanelLeftOpen className="size-4" />
-          </button>
-        )}
 
         <p
           className={cn(

@@ -262,6 +262,34 @@
   }
 }
 
+/*
+ * Faint variant for large chrome areas — the footer and the portal sidebar.
+ *
+ * Kept well below the accent variants: these surfaces carry navigation and
+ * contact details, so the lattice should register as texture at a glance and
+ * never compete with the text sitting on it.
+ */
+@utility islamic-pattern-subtle {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.045;
+    background-color: currentColor;
+    mask-image: url("/brand/pattern.svg");
+    mask-size: 160px 160px;
+    mask-repeat: repeat;
+    -webkit-mask-image: url("/brand/pattern.svg");
+    -webkit-mask-size: 160px 160px;
+    -webkit-mask-repeat: repeat;
+  }
+}
+
 /* Cream scrim over hero imagery — matches the reference implementation */
 @utility hero-scrim {
   background: linear-gradient(

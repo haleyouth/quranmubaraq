@@ -20,14 +20,14 @@ const socialIcons = {
 
 export function Footer() {
   return (
-    <footer className="border-t-4 border-ink bg-ink text-cream">
+    <footer className="islamic-pattern-subtle relative border-t-4 border-ink bg-ink text-cream">
       <Container className="py-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
             <Logo
               width={150}
-              plateClassName="border-cream/25 bg-transparent px-0 py-0"
+              plateClassName="border-transparent bg-transparent px-0 py-0"
             />
             <p className="mt-5 text-cream/70">
               Teaching the Holy Quran online since {site.founded}. One-on-one live classes
