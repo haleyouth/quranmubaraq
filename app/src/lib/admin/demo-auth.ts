@@ -65,8 +65,16 @@ export const DEMO_USERS: readonly DemoUser[] = [
 ] as const;
 
 const SESSION_KEY = "qm_demo_session";
+const IMPERSONATION_KEY = "qm_demo_impersonation";
 
 export type Session = Omit<DemoUser, "password">;
+
+/** Records who started an impersonation so the portal can return to them. */
+export type Impersonation = {
+  actor: Session;
+  target: Session;
+  startedAt: number;
+};
 
 export function signIn(email: string, password: string): Session | null {
   const user = DEMO_USERS.find(
@@ -91,6 +99,76 @@ export function getSession(): Session | null {
 
 export function signOut() {
   window.localStorage.removeItem(SESSION_KEY);
+  window.localStorage.removeItem(IMPERSONATION_KEY);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               Impersonation                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Only Super Admin and Principal may act as another user, mirroring
+ * CRM plan §5.1. The original session is preserved so the actor can return.
+ * In production every start and stop is written to the audit log and the
+ * session is time-boxed; here it is a client-side convenience only.
+ */
+export function canImpersonate(role: Role) {
+  return role === "admin" || role === "principal";
+}
+
+export function startImpersonation(target: Session): boolean {
+  const actor = getSession();
+  if (!actor || !canImpersonate(actor.role)) return false;
+  // Never nest — always impersonate from the real account
+  if (getImpersonation()) return false;
+
+  const record: Impersonation = { actor, target, startedAt: Date.now() };
+  window.localStorage.setItem(IMPERSONATION_KEY, JSON.stringify(record));
+  window.localStorage.setItem(SESSION_KEY, JSON.stringify(target));
+  return true;
+}
+
+export function getImpersonation(): Impersonation | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(IMPERSONATION_KEY);
+    return raw ? (JSON.parse(raw) as Impersonation) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Restores the original account. Returns false if not impersonating. */
+export function stopImpersonation(): boolean {
+  const record = getImpersonation();
+  if (!record) return false;
+  window.localStorage.setItem(SESSION_KEY, JSON.stringify(record.actor));
+  window.localStorage.removeItem(IMPERSONATION_KEY);
+  return true;
+}
+
+/** Builds a session for a teacher or student being impersonated. */
+export function sessionForPerson(
+  name: string,
+  role: Role,
+  branch = "Lahore Campus",
+): Session {
+  const initials = name
+    .replace(/^(Ustadh|Ustadha)\s+/i, "")
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
+  return {
+    email: `${name.toLowerCase().replace(/[^a-z]+/g, ".")}@quranmubarak.com`,
+    name,
+    role,
+    title: role === "teacher" ? "Quran Teacher" : "Student",
+    branch,
+    avatarInitials: initials,
+  };
 }
 
 /** Navigation entries each role is permitted to see. */

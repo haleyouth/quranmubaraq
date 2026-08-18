@@ -14,18 +14,8 @@ export function PageHeader({
   breadcrumb?: { label: string; href?: string }[];
 }) {
   return (
-    <section className="relative overflow-hidden border-b-4 border-ink bg-cream-deep py-16 md:py-20">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, var(--color-ink) 1px, transparent 0)",
-          backgroundSize: "28px 28px",
-        }}
-      />
-
-      <Container className="relative">
+    <section className="islamic-pattern relative overflow-hidden border-b-4 border-ink bg-cream-deep py-16 md:py-20">
+<Container className="relative">
         {breadcrumb && (
           <nav aria-label="Breadcrumb" className="mb-6">
             <ol className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink/60">

@@ -5,11 +5,20 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen, CalendarDays, ChartColumn, ClipboardList, CreditCard, FileText,
-  GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning,
+  Eye, GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning,
   PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
   Users, X,
 } from "lucide-react";
-import { getSession, ROLE_NAV, signOut, type Session } from "@/lib/admin/demo-auth";
+import {
+  getImpersonation,
+  getSession,
+  ROLE_NAV,
+  signOut,
+  stopImpersonation,
+  type Impersonation,
+  type Session,
+} from "@/lib/admin/demo-auth";
+import { InlineClock } from "@/components/admin/DateTimePanel";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +68,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     });
   }
 
+  const [impersonation, setImpersonation] = useState<Impersonation | null>(null);
+
   // Demo session lives in localStorage, so it can only be read after mount.
   useEffect(() => {
     const s = getSession();
@@ -67,8 +78,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       return;
     }
     setSession(s);
+    setImpersonation(getImpersonation());
     setReady(true);
-  }, [router]);
+  }, [router, pathname]);
+
+  function handleReturn() {
+    if (stopImpersonation()) {
+      setSession(getSession());
+      setImpersonation(null);
+      router.push("/admin");
+    }
+  }
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -104,23 +124,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             collapsed ? "lg:justify-center lg:px-2" : "justify-between",
           )}
         >
-          <span className={collapsed ? "lg:hidden" : undefined}>
-            <Logo
-              width={120}
-              href="/admin"
-              plateClassName="border-cream/25 bg-transparent px-0 py-0"
-            />
-          </span>
-
-          {/* Compact mark shown only when collapsed on desktop */}
-          <Link
+          {/* Full logo always — it scales down rather than being replaced */}
+          <Logo
+            width={collapsed ? 56 : 120}
             href="/admin"
-            aria-label="Portal home"
-            className="font-display hidden size-10 place-items-center rounded-xl border-2 border-cream/30 bg-green text-sm text-white lg:data-[collapsed=true]:grid"
-            data-collapsed={collapsed}
-          >
-            QM
-          </Link>
+            plateClassName="border-cream/25 bg-transparent px-0 py-0"
+          />
 
           <button
             type="button"
@@ -245,9 +254,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Menu className="size-5" />
           </button>
 
-          <p className="hidden text-sm font-semibold text-ink/65 lg:block">
-            {session.branch}
-          </p>
+          <div className="hidden items-center gap-4 lg:flex">
+            <p className="text-sm font-semibold text-ink/65">{session.branch}</p>
+            <InlineClock />
+          </div>
 
           <div className="flex items-center gap-3">
             <Link
@@ -263,12 +273,35 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <div className="p-5 md:p-7">
-          {/* Demo build warning — deliberately prominent */}
-          <p className="mb-6 flex items-start gap-2 rounded-xl border-2 border-ink bg-gold px-4 py-3 text-sm font-semibold text-ink">
-            <UserRound className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            Demo portal — signed in as <strong>{session.title}</strong>. Data is
-            fictional and sign-in is not secure. Do not enter real information.
-          </p>
+          {/* Impersonation takes priority — it must never be missed */}
+          {impersonation ? (
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-ink bg-green-deep px-4 py-3 text-white">
+              <p className="flex items-start gap-2 text-sm font-semibold">
+                <Eye className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <span>
+                  Viewing as <strong>{impersonation.target.name}</strong> (
+                  {impersonation.target.title}). You are seeing exactly what they see.
+                  Signed in as {impersonation.actor.name}.
+                </span>
+              </p>
+              <button
+                type="button"
+                onClick={handleReturn}
+                className="inline-flex min-h-9 shrink-0 cursor-pointer items-center gap-2 rounded-full border-2 border-white bg-white px-4 py-1.5 text-sm font-bold text-green-deep transition-colors hover:bg-transparent hover:text-white"
+              >
+                <LogOut className="size-3.5" aria-hidden="true" />
+                Return to my account
+              </button>
+            </div>
+          ) : (
+            <p className="mb-6 flex items-start gap-2 rounded-xl border-2 border-ink bg-gold px-4 py-3 text-sm font-semibold text-ink">
+              <UserRound className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <span>
+                Demo portal — signed in as <strong>{session.title}</strong>. Data is
+                fictional and sign-in is not secure. Do not enter real information.
+              </span>
+            </p>
+          )}
           {children}
         </div>
       </div>

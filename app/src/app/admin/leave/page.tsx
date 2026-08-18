@@ -81,21 +81,21 @@ export default function LeavePage() {
         <Table head={["Ref", "Teacher", "Type", "Dates", "Days", "Affected", "Cover", "Status", "Actions"]}>
           {rows.map((l) => (
             <Tr key={l.id}>
-              <Td className="font-mono text-xs">{l.id}</Td>
-              <Td className="font-semibold">{l.teacher}</Td>
-              <Td>{l.type}</Td>
-              <Td className="text-ink/70">{l.from} → {l.to}</Td>
-              <Td>{l.days}</Td>
-              <Td>
+              <Td label="Ref" className="font-mono text-xs">{l.id}</Td>
+              <Td label="Teacher" className="font-semibold">{l.teacher}</Td>
+              <Td label="Type">{l.type}</Td>
+              <Td label="Dates" className="text-ink/70">{l.from} → {l.to}</Td>
+              <Td label="Days">{l.days}</Td>
+              <Td label="Affected">
                 <span className={l.affected > 15 ? "font-bold text-red-700" : ""}>
                   {l.affected} classes
                 </span>
               </Td>
-              <Td className={l.cover.toLowerCase().includes("not") ? "font-semibold text-red-700" : "text-ink/70"}>
+              <Td label="Cover" className={l.cover.toLowerCase().includes("not") ? "font-semibold text-red-700" : "text-ink/70"}>
                 {l.cover}
               </Td>
-              <Td><StatusBadge status={l.status} /></Td>
-              <Td>
+              <Td label="Status"><StatusBadge status={l.status} /></Td>
+              <Td label="Actions">
                 <div className="flex flex-wrap gap-1.5">
                   {l.status === "pending" ? (
                     <>

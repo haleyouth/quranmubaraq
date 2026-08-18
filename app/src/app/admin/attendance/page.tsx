@@ -35,11 +35,11 @@ export default function AttendancePage() {
         <Table head={["Student", "Guardian", "Course", "Teacher", "Attendance", "Status"]} empty={flagged.length === 0}>
           {flagged.map((s) => (
             <Tr key={s.id}>
-              <Td className="font-semibold">{s.name}</Td>
-              <Td className="text-ink/70">{s.guardian}</Td>
-              <Td className="text-ink/70">{s.course}</Td>
-              <Td className="text-ink/70">{s.teacher}</Td>
-              <Td>
+              <Td label="Student" className="font-semibold">{s.name}</Td>
+              <Td label="Guardian" className="text-ink/70">{s.guardian}</Td>
+              <Td label="Course" className="text-ink/70">{s.course}</Td>
+              <Td label="Teacher" className="text-ink/70">{s.teacher}</Td>
+              <Td label="Attendance">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-16 overflow-hidden rounded-full border border-ink bg-cream">
                     <div className="h-full bg-gold" style={{ width: `${s.attendance}%` }} />
@@ -47,7 +47,7 @@ export default function AttendancePage() {
                   <span className="text-xs font-bold text-red-700">{s.attendance}%</span>
                 </div>
               </Td>
-              <Td><StatusBadge status={s.status} /></Td>
+              <Td label="Status"><StatusBadge status={s.status} /></Td>
             </Tr>
           ))}
         </Table>
@@ -57,12 +57,12 @@ export default function AttendancePage() {
         <Table head={["Time", "Student", "Teacher", "Course", "Session", "Attendance"]}>
           {todaySessions.map((s) => (
             <Tr key={s.id}>
-              <Td className="font-display">{s.time}</Td>
-              <Td className="font-semibold">{s.student}</Td>
-              <Td className="text-ink/70">{s.teacher}</Td>
-              <Td className="text-ink/70">{s.course}</Td>
-              <Td><StatusBadge status={s.status} /></Td>
-              <Td><StatusBadge status={s.attendance} /></Td>
+              <Td label="Time" className="font-display">{s.time}</Td>
+              <Td label="Student" className="font-semibold">{s.student}</Td>
+              <Td label="Teacher" className="text-ink/70">{s.teacher}</Td>
+              <Td label="Course" className="text-ink/70">{s.course}</Td>
+              <Td label="Session"><StatusBadge status={s.status} /></Td>
+              <Td label="Attendance"><StatusBadge status={s.attendance} /></Td>
             </Tr>
           ))}
         </Table>

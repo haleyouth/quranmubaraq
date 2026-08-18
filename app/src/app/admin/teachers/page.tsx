@@ -6,12 +6,19 @@ import {
   Ban, CalendarDays, CheckCircle2, Pencil, Plus, Search, Trash2, UserCog,
 } from "lucide-react";
 import { teachers as seed, type Teacher } from "@/lib/admin/demo-data";
-import { getSession, DEMO_USERS, type Session } from "@/lib/admin/demo-auth";
+import {
+  canImpersonate,
+  getSession,
+  sessionForPerson,
+  startImpersonation,
+  type Session,
+} from "@/lib/admin/demo-auth";
 import {
   AdminButton, AdminPage, Badge, DemoNotice, Field, Panel, StatusBadge,
   Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { ConfirmModal, Modal } from "@/components/admin/Modal";
+import { CalendarView } from "@/components/admin/CalendarView";
 import { useEffect } from "react";
 
 export default function TeachersPage() {
@@ -26,6 +33,7 @@ export default function TeachersPage() {
   const [confirm, setConfirm] = useState<
     { kind: "disable" | "enable" | "delete"; teacher: Teacher } | null
   >(null);
+  const [calendarFor, setCalendarFor] = useState<Teacher | null>(null);
   const [toast, setToast] = useState("");
 
   useEffect(() => setSession(getSession()), []);
@@ -79,30 +87,21 @@ export default function TeachersPage() {
     );
   }
 
-  /** Impersonation — audit-logged and time-boxed in the real system. */
+  /**
+   * Impersonation — the actor's own session is preserved so they can return.
+   * In production this is audit-logged and time-boxed (CRM plan §5.1).
+   */
   function switchToTeacher(teacher: Teacher) {
-    const demo = DEMO_USERS.find((u) => u.role === "teacher");
-    if (!demo) return;
-    window.localStorage.setItem(
-      "qm_demo_session",
-      JSON.stringify({
-        email: demo.email,
-        name: teacher.name,
-        role: "teacher",
-        title: `Teacher (viewed as by ${session?.name ?? "admin"})`,
-        branch: demo.branch,
-        avatarInitials: teacher.name
-          .split(" ")
-          .slice(-2)
-          .map((w) => w[0])
-          .join("")
-          .toUpperCase(),
-      }),
-    );
-    router.push("/admin");
+    const target = sessionForPerson(teacher.name, "teacher");
+    if (startImpersonation(target)) {
+      router.push("/admin");
+    } else {
+      flash("Only Admin and Principal accounts may view as another user.");
+    }
   }
 
   const canManage = session?.role === "admin" || session?.role === "principal";
+  const mayImpersonate = session ? canImpersonate(session.role) : false;
 
   return (
     <AdminPage
@@ -168,7 +167,7 @@ export default function TeachersPage() {
         >
           {filtered.map((t) => (
             <Tr key={t.id}>
-              <Td>
+              <Td label="Teacher">
                 <div className="flex items-center gap-3">
                   <span className="font-display grid size-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-green text-xs text-white">
                     {t.name.split(" ").slice(-2).map((w) => w[0]).join("")}
@@ -181,12 +180,12 @@ export default function TeachersPage() {
                   </div>
                 </div>
               </Td>
-              <Td>
+              <Td label="Contact">
                 <p className="text-ink/80">{t.email}</p>
                 <p className="text-xs text-ink/55">{t.phone}</p>
               </Td>
-              <Td className="text-ink/70">{t.admin}</Td>
-              <Td>
+              <Td label="Admin" className="text-ink/70">{t.admin}</Td>
+              <Td label="Specializations">
                 <div className="flex flex-wrap gap-1.5">
                   {t.specializations.map((s) => (
                     <Badge key={s} tone="sage">
@@ -195,32 +194,34 @@ export default function TeachersPage() {
                   ))}
                 </div>
               </Td>
-              <Td>
+              <Td label="Load">
                 <span className="font-semibold">{t.load}h</span>
                 <span className="text-ink/50"> / 30h</span>
               </Td>
-              <Td>
+              <Td label="Status">
                 <StatusBadge status={t.status} />
               </Td>
-              <Td>
+              <Td label="Actions">
                 <div className="flex flex-wrap gap-1.5">
                   <IconAction label="Edit profile" onClick={() => setEditing(t)}>
                     <Pencil className="size-3.5" />
                   </IconAction>
                   <IconAction
                     label={`View ${t.name}'s class schedule`}
-                    onClick={() => flash(`Opening schedule for ${t.name}.`)}
+                    onClick={() => setCalendarFor(t)}
                   >
                     <CalendarDays className="size-3.5" />
                   </IconAction>
                   {canManage && (
                     <>
-                      <IconAction
-                        label={`Switch to ${t.name}`}
-                        onClick={() => switchToTeacher(t)}
-                      >
-                        <UserCog className="size-3.5" />
-                      </IconAction>
+                      {mayImpersonate && (
+                        <IconAction
+                          label={`View as ${t.name}`}
+                          onClick={() => switchToTeacher(t)}
+                        >
+                          <UserCog className="size-3.5" />
+                        </IconAction>
+                      )}
                       <IconAction
                         label={t.status === "active" ? "Disable teacher" : "Enable teacher"}
                         onClick={() =>
@@ -247,6 +248,22 @@ export default function TeachersPage() {
           ))}
         </Table>
       </Panel>
+
+      {/* Class schedule calendar */}
+      <Modal
+        open={Boolean(calendarFor)}
+        onClose={() => setCalendarFor(null)}
+        title={calendarFor ? `${calendarFor.name} — class schedule` : ""}
+        description="Click any day to see that day's classes."
+        size="lg"
+      >
+        {calendarFor && (
+          <CalendarView
+            title={`${calendarFor.students} students · ${calendarFor.load}h per week`}
+            filter={(s) => s.teacherName === calendarFor.name}
+          />
+        )}
+      </Modal>
 
       {/* Edit / create */}
       <TeacherForm

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 
 export function CtaBand() {
   return (
-    <Section tone="ink" className="relative overflow-hidden">
+    <Section tone="ink" className="islamic-pattern-strong relative overflow-hidden">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 -right-24 size-[26rem] rounded-full bg-green/40 blur-3xl"

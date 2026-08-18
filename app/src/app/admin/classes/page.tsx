@@ -111,10 +111,10 @@ export default function ClassesPage() {
             const pct = Math.round((t.load / 30) * 100);
             return (
               <Tr key={t.id}>
-                <Td className="font-semibold">{t.name}</Td>
-                <Td>{t.students}</Td>
-                <Td>{t.load}h / 30h</Td>
-                <Td>
+                <Td label="Teacher" className="font-semibold">{t.name}</Td>
+                <Td label="Students">{t.students}</Td>
+                <Td label="Weekly hours">{t.load}h / 30h</Td>
+                <Td label="Utilisation">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-20 overflow-hidden rounded-full border border-ink bg-cream">
                       <div
@@ -125,12 +125,12 @@ export default function ClassesPage() {
                     <span className="text-xs font-bold">{pct}%</span>
                   </div>
                 </Td>
-                <Td>
+                <Td label="Specializations">
                   <div className="flex flex-wrap gap-1.5">
                     {t.specializations.map((s) => <Badge key={s} tone="sage">{s}</Badge>)}
                   </div>
                 </Td>
-                <Td><StatusBadge status={t.status} /></Td>
+                <Td label="Status"><StatusBadge status={t.status} /></Td>
               </Tr>
             );
           })}

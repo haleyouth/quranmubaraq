@@ -150,11 +150,11 @@ export default function LeadsPage() {
           <Table head={["Submitted", "Name", "Contact", "Country", "Course", "Status", "Move to"]}>
             {live.map((l) => (
               <Tr key={l.id}>
-                <Td className="text-xs text-ink/60">
+                <Td label="Submitted" className="text-xs text-ink/60">
                   {l.createdAt ? l.createdAt.toLocaleString("en-GB") : "—"}
                 </Td>
-                <Td className="font-semibold">{l.name}</Td>
-                <Td>
+                <Td label="Name" className="font-semibold">{l.name}</Td>
+                <Td label="Contact">
                   <a href={`mailto:${l.email}`} className="block text-sm text-ink/80 hover:text-green-deep">
                     {l.email}
                   </a>
@@ -162,10 +162,10 @@ export default function LeadsPage() {
                     {l.phone}
                   </a>
                 </Td>
-                <Td className="text-ink/70">{l.country}</Td>
-                <Td className="text-ink/70">{l.course || "—"}</Td>
-                <Td><StatusBadge status={l.status} /></Td>
-                <Td>
+                <Td label="Country" className="text-ink/70">{l.country}</Td>
+                <Td label="Course" className="text-ink/70">{l.course || "—"}</Td>
+                <Td label="Status"><StatusBadge status={l.status} /></Td>
+                <Td label="Move to">
                   <select
                     value={l.status}
                     onChange={(e) => advanceLive(l, e.target.value as LeadStatus)}
@@ -187,11 +187,11 @@ export default function LeadsPage() {
         <Table head={["Lead", "Contact", "Country", "Course", "Owner", "Status", "Move to"]}>
           {rows.map((l) => (
             <Tr key={l.id}>
-              <Td>
+              <Td label="Lead">
                 <p className="font-semibold text-ink">{l.name}</p>
                 <p className="text-xs text-ink/55">{l.id} · {l.created}</p>
               </Td>
-              <Td>
+              <Td label="Contact">
                 <a href={`mailto:${l.email}`} className="flex items-center gap-1.5 text-sm text-ink/80 hover:text-green-deep">
                   <Mail className="size-3.5" aria-hidden="true" />
                   {l.email}
@@ -201,11 +201,11 @@ export default function LeadsPage() {
                   {l.phone}
                 </a>
               </Td>
-              <Td className="text-ink/70">{l.country}</Td>
-              <Td className="text-ink/70">{l.course}</Td>
-              <Td className="text-ink/70">{l.owner}</Td>
-              <Td><StatusBadge status={l.status} /></Td>
-              <Td>
+              <Td label="Country" className="text-ink/70">{l.country}</Td>
+              <Td label="Course" className="text-ink/70">{l.course}</Td>
+              <Td label="Owner" className="text-ink/70">{l.owner}</Td>
+              <Td label="Status"><StatusBadge status={l.status} /></Td>
+              <Td label="Move to">
                 <select
                   value={l.status}
                   onChange={(e) => advance(l, e.target.value as LeadStatus)}

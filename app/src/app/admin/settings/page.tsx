@@ -91,9 +91,9 @@ export default function SettingsPage() {
             <Table head={["Role", "Portal", "Modules"]}>
               {DEMO_USERS.map((u) => (
                 <Tr key={u.role}>
-                  <Td className="font-semibold capitalize">{u.role}</Td>
-                  <Td className="text-ink/70">{u.title}</Td>
-                  <Td>
+                  <Td label="Role" className="font-semibold capitalize">{u.role}</Td>
+                  <Td label="Portal" className="text-ink/70">{u.title}</Td>
+                  <Td label="Modules">
                     <div className="flex flex-wrap gap-1.5">
                       {ROLE_NAV[u.role].map((m) => (
                         <Badge key={m} tone="sage">{m}</Badge>
@@ -143,10 +143,10 @@ export default function SettingsPage() {
           <Table head={["When", "Actor", "Action", "Entity"]}>
             {AUDIT.map((a) => (
               <Tr key={a.at}>
-                <Td className="font-mono text-xs text-ink/70">{a.at}</Td>
-                <Td className="font-semibold">{a.actor}</Td>
-                <Td><Badge tone={a.action.includes("impersonate") ? "gold" : "sage"}>{a.action}</Badge></Td>
-                <Td className="text-ink/70">{a.entity}</Td>
+                <Td label="When" className="font-mono text-xs text-ink/70">{a.at}</Td>
+                <Td label="Actor" className="font-semibold">{a.actor}</Td>
+                <Td label="Action"><Badge tone={a.action.includes("impersonate") ? "gold" : "sage"}>{a.action}</Badge></Td>
+                <Td label="Entity" className="text-ink/70">{a.entity}</Td>
               </Tr>
             ))}
           </Table>

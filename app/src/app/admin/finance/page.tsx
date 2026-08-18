@@ -93,16 +93,16 @@ export default function FinancePage() {
           <Table head={["Invoice", "Student", "Period", "Amount", "Due", "Method", "Status", "Actions"]}>
             {invoices.map((i) => (
               <Tr key={i.id}>
-                <Td className="font-mono text-xs">{i.id}</Td>
-                <Td className="font-semibold">{i.student}</Td>
-                <Td className="text-ink/70">{i.period}</Td>
-                <Td className="font-semibold">{i.currency} {i.amount}</Td>
-                <Td className={i.status === "overdue" ? "font-bold text-red-700" : "text-ink/65"}>
+                <Td label="Invoice" className="font-mono text-xs">{i.id}</Td>
+                <Td label="Student" className="font-semibold">{i.student}</Td>
+                <Td label="Period" className="text-ink/70">{i.period}</Td>
+                <Td label="Amount" className="font-semibold">{i.currency} {i.amount}</Td>
+                <Td label="Due" className={i.status === "overdue" ? "font-bold text-red-700" : "text-ink/65"}>
                   {i.due}
                 </Td>
-                <Td className="text-ink/65">{i.method}</Td>
-                <Td><StatusBadge status={i.status} /></Td>
-                <Td>
+                <Td label="Method" className="text-ink/65">{i.method}</Td>
+                <Td label="Status"><StatusBadge status={i.status} /></Td>
+                <Td label="Actions">
                   <div className="flex gap-1.5">
                     {i.status !== "paid" && (
                       <>
@@ -132,14 +132,14 @@ export default function FinancePage() {
           <Table head={["Ref", "Teacher", "Period", "Sessions", "Hours", "Gross", "Net", "Status"]}>
             {poSeed.map((p) => (
               <Tr key={p.id}>
-                <Td className="font-mono text-xs">{p.id}</Td>
-                <Td className="font-semibold">{p.teacher}</Td>
-                <Td className="text-ink/70">{p.period}</Td>
-                <Td>{p.sessions}</Td>
-                <Td>{p.hours}h</Td>
-                <Td>${p.gross}</Td>
-                <Td className="font-semibold">${p.net}</Td>
-                <Td><StatusBadge status={p.status} /></Td>
+                <Td label="Ref" className="font-mono text-xs">{p.id}</Td>
+                <Td label="Teacher" className="font-semibold">{p.teacher}</Td>
+                <Td label="Period" className="text-ink/70">{p.period}</Td>
+                <Td label="Sessions">{p.sessions}</Td>
+                <Td label="Hours">{p.hours}h</Td>
+                <Td label="Gross">${p.gross}</Td>
+                <Td label="Net" className="font-semibold">${p.net}</Td>
+                <Td label="Status"><StatusBadge status={p.status} /></Td>
               </Tr>
             ))}
           </Table>

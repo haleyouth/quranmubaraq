@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!-- Seamless 8-point girih tile. currentColor lets CSS tint it. -->
+  <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+    <!-- Central 8-point star -->
+    <path d="M60 24 L72 42 L94 42 L80 60 L94 78 L72 78 L60 96 L48 78 L26 78 L40 60 L26 42 L48 42 Z"/>
+    <!-- Inner rosette -->
+    <circle cx="60" cy="60" r="11"/>
+    <path d="M60 49 L68 60 L60 71 L52 60 Z"/>
+    <!-- Corner quarter-stars, mirrored so edges tile seamlessly -->
+    <path d="M0 12 L12 0 M0 0 L12 12"/>
+    <path d="M108 0 L120 12 M120 0 L108 12"/>
+    <path d="M0 108 L12 120 M0 120 L12 108"/>
+    <path d="M108 120 L120 108 M120 120 L108 108"/>
+    <!-- Connecting lattice -->
+    <path d="M60 0 L72 12 L60 24 L48 12 Z"/>
+    <path d="M60 96 L72 108 L60 120 L48 108 Z"/>
+    <path d="M0 60 L12 48 L24 60 L12 72 Z"/>
+    <path d="M96 60 L108 48 L120 60 L108 72 Z"/>
+    <path d="M12 12 L48 12 M72 12 L108 12"/>
+    <path d="M12 108 L48 108 M72 108 L108 108"/>
+    <path d="M12 12 L12 48 M12 72 L12 108"/>
+    <path d="M108 12 L108 48 M108 72 L108 108"/>
+  </g>
+</svg>

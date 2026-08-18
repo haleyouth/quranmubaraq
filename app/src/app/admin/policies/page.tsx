@@ -53,7 +53,7 @@ export default function PoliciesPage() {
             const pct = Math.round((p.acknowledged / p.total) * 100);
             return (
               <Tr key={p.id}>
-                <Td>
+                <Td label="Policy">
                   <div className="flex items-center gap-3">
                     <span className="grid size-9 shrink-0 place-items-center rounded-lg border-2 border-ink bg-green">
                       <FileText className="size-4 text-white" aria-hidden="true" />
@@ -61,10 +61,10 @@ export default function PoliciesPage() {
                     <span className="font-semibold text-ink">{p.title}</span>
                   </div>
                 </Td>
-                <Td><Badge tone="sage">{p.category}</Badge></Td>
-                <Td>v{p.version}</Td>
-                <Td className="text-ink/70">{p.audience}</Td>
-                <Td>
+                <Td label="Category"><Badge tone="sage">{p.category}</Badge></Td>
+                <Td label="Version">v{p.version}</Td>
+                <Td label="Audience" className="text-ink/70">{p.audience}</Td>
+                <Td label="Acknowledged">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-16 overflow-hidden rounded-full border border-ink bg-cream">
                       <div
@@ -75,8 +75,8 @@ export default function PoliciesPage() {
                     <span className="text-xs font-bold">{p.acknowledged}/{p.total}</span>
                   </div>
                 </Td>
-                <Td className="text-ink/65">{p.updated}</Td>
-                <Td>
+                <Td label="Updated" className="text-ink/65">{p.updated}</Td>
+                <Td label="Actions">
                   {p.acknowledged < p.total && (
                     <AdminButton size="sm" variant="outline" onClick={() => flash(`Reminder sent for "${p.title}".`)}>
                       Remind

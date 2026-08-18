@@ -22,7 +22,7 @@ export function AdminPage({
           <h1 className="font-display text-3xl text-ink">{title}</h1>
           {description && <p className="mt-1.5 text-ink/70">{description}</p>}
         </div>
-        {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
+        {actions && <div className="flex flex-wrap gap-2 sm:gap-3">{actions}</div>}
       </div>
       {children}
     </div>
@@ -188,6 +188,13 @@ export function StatusBadge({ status }: { status: string }) {
 
 /* ---------------------------------- Table --------------------------------- */
 
+/**
+ * Responsive data table.
+ *
+ * Below `md` the table collapses to stacked cards: each cell keeps its column
+ * name as a `data-label` prefix, so a narrow screen never forces a horizontal
+ * scroll through eight columns. Above `md` it is an ordinary table.
+ */
 export function Table({
   head,
   children,
@@ -198,9 +205,9 @@ export function Table({
   empty?: boolean;
 }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[720px] border-collapse text-left text-sm">
-        <thead>
+    <div className="md:overflow-x-auto">
+      <table className="w-full border-collapse text-left text-sm md:min-w-[720px]">
+        <thead className="hidden md:table-header-group">
           <tr className="border-b-2 border-ink/15">
             {head.map((h) => (
               <th
@@ -213,7 +220,9 @@ export function Table({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-ink/10">{children}</tbody>
+        <tbody className="block md:table-row-group md:divide-y md:divide-ink/10">
+          {children}
+        </tbody>
       </table>
       {empty && (
         <p className="py-10 text-center text-ink/55">No records match your filters.</p>
@@ -224,16 +233,36 @@ export function Table({
 
 export function Td({
   children,
+  label,
   className,
 }: {
   children: React.ReactNode;
+  /** Column name shown as a prefix in the stacked mobile layout. */
+  label?: string;
   className?: string;
 }) {
-  return <td className={cn("px-3 py-3.5 align-middle", className)}>{children}</td>;
+  return (
+    <td
+      data-label={label}
+      className={cn(
+        "block px-3 py-1.5 align-middle md:table-cell md:py-3.5",
+        // Mobile: show the column name to the left of the value
+        label &&
+          "before:mr-2 before:inline-block before:min-w-[92px] before:text-xs before:font-bold before:tracking-wider before:text-ink/50 before:uppercase before:content-[attr(data-label)] md:before:hidden",
+        className,
+      )}
+    >
+      {children}
+    </td>
+  );
 }
 
 export function Tr({ children }: { children: React.ReactNode }) {
-  return <tr className="transition-colors hover:bg-cream">{children}</tr>;
+  return (
+    <tr className="mb-3 block rounded-xl border-2 border-ink/15 bg-white p-2 transition-colors last:mb-0 md:mb-0 md:table-row md:rounded-none md:border-0 md:p-0 md:hover:bg-cream">
+      {children}
+    </tr>
+  );
 }
 
 /* --------------------------------- Inputs --------------------------------- */
@@ -273,7 +302,7 @@ export function StatTile({
   trend?: "up" | "down" | "flat";
 }) {
   return (
-    <div className="rounded-2xl border-2 border-ink bg-white p-5 hard-shadow">
+    <div className="rounded-2xl border-2 border-ink bg-white p-4 hard-shadow sm:p-5">
       <p className="text-xs font-bold tracking-wider text-ink/55 uppercase">{label}</p>
       <p className="font-display mt-2 text-3xl text-ink">{value}</p>
       {delta && (

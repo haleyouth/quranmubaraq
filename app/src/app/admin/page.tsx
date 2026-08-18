@@ -1,38 +1,77 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { AlertTriangle, ArrowRight, Info, Video } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle, ArrowRight, CalendarDays, Info, Video } from "lucide-react";
 import { getSession, type Session } from "@/lib/admin/demo-auth";
 import {
-  alerts, attendanceTrend, enrolmentFunnel, invoices, kpis, leaveRequests,
-  revenueByMonth, teacherProgress, todaySessions,
+  alerts, attendanceTrend, enrolmentFunnel, invoices, kpis,
+  leaveRequests, revenueByMonth,
 } from "@/lib/admin/demo-data";
-import { AdminPage, Panel, StatTile, StatusBadge, Table, Td, Tr, AdminButton } from "@/components/admin/ui";
-import { BarChart, FunnelChart, LineChart } from "@/components/admin/Charts";
+import {
+  filterForRole, sessionsForDay, sessionsForRange, addDays,
+  STATUS_LABEL, type ClassSession,
+} from "@/lib/admin/schedule";
+import {
+  AdminButton, AdminPage, Badge, Panel, StatTile, StatusBadge, Table, Td, Tr,
+} from "@/components/admin/ui";
+import { BarChart, DonutChart, FunnelChart, LineChart } from "@/components/admin/Charts";
+import { DateTimePanel } from "@/components/admin/DateTimePanel";
+import { CalendarView } from "@/components/admin/CalendarView";
+import { JoinClassDialog } from "@/components/admin/JoinClassDialog";
 
 export default function AdminDashboard() {
   const [session, setSession] = useState<Session | null>(null);
-  useEffect(() => setSession(getSession()), []);
+  const [joining, setJoining] = useState<ClassSession | null>(null);
+
+  // Schedule is derived from the current clock, so it is computed after
+  // mount only — the static export has no idea what "now" is at view time.
+  const [today, setToday] = useState<ClassSession[]>([]);
+  const [week, setWeek] = useState<ClassSession[]>([]);
+
+  useEffect(() => {
+    setSession(getSession());
+
+    const refresh = () => {
+      const now = new Date();
+      setToday(sessionsForDay(now, now));
+      setWeek(sessionsForRange(now, addDays(now, 6), now));
+    };
+    refresh();
+
+    // Keeps "live now" accurate as classes start and end
+    const id = window.setInterval(refresh, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const mine = useMemo(
+    () => (session ? filterForRole(today, session.role, session.name) : []),
+    [today, session],
+  );
+
   if (!session) return null;
 
   const isStaff = session.role === "admin" || session.role === "principal";
-  const live = todaySessions.filter((s) => s.status === "live");
+  const live = today.filter((s) => s.status === "live");
 
-  /* ------------------------------ Student view ----------------------------- */
+  /* ------------------------------ Student view ---------------------------- */
   if (session.role === "student") {
-    const next = todaySessions.find((s) => s.status === "upcoming");
-    const myInvoices = invoices.slice(0, 3);
+    const upcoming = mine.filter((s) => s.status === "scheduled" || s.status === "live");
+    const next = upcoming[0];
+    const myWeek = filterForRole(week, session.role, session.name);
+    const done = mine.filter((s) => s.status === "completed").length;
 
     return (
       <AdminPage
         title={`Assalamu alaikum, ${session.name.split(" ")[0]}`}
         description="Your classes, progress and invoices."
       >
+        <DateTimePanel />
+
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <StatTile label="Classes today" value={String(mine.length)} delta={`${done} completed`} />
+          <StatTile label="This week" value={String(myWeek.length)} delta="Scheduled" />
           <StatTile label="Attendance" value="96%" delta="Last 30 days" trend="up" />
-          <StatTile label="Classes this month" value="18" delta="2 remaining" />
-          <StatTile label="Current course" value="Reading" delta="Beginner level" />
           <StatTile label="Next invoice" value="$50" delta="Due 1 Sep" />
         </div>
 
@@ -42,65 +81,87 @@ export default function AdminDashboard() {
               <div>
                 <p className="font-display text-2xl text-ink">{next.course}</p>
                 <p className="mt-1 text-ink/70">
-                  {next.time} with {next.teacher}
+                  {next.start}–{next.end} with {next.teacherName}
                 </p>
-                <AdminButton className="mt-5">
+                <Badge tone={next.status === "live" ? "danger" : "neutral"} className="mt-3">
+                  {STATUS_LABEL[next.status]}
+                </Badge>
+                <AdminButton className="mt-5" onClick={() => setJoining(next)}>
                   <Video className="size-4" aria-hidden="true" />
                   Join class
                 </AdminButton>
               </div>
             ) : (
-              <p className="text-ink/60">No further classes scheduled today.</p>
+              <p className="py-4 text-ink/60">No further classes scheduled today.</p>
             )}
           </Panel>
 
-          <Panel title="Recent progress">
-            <ul className="space-y-3">
-              {teacherProgress.slice(0, 3).map((p) => (
-                <li key={p.student} className="rounded-xl border-2 border-ink/12 bg-cream p-3.5">
-                  <p className="font-semibold text-ink">
-                    {p.surah} · {p.ayah}
-                  </p>
-                  <p className="mt-0.5 text-sm text-ink/65">{p.note}</p>
-                </li>
+          <Panel title="Today's schedule" bodyClassName="p-0">
+            <Table head={["Time", "Course", "Teacher", "Status", ""]} empty={mine.length === 0}>
+              {mine.map((s) => (
+                <Tr key={s.id}>
+                  <Td label="Time" className="font-display">{s.start}</Td>
+                  <Td label="Course" className="font-semibold">{s.course}</Td>
+                  <Td label="Teacher" className="text-ink/70">{s.teacherName}</Td>
+                  <Td label="Status"><StatusBadge status={s.attendance} /></Td>
+                  <Td>
+                    {(s.status === "live" || s.status === "scheduled") && (
+                      <AdminButton size="sm" variant={s.status === "live" ? "primary" : "outline"} onClick={() => setJoining(s)}>
+                        <Video className="size-3.5" aria-hidden="true" />
+                        Join
+                      </AdminButton>
+                    )}
+                  </Td>
+                </Tr>
               ))}
-            </ul>
+            </Table>
           </Panel>
         </div>
 
-        <Panel title="Your invoices">
+        <Panel title="My calendar" description="Click any day to see your classes.">
+          <CalendarView
+            title="Your class schedule"
+            filter={(s) => s.studentName === "Yusuf Ibrahim"}
+            onJoin={setJoining}
+          />
+        </Panel>
+
+        <Panel title="Your invoices" bodyClassName="p-0">
           <Table head={["Invoice", "Period", "Amount", "Status", "Due"]}>
-            {myInvoices.map((inv) => (
+            {invoices.slice(0, 3).map((inv) => (
               <Tr key={inv.id}>
-                <Td className="font-mono text-xs">{inv.id}</Td>
-                <Td>{inv.period}</Td>
-                <Td className="font-semibold">
-                  {inv.currency} {inv.amount}
-                </Td>
-                <Td><StatusBadge status={inv.status} /></Td>
-                <Td className="text-ink/65">{inv.due}</Td>
+                <Td label="Invoice" className="font-mono text-xs">{inv.id}</Td>
+                <Td label="Period">{inv.period}</Td>
+                <Td label="Amount" className="font-semibold">{inv.currency} {inv.amount}</Td>
+                <Td label="Status"><StatusBadge status={inv.status} /></Td>
+                <Td label="Due" className="text-ink/65">{inv.due}</Td>
               </Tr>
             ))}
           </Table>
         </Panel>
+
+        <JoinClassDialog session={joining} onClose={() => setJoining(null)} />
       </AdminPage>
     );
   }
 
-  /* ------------------------------ Teacher view ----------------------------- */
+  /* ------------------------------ Teacher view ---------------------------- */
   if (session.role === "teacher") {
-    const mine = todaySessions.filter((s) => s.teacher === session.name);
-    const pending = mine.filter((s) => s.attendance === "pending");
+    const pending = mine.filter((s) => s.attendance === "pending" && s.status !== "scheduled");
+    const myWeek = filterForRole(week, session.role, session.name);
+    const completed = mine.filter((s) => s.status === "completed").length;
 
     return (
       <AdminPage
         title={`Assalamu alaikum, ${session.name.split(" ").slice(-1)[0]}`}
         description="Your classes today, attendance to mark, and student progress."
       >
+        <DateTimePanel />
+
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <StatTile label="Classes today" value={String(mine.length)} delta={`${pending.length} to mark`} />
-          <StatTile label="Active students" value="18" delta="+2 this month" trend="up" />
-          <StatTile label="Attendance rate" value="94%" delta="+2%" trend="up" />
+          <StatTile label="Classes today" value={String(mine.length)} delta={`${completed} completed`} />
+          <StatTile label="This week" value={String(myWeek.length)} delta="Scheduled" />
+          <StatTile label="To mark" value={String(pending.length)} delta="Needs attendance" trend={pending.length ? "down" : "flat"} />
           <StatTile label="Earnings (Aug)" value="$630" delta="84 sessions" />
         </div>
 
@@ -108,7 +169,7 @@ export default function AdminDashboard() {
           title="Your classes today"
           actions={
             <Link href="/admin/today" className="text-sm font-bold text-ink underline decoration-teal decoration-2 underline-offset-4">
-              View all
+              Mark attendance
             </Link>
           }
           bodyClassName="p-0"
@@ -116,41 +177,45 @@ export default function AdminDashboard() {
           <Table head={["Time", "Student", "Course", "Status", "Attendance", ""]} empty={mine.length === 0}>
             {mine.map((s) => (
               <Tr key={s.id}>
-                <Td className="font-semibold">{s.time}</Td>
-                <Td>{s.student}</Td>
-                <Td className="text-ink/70">{s.course}</Td>
-                <Td><StatusBadge status={s.status} /></Td>
-                <Td><StatusBadge status={s.attendance} /></Td>
+                <Td label="Time" className="font-display">{s.start}</Td>
+                <Td label="Student" className="font-semibold">{s.studentName}</Td>
+                <Td label="Course" className="text-ink/70">{s.course}</Td>
+                <Td label="Status"><Badge tone={s.status === "live" ? "danger" : "neutral"}>{STATUS_LABEL[s.status]}</Badge></Td>
+                <Td label="Attendance"><StatusBadge status={s.attendance} /></Td>
                 <Td>
-                  <AdminButton size="sm" variant={s.status === "live" ? "primary" : "outline"}>
-                    {s.status === "live" ? "Join" : "Open"}
-                  </AdminButton>
+                  {(s.status === "live" || s.status === "scheduled") && (
+                    <AdminButton size="sm" variant={s.status === "live" ? "primary" : "outline"} onClick={() => setJoining(s)}>
+                      <Video className="size-3.5" aria-hidden="true" />
+                      Join
+                    </AdminButton>
+                  )}
                 </Td>
               </Tr>
             ))}
           </Table>
         </Panel>
 
-        <Panel title="Recent student progress" bodyClassName="p-0">
-          <Table head={["Student", "Surah", "Ayah", "Tajweed", "Fluency", "Note"]}>
-            {teacherProgress.map((p) => (
-              <Tr key={p.student}>
-                <Td className="font-semibold">{p.student}</Td>
-                <Td>{p.surah}</Td>
-                <Td className="text-ink/70">{p.ayah}</Td>
-                <Td>{p.tajweed}/5</Td>
-                <Td>{p.fluency}/5</Td>
-                <Td className="text-ink/65">{p.note}</Td>
-              </Tr>
-            ))}
-          </Table>
+        <Panel title="My teaching calendar" description="Click any day to see your classes.">
+          <CalendarView
+            title="Your class schedule"
+            filter={(s) => s.teacherName === session.name}
+            onJoin={setJoining}
+          />
         </Panel>
+
+        <JoinClassDialog session={joining} onClose={() => setJoining(null)} />
       </AdminPage>
     );
   }
 
-  /* --------------------------- Admin / Principal --------------------------- */
+  /* --------------------------- Admin / Principal -------------------------- */
   const shownKpis = isStaff ? kpis : kpis.slice(0, 4);
+  const outcomes = [
+    { label: "Completed", value: today.filter((s) => s.status === "completed").length, color: "var(--color-green)" },
+    { label: "Scheduled", value: today.filter((s) => s.status === "scheduled").length, color: "var(--color-cream-deep)" },
+    { label: "Live", value: live.length, color: "var(--color-green-deep)" },
+    { label: "Missed", value: today.filter((s) => s.status.startsWith("missed")).length, color: "var(--color-gold)" },
+  ];
 
   return (
     <AdminPage
@@ -167,6 +232,8 @@ export default function AdminDashboard() {
         </AdminButton>
       }
     >
+      <DateTimePanel />
+
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {shownKpis.map((k) => (
           <Link key={k.label} href={k.href} className="block">
@@ -175,7 +242,6 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Live now */}
       <Panel
         title={`Live now — ${live.length} classes in progress`}
         actions={
@@ -188,13 +254,13 @@ export default function AdminDashboard() {
         <Table head={["Time", "Student", "Teacher", "Course", "Status", ""]} empty={live.length === 0}>
           {live.map((s) => (
             <Tr key={s.id}>
-              <Td className="font-semibold">{s.time}</Td>
-              <Td>{s.student}</Td>
-              <Td className="text-ink/70">{s.teacher}</Td>
-              <Td className="text-ink/70">{s.course}</Td>
-              <Td><StatusBadge status={s.status} /></Td>
+              <Td label="Time" className="font-display">{s.start}</Td>
+              <Td label="Student" className="font-semibold">{s.studentName}</Td>
+              <Td label="Teacher" className="text-ink/70">{s.teacherName}</Td>
+              <Td label="Course" className="text-ink/70">{s.course}</Td>
+              <Td label="Status"><Badge tone="danger">Live now</Badge></Td>
               <Td>
-                <AdminButton size="sm" variant="outline">
+                <AdminButton size="sm" variant="outline" onClick={() => setJoining(s)}>
                   <Video className="size-3.5" aria-hidden="true" />
                   Observe
                 </AdminButton>
@@ -204,7 +270,6 @@ export default function AdminDashboard() {
         </Table>
       </Panel>
 
-      {/* Alerts */}
       <Panel title="Needs attention">
         <ul className="space-y-3">
           {alerts.map((a) => (
@@ -227,9 +292,16 @@ export default function AdminDashboard() {
         </ul>
       </Panel>
 
-      {/* Charts */}
+      <Panel
+        title="All classes calendar"
+        description="Every scheduled class across the academy. Click a day for detail."
+        actions={<CalendarDays className="size-5 text-ink/40" aria-hidden="true" />}
+      >
+        <CalendarView title="Academy-wide schedule" onJoin={setJoining} />
+      </Panel>
+
       <div className="grid gap-6 lg:grid-cols-2">
-        {isStaff && session.role === "admin" && (
+        {session.role === "admin" && (
           <Panel title="Revenue" description="Last 12 months (USD)">
             <LineChart
               data={revenueByMonth}
@@ -241,6 +313,15 @@ export default function AdminDashboard() {
           </Panel>
         )}
 
+        <Panel title="Today's outcomes" description="Class status breakdown">
+          <DonutChart
+            data={outcomes}
+            caption="Today's class outcomes"
+            centerLabel="Classes"
+            centerValue={String(today.length)}
+          />
+        </Panel>
+
         <Panel title="Attendance" description="Last 7 days">
           <BarChart data={attendanceTrend} caption="Daily attendance rate over the last 7 days" />
         </Panel>
@@ -251,22 +332,20 @@ export default function AdminDashboard() {
 
         <Panel title="Leave awaiting approval" bodyClassName="p-0">
           <Table head={["Teacher", "Type", "Dates", "Affected", "Cover"]}>
-            {leaveRequests
-              .filter((l) => l.status === "pending")
-              .map((l) => (
-                <Tr key={l.id}>
-                  <Td className="font-semibold">{l.teacher}</Td>
-                  <Td>{l.type}</Td>
-                  <Td className="text-ink/70">
-                    {l.from} → {l.to}
-                  </Td>
-                  <Td>{l.affected} classes</Td>
-                  <Td className="text-ink/65">{l.cover}</Td>
-                </Tr>
-              ))}
+            {leaveRequests.filter((l) => l.status === "pending").map((l) => (
+              <Tr key={l.id}>
+                <Td label="Teacher" className="font-semibold">{l.teacher}</Td>
+                <Td label="Type">{l.type}</Td>
+                <Td label="Dates" className="text-ink/70">{l.from} → {l.to}</Td>
+                <Td label="Affected">{l.affected} classes</Td>
+                <Td label="Cover" className="text-ink/65">{l.cover}</Td>
+              </Tr>
+            ))}
           </Table>
         </Panel>
       </div>
+
+      <JoinClassDialog session={joining} onClose={() => setJoining(null)} />
     </AdminPage>
   );
 }

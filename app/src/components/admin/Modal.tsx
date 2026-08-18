@@ -10,6 +10,7 @@ export function Modal({
   title,
   description,
   footer,
+  size = "md",
   children,
 }: {
   open: boolean;
@@ -17,6 +18,7 @@ export function Modal({
   title: string;
   description?: string;
   footer?: React.ReactNode;
+  size?: "md" | "lg";
   children: React.ReactNode;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -43,7 +45,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -53,7 +55,9 @@ export function Modal({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border-4 border-ink bg-white hard-shadow-lg focus:outline-none"
+        className={`relative max-h-[92vh] w-full overflow-y-auto rounded-t-2xl border-4 border-ink bg-white hard-shadow-lg focus:outline-none sm:rounded-2xl ${
+          size === "lg" ? "sm:max-w-4xl" : "sm:max-w-lg"
+        }`}
       >
         <header className="flex items-start justify-between gap-4 border-b-2 border-ink/12 px-5 py-4">
           <div>

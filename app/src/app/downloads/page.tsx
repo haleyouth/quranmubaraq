@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Download, ExternalLink, FileText } from "lucide-react";
+import { BookOpen, Download, ExternalLink, FileText } from "lucide-react";
 import { downloads } from "@/lib/content";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container, Section } from "@/components/ui/Section";
@@ -53,26 +53,40 @@ export default function DownloadsPage() {
                     {r.description}
                   </p>
 
-                  <a
-                    href={r.file}
-                    {...(isExternal
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : { download: true })}
-                    className="group mt-6 inline-flex min-h-12 w-fit cursor-pointer items-center gap-2 rounded-full border-2 border-ink bg-green-deep px-6 py-3 font-bold text-white hard-shadow press"
-                  >
-                    {isExternal ? (
-                      <>
-                        <ExternalLink className="size-5" aria-hidden="true" />
-                        Open {r.title}
-                        <span className="sr-only">(opens in a new tab)</span>
-                      </>
-                    ) : (
-                      <>
+                  {/* Read in the browser first; downloading is the option, not the default */}
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <a
+                      href={r.file}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-full border-2 border-ink bg-green-deep px-6 py-3 font-bold text-white hard-shadow press"
+                    >
+                      <BookOpen className="size-5" aria-hidden="true" />
+                      Read online
+                      <span className="sr-only">
+                        — {r.title} (opens in a new tab)
+                      </span>
+                    </a>
+
+                    {!isExternal && (
+                      <a
+                        href={r.file}
+                        download
+                        className="inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-full border-2 border-ink bg-white px-5 py-3 font-bold text-ink hard-shadow press"
+                      >
                         <Download className="size-5" aria-hidden="true" />
-                        Download {r.title}
-                      </>
+                        Download
+                        <span className="sr-only"> {r.title}</span>
+                      </a>
                     )}
-                  </a>
+
+                    {isExternal && (
+                      <span className="inline-flex items-center gap-1.5 text-sm text-ink/55">
+                        <ExternalLink className="size-3.5" aria-hidden="true" />
+                        Hosted externally
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
             })}

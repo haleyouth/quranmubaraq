@@ -72,6 +72,31 @@
   }
 }
 
+/* Gentle vertical bob for the Bismillah banner */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-2deg);
+  }
+}
+
+/* Text and fill cross-fade between white-on-magenta and black-on-white */
+@keyframes bismillah-shift {
+  0%,
+  45% {
+    background-color: var(--color-green-deep);
+    color: #ffffff;
+  }
+  55%,
+  100% {
+    background-color: #ffffff;
+    color: var(--color-ink);
+  }
+}
+
 /* ==========================================================================
    Base
    ========================================================================== */
@@ -185,6 +210,56 @@
 
 @utility reveal {
   animation: reveal 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/*
+ * Islamic girih lattice.
+ *
+ * A 120px vector tile masked with the current text colour, so it inherits
+ * the palette rather than introducing a fixed grey. Kept faint — it is a
+ * ground, never something text has to compete with.
+ */
+@utility islamic-pattern {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.055;
+    background-color: currentColor;
+    mask-image: url("/brand/pattern.svg");
+    mask-size: 120px 120px;
+    mask-repeat: repeat;
+    -webkit-mask-image: url("/brand/pattern.svg");
+    -webkit-mask-size: 120px 120px;
+    -webkit-mask-repeat: repeat;
+  }
+}
+
+/* Slightly stronger on dark grounds, where the lattice reads as texture */
+@utility islamic-pattern-strong {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.1;
+    background-color: currentColor;
+    mask-image: url("/brand/pattern.svg");
+    mask-size: 140px 140px;
+    mask-repeat: repeat;
+    -webkit-mask-image: url("/brand/pattern.svg");
+    -webkit-mask-size: 140px 140px;
+    -webkit-mask-repeat: repeat;
+  }
 }
 
 /* Cream scrim over hero imagery — matches the reference implementation */

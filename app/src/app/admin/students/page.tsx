@@ -1,18 +1,26 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Pencil, PauseCircle, Plus, Search, UserRound } from "lucide-react";
+import {
+  CalendarDays, CheckCircle2, Pencil, PauseCircle, Plus, Search, UserCog, UserRound,
+} from "lucide-react";
 import { students as seed, type Student } from "@/lib/admin/demo-data";
-import { getSession, type Session } from "@/lib/admin/demo-auth";
+import {
+  canImpersonate, getSession, sessionForPerson, startImpersonation, type Session,
+} from "@/lib/admin/demo-auth";
 import { courses } from "@/lib/content";
 import {
   AdminButton, AdminPage, DemoNotice, Field, Panel, StatusBadge,
   Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
+import { CalendarView } from "@/components/admin/CalendarView";
+import { useRouter } from "next/navigation";
 
 export default function StudentsPage() {
+  const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
+  const [calendarFor, setCalendarFor] = useState<Student | null>(null);
   const [rows, setRows] = useState<Student[]>([...seed]);
   const [query, setQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
@@ -61,7 +69,17 @@ export default function StudentsPage() {
     );
   }
 
+  /** Act as this student, preserving the actor's session for return. */
+  function viewAsStudent(s: Student) {
+    if (startImpersonation(sessionForPerson(s.name, "student"))) {
+      router.push("/admin");
+    } else {
+      flash("Only Admin and Principal accounts may view as another user.");
+    }
+  }
+
   const canManage = session?.role === "admin" || session?.role === "principal";
+  const mayImpersonate = session ? canImpersonate(session.role) : false;
 
   return (
     <AdminPage
@@ -121,7 +139,7 @@ export default function StudentsPage() {
         >
           {filtered.map((s) => (
             <Tr key={s.id}>
-              <Td>
+              <Td label="Student">
                 <div className="flex items-center gap-3">
                   <span className="font-display grid size-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-green-deep text-xs text-white">
                     {s.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
@@ -132,11 +150,11 @@ export default function StudentsPage() {
                   </div>
                 </div>
               </Td>
-              <Td className="text-ink/70">{s.guardian}</Td>
-              <Td className="text-ink/70">{s.course}</Td>
-              <Td className="text-ink/70">{s.teacher}</Td>
-              <Td>{s.plan}</Td>
-              <Td>
+              <Td label="Guardian" className="text-ink/70">{s.guardian}</Td>
+              <Td label="Course" className="text-ink/70">{s.course}</Td>
+              <Td label="Teacher" className="text-ink/70">{s.teacher}</Td>
+              <Td label="Plan">{s.plan}</Td>
+              <Td label="Attendance">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-16 overflow-hidden rounded-full border border-ink bg-cream">
                     <div
@@ -147,8 +165,8 @@ export default function StudentsPage() {
                   <span className="text-xs font-bold">{s.attendance}%</span>
                 </div>
               </Td>
-              <Td><StatusBadge status={s.status} /></Td>
-              <Td>
+              <Td label="Status"><StatusBadge status={s.status} /></Td>
+              <Td label="Actions">
                 <div className="flex gap-1.5">
                   <button
                     type="button"
@@ -159,6 +177,26 @@ export default function StudentsPage() {
                   >
                     <Pencil className="size-3.5" />
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setCalendarFor(s)}
+                    aria-label={`View ${s.name}'s class schedule`}
+                    title="Class schedule"
+                    className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                  >
+                    <CalendarDays className="size-3.5" />
+                  </button>
+                  {mayImpersonate && (
+                    <button
+                      type="button"
+                      onClick={() => viewAsStudent(s)}
+                      aria-label={`View as ${s.name}`}
+                      title="View as this student"
+                      className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                    >
+                      <UserCog className="size-3.5" />
+                    </button>
+                  )}
                   {canManage && (
                     <button
                       type="button"
@@ -176,6 +214,21 @@ export default function StudentsPage() {
           ))}
         </Table>
       </Panel>
+
+      <Modal
+        open={Boolean(calendarFor)}
+        onClose={() => setCalendarFor(null)}
+        title={calendarFor ? `${calendarFor.name} — class schedule` : ""}
+        description="Click any day to see that day's classes."
+        size="lg"
+      >
+        {calendarFor && (
+          <CalendarView
+            title={`${calendarFor.course} · ${calendarFor.plan}`}
+            filter={(x) => x.studentName === calendarFor.name}
+          />
+        )}
+      </Modal>
 
       <StudentForm
         open={Boolean(editing) || creating}

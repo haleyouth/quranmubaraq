@@ -66,8 +66,8 @@ export default function ComplaintsPage() {
         <Table head={["Ticket", "Subject", "Category", "Raised by", "Priority", "Status", "SLA", "Actions"]}>
           {rows.map((c) => (
             <Tr key={c.id}>
-              <Td className="font-mono text-xs">{c.id}</Td>
-              <Td>
+              <Td label="Ticket" className="font-mono text-xs">{c.id}</Td>
+              <Td label="Subject">
                 <button
                   type="button"
                   onClick={() => setDetail(c)}
@@ -79,14 +79,14 @@ export default function ComplaintsPage() {
                   <p className="text-xs text-ink/55">Against: {c.against}</p>
                 )}
               </Td>
-              <Td><Badge tone="sage">{c.category}</Badge></Td>
-              <Td className="text-ink/70">{c.raisedBy}</Td>
-              <Td><StatusBadge status={c.priority} /></Td>
-              <Td><StatusBadge status={c.status} /></Td>
-              <Td className={c.sla.includes("min") ? "font-bold text-red-700" : "text-ink/65"}>
+              <Td label="Category"><Badge tone="sage">{c.category}</Badge></Td>
+              <Td label="Raised by" className="text-ink/70">{c.raisedBy}</Td>
+              <Td label="Priority"><StatusBadge status={c.priority} /></Td>
+              <Td label="Status"><StatusBadge status={c.status} /></Td>
+              <Td label="SLA" className={c.sla.includes("min") ? "font-bold text-red-700" : "text-ink/65"}>
                 {c.sla}
               </Td>
-              <Td>
+              <Td label="Actions">
                 <select
                   value={c.status}
                   onChange={(e) => setStatus(c, e.target.value as ComplaintStatus)}

@@ -5,17 +5,8 @@ import { Container } from "@/components/ui/Section";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden border-b-4 border-ink bg-cream">
-      {/* Decorative ground — pure CSS, no image dependency */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, var(--color-ink) 1px, transparent 0)",
-          backgroundSize: "28px 28px",
-        }}
-      />
+    <section className="islamic-pattern relative overflow-hidden border-b-4 border-ink bg-cream">
+      {/* Soft colour wash behind the girih lattice */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 -right-24 size-[28rem] rounded-full bg-gold/25 blur-3xl"
@@ -120,11 +111,15 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Spans the card width so it reads as a banner above the Bismillah */}
+            {/*
+              Banner spanning the card width. Bobs gently and cross-fades
+              between magenta/white and white/ink. Both animations are
+              disabled under prefers-reduced-motion by the global guard.
+            */}
             <span
               lang="ar"
               dir="rtl"
-              className="absolute -top-7 right-6 left-6 grid h-16 -rotate-2 place-items-center rounded-2xl border-4 border-ink bg-green-deep text-3xl text-white hard-shadow"
+              className="absolute -top-10 right-6 left-6 grid h-16 place-items-center rounded-2xl border-4 border-ink bg-green-deep text-3xl text-white hard-shadow [animation:bob_3.5s_ease-in-out_infinite,bismillah-shift_5s_ease-in-out_infinite]"
             >
               ﷽
             </span>
