@@ -57,10 +57,14 @@ Native mobile apps (PWA covers v1), AI-assisted Tajweed scoring, in-app video re
 
 | Persona | Primary needs | Portal |
 |---|---|---|
-| **Super Admin** (HQ operations) | Full oversight, all branches, config, finance, impersonation | Admin |
+| **Admin / Super Admin** (HQ operations) | Full oversight, all branches, config, finance, impersonation | Admin |
 | **Principal** (branch/campus head) | Own branch: teachers, students, schedules, complaints, local reports | Principal |
 | **Teacher** | Today's classes, join Zoom, mark attendance, log progress, request leave | Teacher |
 | **Student / Parent** | Class schedule, join link, progress, invoices, raise complaint | Student |
+
+> The system has exactly four roles. `ADMIN` is the Super Admin; `PRINCIPAL`
+> is the branch admin level. Security rules must never reference a
+> `super_admin` claim, because none is ever issued.
 
 ---
 
@@ -250,7 +254,7 @@ model User { id String @id @default(cuid())
   organizationId String; branchId String?
   email String @unique; phone String?; passwordHash String?
   firstName String; lastName String; avatarUrl String?
-  role Role                       // SUPER_ADMIN | ADMIN | PRINCIPAL | TEACHER | STUDENT | PARENT
+  role Role                       // ADMIN (Super Admin) | PRINCIPAL | TEACHER | STUDENT
   status UserStatus @default(ACTIVE)   // ACTIVE | DISABLED | PENDING | ARCHIVED
   twoFactorSecret String?
   teacherProfile TeacherProfile?; studentProfile StudentProfile?
@@ -386,12 +390,17 @@ Selected against the `public-apis` catalogue and verified for production suitabi
 
 ### Module 1 — Authentication, Roles & Permissions
 
-**Roles:** `SUPER_ADMIN`, `ADMIN`, `PRINCIPAL`, `TEACHER`, `STUDENT`, `PARENT`.
+**Roles:** `ADMIN`, `PRINCIPAL`, `TEACHER`, `STUDENT`.
+
+`ADMIN` **is** the Super Admin — the highest level, held by HQ operations.
+There is no separate `SUPER_ADMIN` role. `PRINCIPAL` is the admin level for a
+branch. Parents sign in against their child's `STUDENT` record rather than
+holding a role of their own.
 
 RBAC with granular permissions (`class.create`, `finance.view`, `teacher.disable`, `user.impersonate`, …) grouped into role presets; per-user overrides supported.
 
 **Features**
-- Email/password + Google OAuth; TOTP 2FA mandatory for `ADMIN`, `PRINCIPAL`, `SUPER_ADMIN`.
+- Email/password + Google OAuth; TOTP 2FA mandatory for `ADMIN` and `PRINCIPAL`.
 - Self-service Principal signup (preserves current business flow) → HQ approval queue.
 - Invitation flows: Principal invites Teachers; Admin/Principal enrols Students; Student record auto-provisions Parent portal access.
 - Password reset, email verification, session management ("sign out all devices").
@@ -469,7 +478,7 @@ The operational heart. Timezone-correct by construction: all times stored UTC, r
 - **Edit profile** — admin-side and self-service, with field-level permissions (a teacher may edit bio/photo, not rate).
 - **Class schedule tab** — full timetable, weekly load, utilisation %.
 - **Disable teacher** — reversible suspension. Blocks login, halts new assignments, and surfaces a mandatory workflow to reassign or cancel their upcoming sessions before the change commits. Reason required, audit-logged.
-- **Delete teacher** — soft delete/archive by default (preserves attendance, payout and audit history). Hard delete restricted to `SUPER_ADMIN`, requires typed confirmation, and is blocked while active enrolments or unpaid payouts exist.
+- **Delete teacher** — soft delete/archive by default (preserves attendance, payout and audit history). Hard delete restricted to `ADMIN`, requires typed confirmation, and is blocked while active enrolments or unpaid payouts exist.
 - **Switch to teacher** — impersonation per §5.1.
 - Performance panel: attendance reliability, punctuality, student progress velocity, parent ratings, complaints against.
 - Payout summary and history.
@@ -511,7 +520,7 @@ Covers both requested directions: **teacher complaints** (raised by teachers) an
 - Assignment and reassignment; internal notes (staff-only) separated from replies visible to the complainant.
 - Attachments, threaded comments, status workflow (Open → In Review → Awaiting Response → Resolved → Closed, plus Escalated).
 - Resolution note mandatory before closure; satisfaction rating requested from complainant on close.
-- Anonymous submission option for sensitive matters (visible only to Super Admin).
+- Anonymous submission option for sensitive matters (visible only to `ADMIN`).
 - Analytics: volume by category/branch/teacher, resolution time, repeat-complaint detection.
 
 ---

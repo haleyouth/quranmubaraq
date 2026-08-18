@@ -12,12 +12,19 @@ service cloud.firestore {
     }
 
     // Roles are set as custom claims by a Cloud Function, never by the client.
+    // The application defines exactly four: admin, principal, teacher, student.
     function hasRole(role) {
       return isSignedIn() && request.auth.token.role == role;
     }
 
+    // 'admin' is the Super Admin — the highest level. There is no separate
+    // super_admin claim.
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
     function isStaff() {
-      return hasRole('super_admin') || hasRole('admin') || hasRole('principal');
+      return isAdmin() || hasRole('principal');
     }
 
     function isTeacher() {
@@ -73,7 +80,7 @@ service cloud.firestore {
 
       // Admin and principal may delete: a lead is a contact enquiry, and a
       // parent asking to be removed should be removed.
-      allow delete: if hasRole('super_admin') || hasRole('admin') || hasRole('principal');
+      allow delete: if isStaff();
     }
 
     /* ---------------------------------------------------------------- */
@@ -116,7 +123,7 @@ service cloud.firestore {
                     && request.resource.data.source == resource.data.source
                     && request.resource.data.createdAt == resource.data.createdAt;
 
-      allow delete: if hasRole('super_admin') || hasRole('admin') || hasRole('principal');
+      allow delete: if isStaff();
     }
 
     /* ---------------------------------------------------------------- */
@@ -165,7 +172,7 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow read: if isStaff() || isSelf(resource.data.raisedById);
       allow update: if isStaff();
-      allow delete: if hasRole('super_admin');
+      allow delete: if isAdmin();
     }
 
     /* ---------------------------------------------------------------- */
@@ -176,7 +183,7 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow read: if isStaff() || isSelf(resource.data.userId);
       allow update: if isStaff();
-      allow delete: if hasRole('super_admin');
+      allow delete: if isAdmin();
     }
 
     /* ---------------------------------------------------------------- */

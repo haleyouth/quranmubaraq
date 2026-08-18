@@ -12,7 +12,7 @@ service firebase.storage {
     }
 
     function isStaff() {
-      return hasRole('super_admin') || hasRole('admin') || hasRole('principal');
+      return isAdmin() || hasRole('principal');
     }
 
     function isValidUpload() {
