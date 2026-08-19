@@ -19,8 +19,10 @@ export function AdminPage({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl text-ink">{title}</h1>
-          {description && <p className="mt-1.5 text-ink/70">{description}</p>}
+          <h1 className="font-display text-2xl text-ink sm:text-3xl">{title}</h1>
+          {description && (
+            <p className="mt-1 text-sm text-ink/70 sm:mt-1.5 sm:text-base">{description}</p>
+          )}
         </div>
         {actions && <div className="flex flex-wrap gap-2 sm:gap-3">{actions}</div>}
       </div>
@@ -51,7 +53,7 @@ export function Panel({
       className={cn("rounded-2xl border-2 border-ink bg-white hard-shadow", className)}
     >
       {(title || actions) && (
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink/12 px-5 py-4">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink/12 px-4 py-3 sm:px-5 sm:py-4">
           <div>
             {title && <h2 className="font-display text-lg text-ink">{title}</h2>}
             {description && (
@@ -61,7 +63,7 @@ export function Panel({
           {actions}
         </header>
       )}
-      <div className={cn("p-5", bodyClassName)}>{children}</div>
+      <div className={cn("p-4 sm:p-5", bodyClassName)}>{children}</div>
     </section>
   );
 }
@@ -92,7 +94,7 @@ export function AdminButton({
       className={cn(
         "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-bold transition-colors",
         "disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-x-0 disabled:hover:translate-y-0",
-        size === "sm" ? "min-h-9 px-4 text-sm" : "min-h-11 px-5",
+        size === "sm" ? "min-h-11 px-4 text-sm sm:min-h-9" : "min-h-11 px-5",
         btnVariants[variant],
         className,
       )}
@@ -302,13 +304,15 @@ export function StatTile({
   trend?: "up" | "down" | "flat";
 }) {
   return (
-    <div className="rounded-2xl border-2 border-ink bg-white p-4 hard-shadow sm:p-5">
-      <p className="text-xs font-bold tracking-wider text-ink/55 uppercase">{label}</p>
-      <p className="font-display mt-2 text-3xl text-ink">{value}</p>
+    <div className="rounded-2xl border-2 border-ink bg-white p-3 hard-shadow sm:p-5">
+      <p className="text-[10px] font-bold tracking-wider text-ink/55 uppercase sm:text-xs">
+        {label}
+      </p>
+      <p className="font-display mt-1.5 text-2xl text-ink sm:mt-2 sm:text-3xl">{value}</p>
       {delta && (
         <p
           className={cn(
-            "mt-1 text-sm font-semibold",
+            "mt-1 text-[11px] font-semibold sm:text-sm",
             trend === "up" && "text-green-deep",
             trend === "down" && "text-red-700",
             (!trend || trend === "flat") && "text-ink/60",

@@ -68,7 +68,7 @@ export default function AdminDashboard() {
       >
         <DateTimePanel filter={(x) => x.studentName === session.name} />
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           <StatTile label="Classes today" value={String(mine.length)} delta={`${done} completed`} />
           <StatTile label="This week" value={String(myWeek.length)} delta="Scheduled" />
           <StatTile label="Attendance" value="96%" delta="Last 30 days" trend="up" />
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
       >
         <DateTimePanel filter={(x) => x.teacherName === session.name} />
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           <StatTile label="Classes today" value={String(mine.length)} delta={`${completed} completed`} />
           <StatTile label="This week" value={String(myWeek.length)} delta="Scheduled" />
           <StatTile label="To mark" value={String(pending.length)} delta="Needs attendance" trend={pending.length ? "down" : "flat"} />
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
         <Panel
           title="Your classes today"
           actions={
-            <Link href="/admin/today" className="text-sm font-bold text-ink underline decoration-teal decoration-2 underline-offset-4">
+            <Link href="/admin/today" className="inline-flex min-h-11 items-center text-sm font-bold text-ink underline decoration-teal decoration-2 underline-offset-4 sm:min-h-0">
               Mark attendance
             </Link>
           }
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
     >
       <DateTimePanel />
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         {shownKpis.map((k) => (
           <Link key={k.label} href={k.href} className="block">
             <StatTile label={k.label} value={k.value} delta={k.delta} trend={k.trend} />
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
       <Panel
         title={`Live now — ${live.length} classes in progress`}
         actions={
-          <Link href="/admin/today" className="text-sm font-bold text-ink underline decoration-teal decoration-2 underline-offset-4">
+          <Link href="/admin/today" className="inline-flex min-h-11 items-center text-sm font-bold text-ink underline decoration-teal decoration-2 underline-offset-4 sm:min-h-0">
             Today&rsquo;s board
           </Link>
         }

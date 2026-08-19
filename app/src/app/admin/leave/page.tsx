@@ -60,7 +60,7 @@ export default function LeavePage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Pending approval" value={String(pending.length)} delta="Awaiting decision" />
         <StatTile label="Classes affected" value={String(pending.reduce((a, l) => a + l.affected, 0))} delta="If all approved" trend="down" />
         <StatTile label="Uncovered" value={String(uncovered)} delta="Need substitutes" trend="down" />

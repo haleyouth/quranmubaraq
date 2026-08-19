@@ -324,7 +324,7 @@ function IconAction({
       onClick={onClick}
       aria-label={label}
       title={label}
-      className={`grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink transition-colors ${
+      className={`grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink transition-colors sm:size-8 ${
         danger ? "bg-white text-red-700 hover:bg-red-700 hover:text-white" : "bg-white text-ink hover:bg-cream-deep"
       }`}
     >

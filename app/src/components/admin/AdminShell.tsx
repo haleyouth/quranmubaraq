@@ -115,7 +115,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen overflow-x-clip bg-cream">
       {/* Sidebar */}
       <aside
         className={cn(
@@ -147,7 +147,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close menu"
-            className="grid size-9 cursor-pointer place-items-center rounded-full border-2 border-cream/30 text-cream lg:hidden"
+            className="grid size-11 cursor-pointer place-items-center rounded-full border-2 border-cream/30 text-cream lg:hidden"
           >
             <X className="size-4" />
           </button>
@@ -277,7 +277,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <div className="p-5 md:p-7">
+        <div className="p-3 sm:p-5 md:p-7">
           {/* Impersonation must never be missed */}
           {impersonation ? (
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-ink bg-green-deep px-4 py-3 text-white">

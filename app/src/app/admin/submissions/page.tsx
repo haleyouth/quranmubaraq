@@ -205,7 +205,7 @@ export default function SubmissionsPage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Total submissions" value={String(rows.length)} />
         <StatTile label="Trial requests" value={String(trials)} delta="Registration form" />
         <StatTile label="Job applications" value={String(apps)} delta="Careers form" />

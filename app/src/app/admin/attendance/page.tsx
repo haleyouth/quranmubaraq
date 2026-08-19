@@ -15,7 +15,7 @@ export default function AttendancePage() {
       description="Attendance rates, exceptions and students needing follow-up."
     >
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Attendance (7d)" value="91%" delta="+3%" trend="up" />
         <StatTile label="Marked today" value={`${todaySessions.filter((s) => s.attendance !== "pending").length}/${todaySessions.length}`} delta="Sessions" />
         <StatTile label="No shows today" value={String(todaySessions.filter((s) => s.attendance === "absent").length)} delta="Needs follow-up" trend="down" />

@@ -159,11 +159,11 @@ function CalendarCard({
   return (
     <section className="rounded-2xl border-2 border-ink bg-white hard-shadow">
       {/* Today summary */}
-      <header className="grid gap-2 border-b-2 border-ink/12 p-3 sm:grid-cols-2">
-        <div className="flex items-center gap-2.5 rounded-xl border-2 border-ink bg-cream px-3 py-2">
-          <CalendarDays className="size-4 shrink-0 text-ink/50" aria-hidden="true" />
+      <header className="grid grid-cols-2 gap-2 border-b-2 border-ink/12 p-3">
+        <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-cream px-2.5 py-2 sm:gap-2.5 sm:px-3">
+          <CalendarDays className="hidden size-4 shrink-0 text-ink/50 sm:block" aria-hidden="true" />
           <div className="min-w-0">
-            <p className="font-display truncate text-base leading-tight text-ink">
+            <p className="font-display truncate text-sm leading-tight text-ink sm:text-base">
               {now.getDate()} {MONTH_LABEL[now.getMonth()]} {now.getFullYear()}
             </p>
             <p className="truncate text-xs font-semibold text-ink/55">
@@ -172,10 +172,10 @@ function CalendarCard({
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 rounded-xl border-2 border-ink bg-green px-3 py-2 text-white">
-          <Moon className="size-4 shrink-0 text-white/70" aria-hidden="true" />
+        <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-green px-2.5 py-2 text-white sm:gap-2.5 sm:px-3">
+          <Moon className="hidden size-4 shrink-0 text-white/70 sm:block" aria-hidden="true" />
           <div className="min-w-0">
-            <p className="font-display truncate text-base leading-tight">
+            <p className="font-display truncate text-sm leading-tight sm:text-base">
               {hijriToday.day} {hijriToday.monthName} {hijriToday.year} AH
             </p>
             <p
@@ -202,7 +202,7 @@ function CalendarCard({
               aria-selected={tab === t}
               onClick={() => { setTab(t); setMonthCursor(0); }}
               className={cn(
-                "min-h-8 cursor-pointer rounded-full px-4 text-sm font-bold capitalize transition-colors",
+                "min-h-10 cursor-pointer rounded-full px-4 text-sm font-bold capitalize transition-colors sm:min-h-8",
                 tab === t ? "bg-green-deep text-white" : "text-ink hover:bg-cream-deep",
               )}
             >
@@ -216,14 +216,14 @@ function CalendarCard({
             type="button"
             onClick={() => setMonthCursor(monthCursor - 1)}
             aria-label="Previous month"
-            className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+            className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
           >
             <ChevronLeft className="size-4" />
           </button>
           <button
             type="button"
             onClick={() => setMonthCursor(0)}
-            className="min-h-8 cursor-pointer rounded-full border-2 border-ink bg-white px-3 text-sm font-bold transition-colors hover:bg-cream-deep"
+            className="min-h-10 cursor-pointer rounded-full border-2 border-ink bg-white px-3 text-sm font-bold transition-colors hover:bg-cream-deep sm:min-h-8"
           >
             Today
           </button>
@@ -231,7 +231,7 @@ function CalendarCard({
             type="button"
             onClick={() => setMonthCursor(monthCursor + 1)}
             aria-label="Next month"
-            className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+            className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -245,13 +245,14 @@ function CalendarCard({
           <p className="text-xs text-ink/50">{subheading}</p>
         </div>
 
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {DOW.map((d) => (
             <div
               key={d}
               className="pb-1 text-center text-[10px] font-bold tracking-wider text-ink/50 uppercase"
             >
-              {d}
+              <span className="sm:hidden">{d[0]}</span>
+              <span className="hidden sm:inline">{d}</span>
             </div>
           ))}
 
@@ -272,7 +273,7 @@ function CalendarCard({
                     : undefined
                 }
                 className={cn(
-                  "relative flex h-12 flex-col items-center justify-center rounded-lg border-2 transition-colors",
+                  "relative flex aspect-square max-h-14 min-h-11 flex-col items-center justify-center gap-0 rounded-lg border-2 pb-1 transition-colors sm:aspect-auto sm:h-12 sm:pb-0",
                   c.inMonth ? "bg-white" : "bg-cream-deep/30",
                   isToday
                     ? "border-green-deep bg-green-deep text-white ring-2 ring-green-deep/25"
@@ -283,7 +284,7 @@ function CalendarCard({
               >
                 <span
                   className={cn(
-                    "font-display text-lg leading-none",
+                    "font-display text-base leading-none sm:text-lg",
                     isToday ? "text-white" : c.inMonth ? "text-ink" : "text-ink/30",
                   )}
                 >
@@ -291,7 +292,7 @@ function CalendarCard({
                 </span>
                 <span
                   className={cn(
-                    "mt-0.5 text-[11px] leading-none font-semibold",
+                    "mt-0.5 text-[10px] leading-none font-semibold sm:text-[11px]",
                     isToday ? "text-white/75" : c.inMonth ? "text-ink/45" : "text-ink/25",
                   )}
                 >
@@ -300,16 +301,19 @@ function CalendarCard({
 
                 {classes > 0 && c.inMonth && (
                   <span
+                    aria-hidden="true"
                     className={cn(
-                      "absolute top-1 right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold leading-none",
+                      "absolute bottom-0.5 inline-flex items-center justify-center rounded-full leading-none",
+                      // Phones: a dot, since a digit at this size is unreadable
+                      "size-1 sm:top-1 sm:right-1 sm:bottom-auto sm:size-auto sm:h-4 sm:min-w-4 sm:px-1 sm:text-[9px] sm:font-bold",
                       isToday
                         ? "bg-white text-green-deep"
                         : isPast
-                          ? "bg-ink/15 text-ink/60"
+                          ? "bg-ink/30 text-ink/60 sm:bg-ink/15"
                           : "bg-green text-white",
                     )}
                   >
-                    {classes}
+                    <span className="hidden sm:inline">{classes}</span>
                   </span>
                 )}
               </div>

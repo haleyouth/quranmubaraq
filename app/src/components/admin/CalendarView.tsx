@@ -93,7 +93,7 @@ export function CalendarView({
             type="button"
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
             aria-label="Previous month"
-            className="grid size-9 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+            className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-9"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -104,7 +104,7 @@ export function CalendarView({
             type="button"
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
             aria-label="Next month"
-            className="grid size-9 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+            className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-9"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -112,15 +112,16 @@ export function CalendarView({
       </div>
 
       {/* Grid */}
-      <div className="mt-5 -mx-2 overflow-x-auto px-2">
-        <div className="min-w-[520px] sm:min-w-[640px]">
-          <div className="grid grid-cols-7 gap-1.5">
+      <div className="mt-4 -mx-1 px-1 sm:mt-5 sm:-mx-2 sm:overflow-x-auto sm:px-2">
+        <div className="sm:min-w-[640px]">
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {DOW.map((d) => (
               <div
                 key={d}
-                className="pb-1 text-center text-xs font-bold tracking-wider text-ink/55 uppercase"
+                className="pb-1 text-center text-[10px] font-bold tracking-wider text-ink/55 uppercase sm:text-xs"
               >
-                {d}
+                <span className="sm:hidden">{d[0]}</span>
+                <span className="hidden sm:inline">{d}</span>
               </div>
             ))}
 
@@ -139,7 +140,7 @@ export function CalendarView({
                   disabled={list.length === 0}
                   aria-label={`${day.getDate()} ${MONTH_LABEL[day.getMonth()]}, ${list.length} classes`}
                   className={cn(
-                    "h-[76px] rounded-lg border-2 p-1.5 text-left transition-colors sm:h-[92px] sm:rounded-xl sm:p-2",
+                    "flex aspect-square min-h-11 flex-col rounded-lg border-2 p-1 text-left transition-colors sm:aspect-auto sm:h-[92px] sm:rounded-xl sm:p-2",
                     inMonth ? "bg-white" : "bg-cream-deep/40",
                     isToday ? "border-green-deep ring-2 ring-green-deep/25" : "border-ink/15",
                     list.length > 0
@@ -150,7 +151,7 @@ export function CalendarView({
                   <span className="flex items-baseline justify-between">
                     <span
                       className={cn(
-                        "font-display text-lg leading-none",
+                        "font-display text-sm leading-none sm:text-lg",
                         inMonth ? "text-ink" : "text-ink/35",
                         isToday && "text-green-deep",
                       )}
@@ -159,7 +160,7 @@ export function CalendarView({
                     </span>
                     <span
                       className={cn(
-                        "text-[11px] font-semibold leading-none",
+                        "text-[9px] font-semibold leading-none sm:text-[11px]",
                         inMonth ? "text-ink/45" : "text-ink/25",
                       )}
                     >
@@ -167,8 +168,26 @@ export function CalendarView({
                     </span>
                   </span>
 
+                  {/* Phones: a single dot marks a day with classes; the drawer
+                      lists them in full when the day is tapped. */}
                   {list.length > 0 && (
-                    <span className="mt-1.5 block space-y-1">
+                    <span className="mt-auto flex items-center justify-center pb-0.5 sm:hidden">
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "size-1.5 rounded-full",
+                          list.some((x) => x.status === "live")
+                            ? "bg-red-700"
+                            : list.every((x) => x.status === "completed")
+                              ? "bg-green"
+                              : "bg-green-deep",
+                        )}
+                      />
+                    </span>
+                  )}
+
+                  {list.length > 0 && (
+                    <span className="mt-1.5 hidden space-y-1 sm:block">
                       {list.slice(0, 2).map((s) => (
                         <span
                           key={s.id}

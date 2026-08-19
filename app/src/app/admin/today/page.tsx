@@ -101,7 +101,7 @@ export default function TodayPage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Live now" value={String(counts.live)} delta="In progress" />
         <StatTile label="Upcoming" value={String(counts.scheduled)} delta="Later today" />
         <StatTile label="Held" value={String(counts.completed)} delta="Recorded" trend="up" />

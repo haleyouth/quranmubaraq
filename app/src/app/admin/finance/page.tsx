@@ -73,7 +73,7 @@ export default function FinancePage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Revenue MTD" value="$11,240" delta="+8% vs July" trend="up" />
         <StatTile label="Outstanding" value={`$${outstanding.toFixed(2)}`} delta={`${overdue} overdue`} trend="down" />
         <StatTile label="Collection rate" value="91%" delta="+3%" trend="up" />

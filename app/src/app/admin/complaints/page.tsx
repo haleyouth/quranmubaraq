@@ -54,7 +54,7 @@ export default function ComplaintsPage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Open cases" value={String(openCount)} delta="Awaiting action" />
         <StatTile label="Urgent" value={String(urgent)} delta="2h SLA" trend="down" />
         <StatTile label="Escalated" value={String(escalated)} delta="Needs principal" trend="down" />

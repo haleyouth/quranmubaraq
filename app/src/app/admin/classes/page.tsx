@@ -71,7 +71,7 @@ export default function ClassesPage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Active classes" value="186" delta="Across 5 courses" />
         <StatTile label="One-on-one" value="171" delta="92% of all classes" />
         <StatTile label="Group classes" value="15" delta="8% of all classes" />

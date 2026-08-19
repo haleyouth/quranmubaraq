@@ -88,7 +88,7 @@ export function NotificationBell({ session }: { session: Session }) {
         aria-expanded={open}
         aria-haspopup="true"
         className={cn(
-          "relative grid size-9 cursor-pointer place-items-center rounded-full border-2 transition-colors",
+          "relative grid size-11 cursor-pointer place-items-center rounded-full border-2 transition-colors sm:size-9",
           open
             ? "border-ink bg-ink text-cream"
             : "border-ink bg-white text-ink hover:bg-cream-deep",

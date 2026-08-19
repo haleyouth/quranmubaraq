@@ -172,7 +172,7 @@ export default function StudentsPage() {
                     onClick={() => setEditing(s)}
                     aria-label={`Edit ${s.name}`}
                     title="Edit profile"
-                    className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                    className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
                   >
                     <Pencil className="size-3.5" />
                   </button>
@@ -181,7 +181,7 @@ export default function StudentsPage() {
                     onClick={() => setCalendarFor(s)}
                     aria-label={`View ${s.name}'s class schedule`}
                     title="Class schedule"
-                    className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                    className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
                   >
                     <CalendarDays className="size-3.5" />
                   </button>
@@ -191,7 +191,7 @@ export default function StudentsPage() {
                       onClick={() => viewAsStudent(s)}
                       aria-label={`View as ${s.name}`}
                       title="View as this student"
-                      className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                      className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
                     >
                       <UserCog className="size-3.5" />
                     </button>
@@ -202,7 +202,7 @@ export default function StudentsPage() {
                       onClick={() => togglePause(s)}
                       aria-label={s.status === "active" ? `Pause ${s.name}` : `Resume ${s.name}`}
                       title={s.status === "active" ? "Pause enrolment" : "Resume enrolment"}
-                      className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                      className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
                     >
                       <PauseCircle className="size-3.5" />
                     </button>

@@ -59,7 +59,7 @@ export function LineChart({
       <div className="relative">
         <svg
           viewBox={`0 0 ${W} ${H}`}
-          className="h-56 w-full touch-none"
+          className="h-56 w-full touch-none [overflow:hidden]"
           role="img"
           aria-label={caption}
           preserveAspectRatio="none"
@@ -99,15 +99,25 @@ export function LineChart({
 
           {points.map(([x, y], i) => (
             <g key={i}>
-              {/* Wide invisible hit area for comfortable hovering */}
-              <rect
-                x={x - (W - PX * 2) / (values.length * 2)}
-                y={0}
-                width={(W - PX * 2) / values.length}
-                height={H}
-                fill="transparent"
-                onMouseEnter={() => setHover(i)}
-              />
+              {/*
+                Wide invisible hit area for comfortable hovering, clamped to
+                the chart so the end bands do not spill past the viewBox.
+              */}
+              {(() => {
+                const band = (W - PX * 2) / values.length;
+                const left = Math.max(0, x - band / 2);
+                const right = Math.min(W, x + band / 2);
+                return (
+                  <rect
+                    x={left}
+                    y={0}
+                    width={Math.max(0, right - left)}
+                    height={H}
+                    fill="transparent"
+                    onMouseEnter={() => setHover(i)}
+                  />
+                );
+              })()}
               <circle
                 cx={x}
                 cy={y}

@@ -202,7 +202,7 @@ export default function LeadsPage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-5">
         {STAGES.map((s) => (
           <button key={s} type="button" onClick={() => setStatusFilter(s)} className="text-left">
             <StatTile label={s} value={String(counts[s] ?? 0)} />
@@ -301,7 +301,7 @@ export default function LeadsPage() {
                       onClick={() => setEditing(l)}
                       aria-label={`Edit ${l.name}`}
                       title="Edit lead"
-                      className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                      className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
                     >
                       <Pencil className="size-3.5" />
                     </button>
@@ -310,7 +310,7 @@ export default function LeadsPage() {
                       onClick={() => void changeStatus(l, "enrolled")}
                       aria-label={`Mark ${l.name} enrolled`}
                       title="Mark enrolled"
-                      className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep"
+                      className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white transition-colors hover:bg-cream-deep sm:size-8"
                     >
                       <UserPlus className="size-3.5" />
                     </button>
@@ -319,7 +319,7 @@ export default function LeadsPage() {
                       onClick={() => setDeleting(l)}
                       aria-label={`Delete ${l.name}`}
                       title="Delete lead"
-                      className="grid size-8 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white text-red-700 transition-colors hover:bg-red-700 hover:text-white"
+                      className="grid size-10 cursor-pointer place-items-center rounded-lg border-2 border-ink bg-white text-red-700 transition-colors hover:bg-red-700 hover:text-white sm:size-8"
                     >
                       <Trash2 className="size-3.5" />
                     </button>

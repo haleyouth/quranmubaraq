@@ -39,7 +39,7 @@ export default function PoliciesPage() {
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         <StatTile label="Published policies" value={String(policies.length)} />
         <StatTile label="Awaiting acknowledgment" value={String(outstanding)} delta="Across all staff" trend="down" />
         <StatTile label="Fully acknowledged" value={String(policies.filter((p) => p.acknowledged === p.total).length)} trend="up" />
