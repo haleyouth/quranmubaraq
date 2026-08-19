@@ -1,13 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Info, MessageSquarePlus, Search, Send, ShieldCheck } from "lucide-react";
+import {
+  Info, MessageSquarePlus, Search, Send, ShieldCheck, Wifi, WifiOff,
+} from "lucide-react";
 import { getSession, type Role, type Session } from "@/lib/admin/demo-auth";
 import {
   canMessage, contactsFor, loadMessages, markThreadRead, persistMessage,
   resetMessages, subscribeMessages, threadId, timeAgo,
   type Message, type Party,
 } from "@/lib/admin/messages";
+import {
+  markLiveThreadRead, sendLiveMessage, subscribeToMessages,
+  type LiveMessage,
+} from "@/lib/admin/messages-live";
 import {
   AdminButton, AdminPage, Badge, Panel, inputClass,
 } from "@/components/admin/ui";
@@ -28,20 +34,74 @@ export default function MessagesPage() {
   const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
   const [composing, setComposing] = useState(false);
+  /**
+   * "live" once Firestore delivers a snapshot; "local" while it cannot,
+   * which is the case until Firebase Auth is connected. Only the transport
+   * differs — the thread UI below is identical either way.
+   */
+  const [transport, setTransport] = useState<"connecting" | "live" | "local">("connecting");
+  const liveRef = useRef<LiveMessage[]>([]);
   const endRef = useRef<HTMLDivElement>(null);
 
-  // Messages live in a shared store, so a message sent by one account is
-  // visible when you sign in as the other — and updates live across tabs.
+  /**
+   * Prefer Firestore, which pushes to every device in real time. Fall back to
+   * the local store only when Firestore is unreachable, so the demo still
+   * works before Auth is connected.
+   */
   useEffect(() => {
-    setSession(getSession());
-    const refresh = () => setMessages(loadMessages());
-    refresh();
-    const unsubscribe = subscribeMessages(refresh);
-    // Keeps the relative timestamps ("34m ago") honest
-    const tick = window.setInterval(refresh, 30_000);
+    const s = getSession();
+    setSession(s);
+    if (!s) return;
+
+    const refreshLocal = () => setMessages(loadMessages());
+    let unsubscribeLive: (() => void) | undefined;
+    let unsubscribeLocal: (() => void) | undefined;
+    let tick: number | undefined;
+
+    const useLocal = () => {
+      if (unsubscribeLocal) return;
+      setTransport("local");
+      refreshLocal();
+      unsubscribeLocal = subscribeMessages(refreshLocal);
+      // Keeps relative timestamps ("34m ago") honest
+      tick = window.setInterval(refreshLocal, 30_000);
+    };
+
+    try {
+      unsubscribeLive = subscribeToMessages(
+        s.name,
+        (live) => {
+          liveRef.current = live;
+          setTransport("live");
+          const now = Date.now();
+          setMessages(
+            live.map((m) => ({
+              id: m.id,
+              threadId: m.threadId,
+              fromName: m.fromName,
+              fromRole: m.fromRole,
+              body: m.body,
+              minutesAgo: m.sentAt ? Math.max(0, (now - m.sentAt.getTime()) / 60_000) : 0,
+              read: m.readBy.includes(s.name),
+            })),
+          );
+        },
+        () => useLocal(),
+      );
+    } catch {
+      useLocal();
+    }
+
+    // If no snapshot arrives promptly, Firestore is unreachable
+    const guard = window.setTimeout(() => {
+      if (liveRef.current.length === 0) useLocal();
+    }, 3500);
+
     return () => {
-      unsubscribe();
-      window.clearInterval(tick);
+      unsubscribeLive?.();
+      unsubscribeLocal?.();
+      window.clearTimeout(guard);
+      if (tick) window.clearInterval(tick);
     };
   }, []);
 
@@ -82,8 +142,12 @@ export default function MessagesPage() {
   // Mark the open thread as read for this reader only
   useEffect(() => {
     if (!active || !session) return;
-    markThreadRead(active, session.name);
-  }, [active, session, messages.length]);
+    if (transport === "live") {
+      void markLiveThreadRead(liveRef.current, active, session.name);
+    } else {
+      markThreadRead(active, session.name);
+    }
+  }, [active, session, transport, messages.length]);
 
   if (!session) return null;
 
@@ -91,16 +155,41 @@ export default function MessagesPage() {
     if (!session || !current || !draft.trim()) return;
     if (!canMessage(session.role, session.name, current.contact.name)) return;
 
+    const body = draft.trim();
+    setDraft("");
+
+    if (transport === "live") {
+      // onSnapshot echoes the write back, so no optimistic insert is needed
+      sendLiveMessage({
+        threadId: current.id,
+        fromName: session.name,
+        fromRole: session.role,
+        toName: current.contact.name,
+        body,
+      }).catch(() => {
+        // Delivery failed — keep the message rather than losing it
+        persistMessage({
+          id: `M-${Date.now()}-${Math.round(Math.random() * 1e6)}`,
+          threadId: current.id,
+          fromName: session.name,
+          fromRole: session.role,
+          body,
+          read: false,
+        });
+        setMessages(loadMessages());
+      });
+      return;
+    }
+
     persistMessage({
       id: `M-${Date.now()}-${Math.round(Math.random() * 1e6)}`,
       threadId: current.id,
       fromName: session.name,
       fromRole: session.role,
-      body: draft.trim(),
+      body,
       read: false, // unread for the recipient until they open the thread
     });
     setMessages(loadMessages());
-    setDraft("");
   }
 
   function startThread(c: Party) {
@@ -135,6 +224,26 @@ export default function MessagesPage() {
         </>
       }
     >
+
+      {/* State the transport plainly — a demo that looks realtime but is not
+          would be worse than one that admits it. */}
+      {transport === "live" ? (
+        <p className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-2.5 text-sm font-semibold text-ink">
+          <Wifi className="size-4 shrink-0" aria-hidden="true" />
+          Live — messages reach the other person&rsquo;s device instantly.
+        </p>
+      ) : transport === "local" ? (
+        <p className="flex items-start gap-2 rounded-xl border-2 border-ink bg-gold px-4 py-2.5 text-sm text-ink">
+          <WifiOff className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <span>
+            <strong>This browser only.</strong> Live delivery needs an
+            authenticated staff account. Until Firebase Auth is connected,
+            messages are shared between tabs on this device but do not reach
+            another device.
+          </span>
+        </p>
+      ) : null}
+
 
       <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
         {/* Conversation list */}

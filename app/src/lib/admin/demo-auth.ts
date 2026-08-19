@@ -64,6 +64,17 @@ export const DEMO_USERS: readonly DemoUser[] = [
   },
 ] as const;
 
+/**
+ * Session storage.
+ *
+ * sessionStorage is per-tab, so two roles can be signed in side by side —
+ * a teacher in one tab and their student in another — which is exactly how
+ * you demonstrate a conversation. localStorage is shared across every tab in
+ * the profile, so signing in as a second role silently replaced the first.
+ *
+ * The previous localStorage session is migrated on first read so anyone
+ * already signed in is not thrown out by this change.
+ */
 const SESSION_KEY = "qm_demo_session";
 const IMPERSONATION_KEY = "qm_demo_impersonation";
 
@@ -83,21 +94,33 @@ export function signIn(email: string, password: string): Session | null {
   if (!user) return null;
 
   const { password: _password, ...session } = user;
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return session;
 }
 
 export function getSession(): Session | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(SESSION_KEY);
-    return raw ? (JSON.parse(raw) as Session) : null;
+    const raw = window.sessionStorage.getItem(SESSION_KEY);
+    if (raw) return JSON.parse(raw) as Session;
+
+    // Migrate a session left over from the localStorage implementation
+    const legacy = window.localStorage.getItem(SESSION_KEY);
+    if (legacy) {
+      window.sessionStorage.setItem(SESSION_KEY, legacy);
+      window.localStorage.removeItem(SESSION_KEY);
+      return JSON.parse(legacy) as Session;
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
 export function signOut() {
+  window.sessionStorage.removeItem(SESSION_KEY);
+  window.sessionStorage.removeItem(IMPERSONATION_KEY);
+  // Clear any legacy copy too
   window.localStorage.removeItem(SESSION_KEY);
   window.localStorage.removeItem(IMPERSONATION_KEY);
 }
@@ -123,15 +146,15 @@ export function startImpersonation(target: Session): boolean {
   if (getImpersonation()) return false;
 
   const record: Impersonation = { actor, target, startedAt: Date.now() };
-  window.localStorage.setItem(IMPERSONATION_KEY, JSON.stringify(record));
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(target));
+  window.sessionStorage.setItem(IMPERSONATION_KEY, JSON.stringify(record));
+  window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(target));
   return true;
 }
 
 export function getImpersonation(): Impersonation | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(IMPERSONATION_KEY);
+    const raw = window.sessionStorage.getItem(IMPERSONATION_KEY);
     return raw ? (JSON.parse(raw) as Impersonation) : null;
   } catch {
     return null;
@@ -142,8 +165,8 @@ export function getImpersonation(): Impersonation | null {
 export function stopImpersonation(): boolean {
   const record = getImpersonation();
   if (!record) return false;
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(record.actor));
-  window.localStorage.removeItem(IMPERSONATION_KEY);
+  window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(record.actor));
+  window.sessionStorage.removeItem(IMPERSONATION_KEY);
   return true;
 }
 

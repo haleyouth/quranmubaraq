@@ -165,6 +165,44 @@ service cloud.firestore {
     }
 
     /* ---------------------------------------------------------------- */
+    /* Messages                                                         */
+    /* ---------------------------------------------------------------- */
+
+    match /messages/{messageId} {
+      // A person may only read threads they are part of. Combined with the
+      // participant filter on the client query, nobody can enumerate another
+      // person's conversation.
+      allow read: if isSignedIn()
+                  && request.auth.token.name in resource.data.participants;
+
+      // The sender must be the signed-in person and must be a participant,
+      // so a message cannot be forged in someone else's name.
+      allow create: if isSignedIn()
+                    && request.resource.data.keys().hasOnly([
+                         'threadId', 'fromName', 'fromRole',
+                         'participants', 'body', 'sentAt', 'readBy'
+                       ])
+                    && request.resource.data.fromName == request.auth.token.name
+                    && request.auth.token.name in request.resource.data.participants
+                    && request.resource.data.participants.size() == 2
+                    && request.resource.data.body is string
+                    && request.resource.data.body.size() > 0
+                    && request.resource.data.body.size() <= 4000;
+
+      // Updates exist only to record read receipts: a participant may add
+      // themselves to readBy and change nothing else.
+      allow update: if isSignedIn()
+                    && request.auth.token.name in resource.data.participants
+                    && request.resource.data.diff(resource.data)
+                         .affectedKeys().hasOnly(['readBy'])
+                    && request.resource.data.body == resource.data.body
+                    && request.resource.data.fromName == resource.data.fromName;
+
+      // Messages are a record; only the Super Admin may remove one.
+      allow delete: if isAdmin();
+    }
+
+    /* ---------------------------------------------------------------- */
     /* Complaints                                                       */
     /* ---------------------------------------------------------------- */
 
