@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CheckCircle2, Plus, TriangleAlert } from "lucide-react";
 import { leaveRequests as seed, teachers, type Leave, type LeaveStatus } from "@/lib/admin/demo-data";
 import {
-  AdminButton, AdminPage, DemoNotice, Field, Panel, StatTile,
+  AdminButton, AdminPage, Field, Panel, StatTile,
   StatusBadge, Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
@@ -52,7 +52,6 @@ export default function LeavePage() {
         </AdminButton>
       }
     >
-      <DemoNotice />
 
       {toast && (
         <p role="status" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-3 text-sm font-semibold text-ink">

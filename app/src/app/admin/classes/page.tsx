@@ -7,7 +7,7 @@ import { classDefs, WEEKDAY_LABEL, type Weekday } from "@/lib/admin/schedule";
 import { getSession, type Session } from "@/lib/admin/demo-auth";
 import { courses } from "@/lib/content";
 import {
-  AdminButton, AdminPage, Badge, DemoNotice, Field, Panel, StatTile,
+  AdminButton, AdminPage, Badge, Field, Panel, StatTile,
   StatusBadge, Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
@@ -63,7 +63,6 @@ export default function ClassesPage() {
         </AdminButton>
       }
     >
-      <DemoNotice />
 
       {toast && (
         <p role="status" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-3 text-sm font-semibold text-ink">

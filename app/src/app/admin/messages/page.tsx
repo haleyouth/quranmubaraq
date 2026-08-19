@@ -9,7 +9,7 @@ import {
   type Message, type Party,
 } from "@/lib/admin/messages";
 import {
-  AdminButton, AdminPage, Badge, DemoNotice, Panel, inputClass,
+  AdminButton, AdminPage, Badge, Panel, inputClass,
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
 import { cn } from "@/lib/utils";
@@ -135,11 +135,6 @@ export default function MessagesPage() {
         </>
       }
     >
-      <DemoNotice>
-        Messages are shared between the demo accounts on this browser, so a
-        message sent as one role appears when you sign in as the other. Stored
-        locally only — replaced by Firestore when the backend lands.
-      </DemoNotice>
 
       <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
         {/* Conversation list */}

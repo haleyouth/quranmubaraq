@@ -8,7 +8,7 @@ import {
 } from "@/lib/admin/reports";
 import { addDays } from "@/lib/admin/schedule";
 import {
-  AdminButton, AdminPage, Badge, DemoNotice, Panel, StatTile,
+  AdminButton, AdminPage, Badge, Panel, StatTile,
   Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
@@ -95,7 +95,6 @@ export default function ReportsPage() {
           : "Generate, preview and export reports across the academy."
       }
     >
-      <DemoNotice />
 
       {toast && (
         <p role="status" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-3 text-sm font-semibold text-ink">

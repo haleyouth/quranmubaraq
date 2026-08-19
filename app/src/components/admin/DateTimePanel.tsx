@@ -367,18 +367,18 @@ function PremiumClock({ now }: { now: Date }) {
   const CIRC = 2 * Math.PI * 88;
 
   return (
-    <section className="islamic-pattern-strong relative flex flex-col overflow-hidden rounded-2xl border-2 border-ink bg-ink px-4 py-4 text-cream hard-shadow">
+    <section className="relative flex flex-col overflow-hidden rounded-2xl border-2 border-ink bg-ink px-4 py-4 text-cream hard-shadow">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-20 -right-20 size-60 rounded-full bg-gold/20 blur-3xl"
+        className="pointer-events-none absolute -top-20 -right-20 size-60 rounded-full bg-gold/10 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -left-20 size-52 rounded-full bg-green/30 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -left-20 size-52 rounded-full bg-green/15 blur-3xl"
       />
 
       <div className="relative flex items-center justify-between">
-        <p className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-cream/65 uppercase">
+        <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-cream/75 uppercase">
           {isDay ? (
             <Sun className="size-3.5 text-gold" aria-hidden="true" />
           ) : (
@@ -415,8 +415,8 @@ function PremiumClock({ now }: { now: Date }) {
                 x1={100 + r1 * Math.sin(a)} y1={100 - r1 * Math.cos(a)}
                 x2={100 + 79 * Math.sin(a)} y2={100 - 79 * Math.cos(a)}
                 stroke="currentColor"
-                strokeOpacity={major ? 0.5 : 0.16}
-                strokeWidth={major ? 3 : 1.2}
+                strokeOpacity={major ? 0.75 : 0.3}
+                strokeWidth={major ? 4 : 1.6}
                 strokeLinecap="round"
               />
             );
@@ -432,37 +432,38 @@ function PremiumClock({ now }: { now: Date }) {
                 textAnchor="middle"
                 className="font-display"
                 fill="currentColor"
-                fillOpacity="0.45"
-                fontSize="13"
+                fillOpacity="0.75"
+                fontSize="17"
+                fontWeight="700"
               >
                 {n}
               </text>
             );
           })}
 
-          <line x1="100" y1="108" x2="100" y2="50" stroke="currentColor" strokeWidth="6" strokeLinecap="round"
+          <line x1="100" y1="108" x2="100" y2="50" stroke="currentColor" strokeWidth="9" strokeLinecap="round"
                 transform={`rotate(${hourDeg} 100 100)`} />
-          <line x1="100" y1="110" x2="100" y2="32" stroke="currentColor" strokeWidth="4" strokeLinecap="round"
+          <line x1="100" y1="110" x2="100" y2="32" stroke="currentColor" strokeWidth="6" strokeLinecap="round"
                 transform={`rotate(${minDeg} 100 100)`} />
-          <line x1="100" y1="116" x2="100" y2="26" stroke="var(--color-gold)" strokeWidth="1.8" strokeLinecap="round"
+          <line x1="100" y1="116" x2="100" y2="26" stroke="var(--color-gold)" strokeWidth="2.5" strokeLinecap="round"
                 transform={`rotate(${secDeg} 100 100)`} />
-          <circle cx="100" cy="100" r="5.5" fill="var(--color-gold)" />
+          <circle cx="100" cy="100" r="7" fill="var(--color-gold)" />
           <circle cx="100" cy="100" r="2" fill="var(--color-ink)" />
         </svg>
       </div>
 
       {/* Digital readout */}
-      <p className="font-display relative text-center text-3xl leading-none tabular-nums">
+      <p className="font-display relative text-center text-4xl leading-none font-extrabold tabular-nums">
         {hh}
         <span className="animate-pulse text-gold">:</span>
         {mm}
-        <span className="text-lg text-cream/55">:{ss}</span>
+        <span className="text-xl font-bold text-cream/60">:{ss}</span>
       </p>
 
-      <p className="relative mt-1 truncate text-center text-[11px] font-semibold text-cream/45">
+      <p className="relative mt-1.5 truncate text-center text-xs font-semibold text-cream/55">
         {tz}
       </p>
-      <p className="relative text-center text-[11px] text-gold/80">
+      <p className="relative text-center text-xs font-semibold text-gold/90">
         {hijri.day} {hijri.monthName} {hijri.year} AH
       </p>
     </section>

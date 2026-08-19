@@ -6,7 +6,7 @@ import { invoices as invSeed, payouts as poSeed, revenueByMonth, type Invoice } 
 import { plans } from "@/lib/content";
 import { getSession, type Session } from "@/lib/admin/demo-auth";
 import {
-  AdminButton, AdminPage, DemoNotice, Panel, StatTile, StatusBadge, Table, Td, Tr,
+  AdminButton, AdminPage, Panel, StatTile, StatusBadge, Table, Td, Tr,
 } from "@/components/admin/ui";
 import { LineChart } from "@/components/admin/Charts";
 
@@ -65,7 +65,6 @@ export default function FinancePage() {
         </AdminButton>
       }
     >
-      <DemoNotice />
 
       {toast && (
         <p role="status" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-3 text-sm font-semibold text-ink">

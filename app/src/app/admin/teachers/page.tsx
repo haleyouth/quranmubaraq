@@ -14,7 +14,7 @@ import {
   type Session,
 } from "@/lib/admin/demo-auth";
 import {
-  AdminButton, AdminPage, Badge, DemoNotice, Field, Panel, StatusBadge,
+  AdminButton, AdminPage, Badge, Field, Panel, StatusBadge,
   Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { ConfirmModal, Modal } from "@/components/admin/Modal";
@@ -116,7 +116,6 @@ export default function TeachersPage() {
         )
       }
     >
-      <DemoNotice />
 
       {toast && (
         <p

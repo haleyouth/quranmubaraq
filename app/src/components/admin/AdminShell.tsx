@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen, Briefcase, CalendarDays, ChartColumn, ClipboardList, CreditCard, FileText,
+  Inbox,
   Eye, GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning,
   MessageCircle, PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
   Users, X,
@@ -19,7 +20,8 @@ import {
   type Session,
 } from "@/lib/admin/demo-auth";
 import { InlineClock } from "@/components/admin/DateTimePanel";
-import { AyahBar } from "@/components/admin/AyahBar";
+import { AyahMarquee } from "@/components/admin/AyahMarquee";
+import { NotificationBell } from "@/components/admin/NotificationBell";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +30,7 @@ const NAV = [
   { key: "today", label: "Today's Classes", href: "/admin/today", icon: CalendarDays },
   { key: "messages", label: "Messages", href: "/admin/messages", icon: MessageCircle },
   { key: "leads", label: "Leads", href: "/admin/leads", icon: ClipboardList },
+  { key: "submissions", label: "Submissions", href: "/admin/submissions", icon: Inbox },
   { key: "applications", label: "Applications", href: "/admin/applications", icon: Briefcase },
   { key: "students", label: "Students", href: "/admin/students", icon: Users },
   { key: "teachers", label: "Teachers", href: "/admin/teachers", icon: GraduationCap },
@@ -252,15 +255,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Menu className="size-5" />
           </button>
 
-          <div className="hidden items-center gap-4 lg:flex">
+          <div className="hidden shrink-0 items-center gap-4 lg:flex">
             <p className="text-sm font-semibold text-ink/65">{session.branch}</p>
             <InlineClock />
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Verse of the day, scrolling beside the date */}
+          <AyahMarquee />
+
+          <div className="flex shrink-0 items-center gap-3">
+            <NotificationBell session={session} />
             <Link
               href="/"
-              className="text-sm font-bold text-ink underline decoration-teal decoration-2 underline-offset-4 hover:text-green-deep"
+              className="hidden text-sm font-bold text-ink underline decoration-teal decoration-2 underline-offset-4 hover:text-green-deep sm:inline"
             >
               View website
             </Link>
@@ -271,9 +278,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <div className="p-5 md:p-7">
-          <AyahBar />
-
-          {/* Impersonation takes priority — it must never be missed */}
+          {/* Impersonation must never be missed */}
           {impersonation ? (
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-ink bg-green-deep px-4 py-3 text-white">
               <p className="flex items-start gap-2 text-sm font-semibold">
@@ -293,15 +298,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 Return to my account
               </button>
             </div>
-          ) : (
-            <p className="mb-6 flex items-start gap-2 rounded-xl border-2 border-ink bg-gold px-4 py-3 text-sm font-semibold text-ink">
-              <UserRound className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-              <span>
-                Demo portal — signed in as <strong>{session.title}</strong>. Data is
-                fictional and sign-in is not secure. Do not enter real information.
-              </span>
-            </p>
-          )}
+          ) : null}
           {children}
         </div>
       </div>

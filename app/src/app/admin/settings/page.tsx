@@ -5,7 +5,7 @@ import { CheckCircle2, ShieldAlert } from "lucide-react";
 import { site } from "@/lib/content";
 import { DEMO_USERS, ROLE_NAV } from "@/lib/admin/demo-auth";
 import {
-  AdminButton, AdminPage, Badge, DemoNotice, Field, Panel, Table, Td, Tr, inputClass,
+  AdminButton, AdminPage, Badge, Field, Panel, Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 
 const TABS = ["organisation", "roles", "integrations", "audit"] as const;
@@ -29,7 +29,6 @@ export default function SettingsPage() {
 
   return (
     <AdminPage title="Settings" description="Organisation, roles, integrations and audit trail.">
-      <DemoNotice />
 
       {toast && (
         <p role="status" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-3 text-sm font-semibold text-ink">

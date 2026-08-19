@@ -8,7 +8,7 @@ import {
   type Attendance, type ClassSession, type SessionStatus,
 } from "@/lib/admin/schedule";
 import {
-  AdminButton, AdminPage, Badge, DemoNotice, Field, Panel, StatTile,
+  AdminButton, AdminPage, Badge, Field, Panel, StatTile,
   StatusBadge, Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { Modal } from "@/components/admin/Modal";
@@ -93,7 +93,6 @@ export default function TodayPage() {
           : "Live operational board — every session scheduled today."
       }
     >
-      <DemoNotice />
 
       {toast && (
         <p role="status" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-3 text-sm font-semibold text-ink">

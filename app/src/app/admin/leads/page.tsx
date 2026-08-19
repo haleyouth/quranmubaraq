@@ -14,7 +14,7 @@ import {
   type StoredLead,
 } from "@/lib/leads";
 import {
-  AdminButton, AdminPage, Badge, DemoNotice, Field, Panel, StatTile,
+  AdminButton, AdminPage, Badge, Field, Panel, StatTile,
   StatusBadge, Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
 import { ConfirmModal, Modal } from "@/components/admin/Modal";
@@ -182,11 +182,6 @@ export default function LeadsPage() {
         </AdminButton>
       }
     >
-      <DemoNotice>
-        Registrations submitted on the website are saved to Firestore and appear
-        here. Rows marked <strong>Live</strong> are real submissions and can be
-        edited or deleted; the rest are demo data for this session.
-      </DemoNotice>
 
       {toast && (
         <p role="status" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-teal px-4 py-3 text-sm font-semibold text-ink">

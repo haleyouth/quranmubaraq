@@ -2,7 +2,7 @@
 
 import { attendanceTrend, students, todaySessions } from "@/lib/admin/demo-data";
 import {
-  AdminPage, DemoNotice, Panel, StatTile, StatusBadge, Table, Td, Tr,
+  AdminPage, Panel, StatTile, StatusBadge, Table, Td, Tr,
 } from "@/components/admin/ui";
 import { BarChart } from "@/components/admin/Charts";
 
@@ -14,7 +14,6 @@ export default function AttendancePage() {
       title="Attendance"
       description="Attendance rates, exceptions and students needing follow-up."
     >
-      <DemoNotice />
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatTile label="Attendance (7d)" value="91%" delta="+3%" trend="up" />
