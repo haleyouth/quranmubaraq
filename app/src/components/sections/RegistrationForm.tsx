@@ -191,6 +191,7 @@ export function RegistrationForm() {
                 error={errors.dob}
                 required
                 label="Student's date of birth"
+                hint="We use this to match your child with the right teacher and level."
               />
 
               {/* Country */}

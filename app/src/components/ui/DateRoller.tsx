@@ -9,7 +9,7 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-const ITEM_H = 40; // px per row, must match the item height below
+const ITEM_H = 44; // px per row; must match the h-11 items below
 
 /**
  * Date-of-birth roller.
@@ -18,9 +18,9 @@ const ITEM_H = 40; // px per row, must match the item height below
  * Chosen over a calendar grid because entering a birth date means paging back
  * years, which a month grid handles badly.
  *
- * Accessibility: each column is a listbox with real buttons, so it is fully
- * keyboard- and screen-reader operable — the scroll snapping is an
- * enhancement, not the only way to choose.
+ * Accessibility: each column is a listbox of real buttons. Arrow keys move by
+ * one, Page Up/Down by five, Home/End jump to the ends, and decade buttons
+ * skip whole ranges — scroll snapping is an enhancement, not the only way in.
  */
 export function DateRoller({
   value,
@@ -28,6 +28,7 @@ export function DateRoller({
   minAge = 3,
   maxAge = 90,
   label = "Date of birth",
+  hint,
   required,
   error,
   name,
@@ -38,6 +39,8 @@ export function DateRoller({
   minAge?: number;
   maxAge?: number;
   label?: string;
+  /** Explains why the date is needed, shown under the control. */
+  hint?: string;
   required?: boolean;
   error?: string;
   name?: string;
@@ -55,13 +58,22 @@ export function DateRoller({
   }, [value]);
 
   if (!thisYear) {
-    return <div className="h-[184px] animate-pulse rounded-xl border-2 border-ink/20 bg-cream" />;
+    return <div className="h-[240px] animate-pulse rounded-xl border-2 border-ink/20 bg-cream" />;
   }
 
   const years = Array.from(
     { length: maxAge - minAge + 1 },
     (_, i) => thisYear - minAge - i,
   );
+
+  // One shortcut per decade covered by the range, newest first
+  const newest = years[0];
+  const oldest = years[years.length - 1];
+  const decadeShortcuts: number[] = [];
+  for (let d = Math.floor(newest / 10) * 10; d >= Math.floor(oldest / 10) * 10; d -= 10) {
+    const inRange = years.find((y) => y >= d && y < d + 10);
+    if (inRange !== undefined) decadeShortcuts.push(d);
+  }
 
   const year = parsed?.year ?? thisYear - 10;
   const month = parsed?.month ?? 1;
@@ -91,11 +103,31 @@ export function DateRoller({
           error ? "border-red-600" : "border-ink",
         )}
       >
+        {/* Decade jumps: reaching a birth year one notch at a time is painful */}
+        <div className="flex flex-wrap gap-1.5 border-b-2 border-ink/12 bg-cream px-2 py-2">
+          <span className="self-center pr-1 text-[10px] font-bold tracking-wider text-ink/45 uppercase">
+            Jump
+          </span>
+          {decadeShortcuts.map((y) => (
+            <button
+              key={y}
+              type="button"
+              onClick={() => emit(day, month, y)}
+              aria-pressed={year === y}
+              className={cn(
+                "min-h-8 cursor-pointer rounded-full border-2 border-ink px-2.5 text-xs font-bold transition-colors",
+                year === y ? "bg-green-deep text-white" : "bg-white text-ink hover:bg-cream-deep",
+              )}
+            >
+              {y}s
+            </button>
+          ))}
+        </div>
         <div className="relative grid grid-cols-[1fr_1.4fr_1fr]">
           {/* Selection band, centred behind all three columns */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-10 -translate-y-1/2 border-y-2 border-green-deep/35 bg-green-deep/8"
+            className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-11 -translate-y-1/2 border-y-2 border-green-deep/35 bg-green-deep/8"
           />
 
           <Column
@@ -122,11 +154,15 @@ export function DateRoller({
         </div>
 
         <div className="flex items-center justify-between gap-3 border-t-2 border-ink/12 bg-cream px-3 py-2">
-          <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
-            <CalendarDays className="size-3.5 text-ink/50" aria-hidden="true" />
-            {parsed
-              ? `${day} ${MONTHS[month - 1]} ${year}`
-              : "Scroll to choose a date"}
+          <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-ink">
+            <CalendarDays className="size-3.5 shrink-0 text-ink/50" aria-hidden="true" />
+            <span className="truncate">
+              {parsed
+                ? new Date(year, month - 1, day).toLocaleDateString("en-GB", {
+                    weekday: "short", day: "numeric", month: "long", year: "numeric",
+                  })
+                : "Scroll or use the arrow keys"}
+            </span>
           </p>
           {age !== null && (
             <p className="text-sm font-bold text-green-deep">
@@ -138,6 +174,8 @@ export function DateRoller({
 
       {/* Real value for uncontrolled form reads and validation */}
       {name && <input type="hidden" name={name} value={value} />}
+
+      {hint && !error && <p className="mt-2 text-sm text-ink/55">{hint}</p>}
 
       {error && (
         <p role="alert" className="mt-2 text-sm font-semibold text-red-700">
@@ -198,9 +236,30 @@ function Column<T extends number>({
         ref={ref}
         role="listbox"
         aria-label={label}
+        aria-activedescendant={`${label}-${selected}`}
         tabIndex={0}
         onScroll={handleScroll}
-        className="h-[120px] snap-y snap-mandatory overflow-y-auto scroll-smooth focus:outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        onKeyDown={(e) => {
+          const i = items.indexOf(selected);
+          const step =
+            e.key === "ArrowDown" ? 1
+            : e.key === "ArrowUp" ? -1
+            : e.key === "PageDown" ? 5
+            : e.key === "PageUp" ? -5
+            : 0;
+          if (step) {
+            e.preventDefault();
+            const next = items[Math.max(0, Math.min(items.length - 1, i + step))];
+            if (next !== undefined) onSelect(next);
+          } else if (e.key === "Home") {
+            e.preventDefault();
+            onSelect(items[0]);
+          } else if (e.key === "End") {
+            e.preventDefault();
+            onSelect(items[items.length - 1]);
+          }
+        }}
+        className="h-[132px] snap-y snap-mandatory overflow-y-auto scroll-smooth focus-visible:ring-2 focus-visible:ring-green-deep/40 focus:outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ scrollPaddingBlock: ITEM_H }}
       >
         {/* Spacers let the first and last items reach the centre band */}
@@ -211,15 +270,17 @@ function Column<T extends number>({
           return (
             <button
               key={it}
+              id={`${label}-${it}`}
               type="button"
               role="option"
               aria-selected={active}
+              tabIndex={-1}
               onClick={() => onSelect(it)}
               className={cn(
-                "flex h-10 w-full snap-center items-center justify-center text-sm transition-colors",
+                "flex h-11 w-full snap-center items-center justify-center transition-all",
                 active
-                  ? "font-display text-base font-bold text-green-deep"
-                  : "cursor-pointer text-ink/45 hover:text-ink",
+                  ? "font-display text-lg font-bold text-green-deep"
+                  : "cursor-pointer text-sm text-ink/40 hover:text-ink",
               )}
             >
               {render(it)}

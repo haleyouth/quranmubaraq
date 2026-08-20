@@ -50,6 +50,13 @@ export type LeadEdit = Partial<
 >;
 
 /**
+ * Trial-class requests submitted from the public registration form.
+ *
+ * The Firestore collection is still named `leads` because renaming it would
+ * orphan existing documents; staff manage these under Submissions.
+ */
+
+/**
  * Writes a trial registration into the `leads` collection.
  *
  * Firestore rules allow create-only from the public site (see

@@ -197,12 +197,51 @@ export default function ReportsPage() {
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-bold text-ink">From</span>
-            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className={inputClass} />
+            <input
+              type="date"
+              value={from}
+              max={to || undefined}
+              onChange={(e) => setFrom(e.target.value)}
+              className={inputClass}
+            />
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-bold text-ink">To</span>
-            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={inputClass} />
+            <input
+              type="date"
+              value={to}
+              min={from || undefined}
+              onChange={(e) => setTo(e.target.value)}
+              className={inputClass}
+            />
           </label>
+        </div>
+
+        {/* Presets, because these are the ranges staff actually ask for */}
+        <div className="mt-3 flex flex-wrap gap-2">
+          {[
+            { label: "Last 7 days", days: 7 },
+            { label: "Last 30 days", days: 30 },
+            { label: "Last 90 days", days: 90 },
+            { label: "This year", days: 0 },
+          ].map((p2) => (
+            <button
+              key={p2.label}
+              type="button"
+              onClick={() => {
+                const now = new Date();
+                const start =
+                  p2.days === 0
+                    ? new Date(now.getFullYear(), 0, 1)
+                    : addDays(now, -p2.days);
+                setFrom(start.toISOString().slice(0, 10));
+                setTo(now.toISOString().slice(0, 10));
+              }}
+              className="min-h-9 cursor-pointer rounded-full border-2 border-ink bg-white px-3 text-xs font-bold text-ink transition-colors hover:bg-cream-deep"
+            >
+              {p2.label}
+            </button>
+          ))}
         </div>
       </Panel>
 

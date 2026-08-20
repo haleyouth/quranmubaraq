@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Plus, TriangleAlert } from "lucide-react";
 import { leaveRequests as seed, teachers, type Leave, type LeaveStatus } from "@/lib/admin/demo-data";
 import {
@@ -13,6 +13,24 @@ export default function LeavePage() {
   const [rows, setRows] = useState<Leave[]>([...seed]);
   const [open, setOpen] = useState(false);
   const [cover, setCover] = useState<Leave | null>(null);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [today, setToday] = useState("");
+
+  // Today is only knowable on the client with output: "export"
+  useEffect(() => setToday(new Date().toISOString().slice(0, 10)), []);
+
+  const dayCount =
+    from && to
+      ? Math.max(
+          1,
+          Math.round(
+            (new Date(`${to}T00:00:00`).getTime() -
+              new Date(`${from}T00:00:00`).getTime()) /
+              86400000,
+          ) + 1,
+        )
+      : 0;
   const [toast, setToast] = useState("");
 
   function flash(m: string) {
@@ -181,9 +199,42 @@ export default function LeavePage() {
             </select>
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="From"><input type="date" className={inputClass} /></Field>
-            <Field label="To"><input type="date" className={inputClass} /></Field>
+            <Field label="First day away">
+              <input
+                type="date"
+                value={from}
+                min={today}
+                onChange={(e) => {
+                  setFrom(e.target.value);
+                  // Keep the range valid rather than letting it invert
+                  if (to && e.target.value > to) setTo(e.target.value);
+                }}
+                className={inputClass}
+              />
+            </Field>
+            <Field label="Last day away">
+              <input
+                type="date"
+                value={to}
+                min={from || today}
+                onChange={(e) => setTo(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
           </div>
+
+          {from && to && (
+            <p className="rounded-xl border-2 border-ink/15 bg-cream px-4 py-2.5 text-sm font-semibold text-ink">
+              {dayCount} day{dayCount === 1 ? "" : "s"} away ·{" "}
+              {new Date(`${from}T00:00:00`).toLocaleDateString("en-GB", {
+                weekday: "short", day: "numeric", month: "short",
+              })}
+              {" to "}
+              {new Date(`${to}T00:00:00`).toLocaleDateString("en-GB", {
+                weekday: "short", day: "numeric", month: "short", year: "numeric",
+              })}
+            </p>
+          )}
           <Field label="Reason">
             <textarea rows={3} className={inputClass} placeholder="Brief reason for the request" />
           </Field>
