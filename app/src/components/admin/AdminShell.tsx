@@ -6,18 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen, CalendarDays, ChartColumn, CreditCard, FileText, Inbox,
   Eye, GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquareWarning,
-  MessageCircle, PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
+  MessageCircle, KeyRound, PanelLeftClose, PanelLeftOpen, Plane, Settings, ShieldAlert, UserRound,
   Users, X,
 } from "lucide-react";
-import {
-  getImpersonation,
-  getSession,
-  ROLE_NAV,
-  signOut,
-  stopImpersonation,
-  type Impersonation,
-  type Session,
-} from "@/lib/admin/demo-auth";
+import { ROLE_NAV, signOut, stopImpersonation } from "@/lib/admin/auth";
+import { useSession } from "@/lib/admin/session-context";
 import { InlineClock } from "@/components/admin/DateTimePanel";
 import { AyahMarquee } from "@/components/admin/AyahMarquee";
 import { NotificationBell } from "@/components/admin/NotificationBell";
@@ -38,6 +31,7 @@ const NAV = [
   { key: "finance", label: "Finance", href: "/admin/finance", icon: CreditCard },
   { key: "reports", label: "Reports", href: "/admin/reports", icon: FileText },
   { key: "policies", label: "Rules & Policies", href: "/admin/policies", icon: ShieldAlert },
+  { key: "accounts", label: "Portal Accounts", href: "/admin/accounts", icon: KeyRound },
   { key: "settings", label: "Settings", href: "/admin/settings", icon: Settings },
 ] as const;
 
@@ -51,8 +45,7 @@ const PORTAL_LABEL = {
 const COLLAPSE_KEY = "qm_admin_sidebar_collapsed";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [ready, setReady] = useState(false);
+  const { session, actor, impersonation, loading, refresh } = useSession();
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
@@ -71,34 +64,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     });
   }
 
-  const [impersonation, setImpersonation] = useState<Impersonation | null>(null);
-
-  // Demo session lives in localStorage, so it can only be read after mount.
-  useEffect(() => {
-    const s = getSession();
-    if (!s) {
-      router.replace("/admin/login");
-      return;
-    }
-    setSession(s);
-    setImpersonation(getImpersonation());
-    setReady(true);
-  }, [router, pathname]);
-
   function handleReturn() {
     if (stopImpersonation()) {
-      setSession(getSession());
-      setImpersonation(null);
+      refresh();
       router.push("/admin");
     }
   }
 
   useEffect(() => setOpen(false), [pathname]);
 
-  if (!ready || !session) {
+  if (loading || !session) {
     return (
       <div className="grid min-h-screen place-items-center bg-cream">
-        <p className="text-ink/60">Loading portal&hellip;</p>
+        <p className="text-ink/60">
+          {loading ? "Signing you in…" : "Redirecting to sign in…"}
+        </p>
       </div>
     );
   }
@@ -106,8 +86,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const allowed = ROLE_NAV[session.role];
   const items = NAV.filter((n) => allowed.includes(n.key));
 
-  function handleSignOut() {
-    signOut();
+  async function handleSignOut() {
+    await signOut();
     router.replace("/admin/login");
   }
 
@@ -219,7 +199,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
           <button
             type="button"
-            onClick={handleSignOut}
+            onClick={() => void handleSignOut()}
             title={collapsed ? "Sign out" : undefined}
             className={cn(
               "mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-cream/30 px-4 py-2 text-sm font-bold text-cream/80 transition-colors hover:border-gold hover:bg-gold hover:text-ink",

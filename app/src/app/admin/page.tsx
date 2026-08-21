@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ArrowRight, CalendarDays, Info, Video } from "lucide-react";
-import { getSession, type Session } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import {
   alerts, attendanceTrend, enrolmentFunnel, invoices, kpis,
   leaveRequests, revenueByMonth,
@@ -21,7 +21,7 @@ import { CalendarView } from "@/components/admin/CalendarView";
 import { JoinClassDialog } from "@/components/admin/JoinClassDialog";
 
 export default function AdminDashboard() {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useSession();
   const [joining, setJoining] = useState<ClassSession | null>(null);
 
   // Schedule is derived from the current clock, so it is computed after
@@ -30,7 +30,6 @@ export default function AdminDashboard() {
   const [week, setWeek] = useState<ClassSession[]>([]);
 
   useEffect(() => {
-    setSession(getSession());
 
     const refresh = () => {
       const now = new Date();

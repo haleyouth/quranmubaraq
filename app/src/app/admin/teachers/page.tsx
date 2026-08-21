@@ -7,12 +7,9 @@ import {
 } from "lucide-react";
 import { teachers as seed, type Teacher } from "@/lib/admin/demo-data";
 import {
-  canImpersonate,
-  getSession,
-  sessionForPerson,
-  startImpersonation,
-  type Session,
+  canImpersonate, sessionForPerson, startImpersonation, type Session,
 } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import {
   AdminButton, AdminPage, Badge, Field, Panel, StatusBadge,
   Table, Td, Tr, inputClass,
@@ -23,7 +20,7 @@ import { useEffect } from "react";
 
 export default function TeachersPage() {
   const router = useRouter();
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useSession();
   const [rows, setRows] = useState<Teacher[]>([...seed]);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -36,7 +33,6 @@ export default function TeachersPage() {
   const [calendarFor, setCalendarFor] = useState<Teacher | null>(null);
   const [toast, setToast] = useState("");
 
-  useEffect(() => setSession(getSession()), []);
 
   const filtered = useMemo(
     () =>
@@ -92,8 +88,9 @@ export default function TeachersPage() {
    * In production this is audit-logged and time-boxed (CRM plan §5.1).
    */
   function switchToTeacher(teacher: Teacher) {
-    const target = sessionForPerson(teacher.name, "teacher");
-    if (startImpersonation(target)) {
+    if (!session) return;
+    const target = sessionForPerson(teacher.id, teacher.name, "teacher");
+    if (startImpersonation(session, target)) {
       router.push("/admin");
     } else {
       flash("Only Admin and Principal accounts may view as another user.");

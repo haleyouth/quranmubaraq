@@ -3,11 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, KeyRound, Loader2, ShieldAlert } from "lucide-react";
-import { DEMO_USERS, signIn } from "@/lib/admin/demo-auth";
+import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { signIn } from "@/lib/admin/auth";
 import { Logo } from "@/components/ui/Logo";
 import { inputClass } from "@/components/admin/ui";
-import { cn } from "@/lib/utils";
+
+/** Firebase error codes, translated into something a person can act on. */
+function friendlyError(code: string, fallback: string) {
+  switch (code) {
+    case "auth/invalid-credential":
+    case "auth/wrong-password":
+    case "auth/user-not-found":
+      return "That email and password do not match an account.";
+    case "auth/invalid-email":
+      return "Please enter a valid email address.";
+    case "auth/too-many-requests":
+      return "Too many attempts. Please wait a few minutes and try again.";
+    case "auth/network-request-failed":
+      return "Could not reach the server. Please check your connection.";
+    case "auth/user-disabled":
+      return "This account has been disabled. Please contact administration.";
+    default:
+      return fallback;
+  }
+}
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -16,24 +35,20 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setBusy(true);
 
-    const session = signIn(email, password);
-    if (!session) {
-      setError("Those credentials do not match a demo account.");
+    try {
+      await signIn(email, password);
+      router.push("/admin");
+    } catch (err) {
+      const code = (err as { code?: string })?.code ?? "";
+      const message = (err as Error)?.message ?? "Sign in failed.";
+      setError(friendlyError(code, message));
       setBusy(false);
-      return;
     }
-    router.push("/admin");
-  }
-
-  function fill(demoEmail: string) {
-    setEmail(demoEmail);
-    setPassword("demo1234");
-    setError("");
   }
 
   return (
@@ -43,13 +58,16 @@ export default function AdminLoginPage() {
         <div className="w-full max-w-md">
           <Logo width={150} plateClassName="hard-shadow" />
 
-          <h1 className="font-display mt-8 text-4xl text-ink">Portal sign in</h1>
+          <h1 className="font-display mt-8 text-3xl text-ink sm:text-4xl">
+            Portal sign in
+          </h1>
           <p className="mt-2 text-ink/70">
             Admin, Principal, Teacher and Student portals.
           </p>
 
           <form
             onSubmit={handleSubmit}
+            noValidate
             className="mt-8 rounded-2xl border-4 border-ink bg-white p-6 hard-shadow-lg md:p-8"
           >
             <div className="space-y-5">
@@ -61,7 +79,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="username"
                   required
-                  placeholder="admin@quranmubarak.com"
+                  placeholder="you@quranmubarak.com"
                   className={inputClass}
                 />
               </label>
@@ -74,7 +92,6 @@ export default function AdminLoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
                   required
-                  placeholder="demo1234"
                   className={inputClass}
                 />
               </label>
@@ -120,55 +137,43 @@ export default function AdminLoginPage() {
         </div>
       </div>
 
-      {/* Demo credentials */}
-      <div className="flex items-center justify-center border-t-4 border-ink bg-ink px-6 py-14 lg:border-t-0 lg:border-l-4">
+      {/* Reassurance panel */}
+      <div className="islamic-pattern-strong flex items-center justify-center border-t-4 border-ink bg-ink px-6 py-14 lg:border-t-0 lg:border-l-4">
         <div className="w-full max-w-md">
           <p className="inline-flex items-center gap-2 rounded-full border-2 border-gold bg-gold px-4 py-1.5 text-sm font-bold text-ink">
-            <KeyRound className="size-4" aria-hidden="true" />
-            Demo credentials
+            <ShieldCheck className="size-4" aria-hidden="true" />
+            Secure sign in
           </p>
 
           <h2 className="font-display mt-5 text-2xl text-cream">
-            Choose a role to explore
+            One portal, four roles
           </h2>
           <p className="mt-2 text-cream/70">
-            Each account opens a different portal with its own navigation and
-            permissions. Click one to fill the form.
+            Your account decides what you see. Teachers reach their own classes
+            and students, principals their branch, and administration the whole
+            academy.
           </p>
 
-          <ul className="mt-6 space-y-3">
-            {DEMO_USERS.map((u) => (
-              <li key={u.email}>
-                <button
-                  type="button"
-                  onClick={() => fill(u.email)}
-                  className={cn(
-                    "w-full cursor-pointer rounded-xl border-2 border-cream/25 bg-cream/5 px-4 py-3.5 text-left transition-colors",
-                    "hover:border-gold hover:bg-cream/10",
-                  )}
-                >
-                  <span className="flex items-center justify-between gap-3">
-                    <span className="font-display text-cream">{u.title}</span>
-                    <span className="rounded-full border-2 border-gold px-2.5 py-0.5 text-xs font-bold text-gold">
-                      {u.role}
-                    </span>
-                  </span>
-                  <span className="mt-1 block font-mono text-sm text-cream/75">
-                    {u.email}
-                  </span>
-                  <span className="mt-0.5 block font-mono text-sm text-cream/55">
-                    demo1234
-                  </span>
-                </button>
+          <ul className="mt-6 space-y-3 text-sm text-cream/75">
+            {[
+              ["Administration", "Full oversight across every branch."],
+              ["Principal", "Their branch: teachers, students and schedules."],
+              ["Teacher", "Today's classes, attendance and their students."],
+              ["Student", "Their schedule, progress, invoices and messages."],
+            ].map(([role, detail]) => (
+              <li
+                key={role}
+                className="rounded-xl border-2 border-cream/20 bg-cream/5 px-4 py-3"
+              >
+                <span className="font-display block text-cream">{role}</span>
+                <span className="text-cream/65">{detail}</span>
               </li>
             ))}
           </ul>
 
-          <p className="mt-6 flex items-start gap-2 rounded-xl border-2 border-cream/25 px-4 py-3 text-sm text-cream/70">
-            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
-            These credentials are public and the session is stored in the browser only.
-            This demo has no real authentication — replace it with Firebase Auth before
-            handling any real student data.
+          <p className="mt-6 text-sm text-cream/55">
+            Do not have an account? Ask your principal or the academy
+            administration to create one for you.
           </p>
         </div>
       </div>

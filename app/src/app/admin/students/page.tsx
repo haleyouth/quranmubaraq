@@ -6,8 +6,9 @@ import {
 } from "lucide-react";
 import { students as seed, type Student } from "@/lib/admin/demo-data";
 import {
-  canImpersonate, getSession, sessionForPerson, startImpersonation, type Session,
+  canImpersonate, sessionForPerson, startImpersonation, type Session,
 } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import { courses } from "@/lib/content";
 import {
   AdminButton, AdminPage, Field, Panel, StatusBadge,
@@ -19,7 +20,7 @@ import { useRouter } from "next/navigation";
 
 export default function StudentsPage() {
   const router = useRouter();
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useSession();
   const [calendarFor, setCalendarFor] = useState<Student | null>(null);
   const [rows, setRows] = useState<Student[]>([...seed]);
   const [query, setQuery] = useState("");
@@ -28,7 +29,6 @@ export default function StudentsPage() {
   const [creating, setCreating] = useState(false);
   const [toast, setToast] = useState("");
 
-  useEffect(() => setSession(getSession()), []);
 
   const filtered = useMemo(
     () =>
@@ -71,7 +71,8 @@ export default function StudentsPage() {
 
   /** Act as this student, preserving the actor's session for return. */
   function viewAsStudent(s: Student) {
-    if (startImpersonation(sessionForPerson(s.name, "student"))) {
+    if (!session) return;
+    if (startImpersonation(session, sessionForPerson(s.id, s.name, "student"))) {
       router.push("/admin");
     } else {
       flash("Only Admin and Principal accounts may view as another user.");

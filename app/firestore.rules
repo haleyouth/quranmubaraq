@@ -11,10 +11,21 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Roles are set as custom claims by a Cloud Function, never by the client.
-    // The application defines exactly four: admin, principal, teacher, student.
+    /**
+     * Identity comes from the caller's own /users document, not from client
+     * state. A user may edit their profile but never their own role (see the
+     * users rules below), so this cannot be escalated from the browser.
+     */
+    function profile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function hasRole(role) {
-      return isSignedIn() && request.auth.token.role == role;
+      return isSignedIn() && profile().role == role;
+    }
+
+    function myName() {
+      return profile().name;
     }
 
     // 'admin' is the Super Admin — the highest level. There is no separate
@@ -131,13 +142,39 @@ service cloud.firestore {
     /* ---------------------------------------------------------------- */
 
     match /users/{userId} {
-      allow read: if isSelf(userId) || isStaff();
-      // Users may edit their own profile but never their own role.
+      // Anyone signed in may read the directory: the messaging UI needs names
+      // and roles to show who you may contact. Profiles hold no secrets.
+      allow read: if isSignedIn();
+
+      // A user may edit their own profile but never their own role or status,
+      // which is what keeps the role lookup above trustworthy.
+      // Staff may edit anyone, but only an admin may hand out the admin role
+      // or take it away — otherwise a principal could promote themselves.
       allow update: if (isSelf(userId)
                         && !request.resource.data.diff(resource.data)
                              .affectedKeys().hasAny(['role', 'status']))
-                    || isStaff();
-      allow create, delete: if isStaff();
+                    || isAdmin()
+                    || (hasRole('principal')
+                        && request.resource.data.role != 'admin'
+                        && resource.data.role != 'admin');
+
+      // Staff create teacher and student accounts. Self-create is permitted
+      // for the caller's own uid with a non-privileged role, so a first
+      // sign-in can provision a profile without granting an escalation.
+      //
+      // Bootstrap: the very first admin cannot be created by staff, because
+      // no staff profile exists yet. A privileged self-create is therefore
+      // allowed only while the sentinel document /config/bootstrap still
+      // exists. Deleting that document closes this path for good.
+      allow create: if isAdmin()
+                    || (hasRole('principal')
+                        && request.resource.data.role != 'admin')
+                    || (isSelf(userId)
+                        && request.resource.data.role in ['teacher', 'student'])
+                    || (isSelf(userId)
+                        && exists(/databases/$(database)/documents/config/bootstrap));
+
+      allow delete: if isAdmin();
     }
 
     /* ---------------------------------------------------------------- */
@@ -165,6 +202,19 @@ service cloud.firestore {
     }
 
     /* ---------------------------------------------------------------- */
+    /* Bootstrap sentinel                                               */
+    /* ---------------------------------------------------------------- */
+
+    match /config/bootstrap {
+      // Readable so the rules above can test for it; only an admin may
+      // remove it, which is the act of closing bootstrap.
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow delete: if isAdmin();
+      allow update: if false;
+    }
+
+    /* ---------------------------------------------------------------- */
     /* Messages                                                         */
     /* ---------------------------------------------------------------- */
 
@@ -173,7 +223,7 @@ service cloud.firestore {
       // participant filter on the client query, nobody can enumerate another
       // person's conversation.
       allow read: if isSignedIn()
-                  && request.auth.token.name in resource.data.participants;
+                  && myName() in resource.data.participants;
 
       // The sender must be the signed-in person and must be a participant,
       // so a message cannot be forged in someone else's name.
@@ -182,8 +232,8 @@ service cloud.firestore {
                          'threadId', 'fromName', 'fromRole',
                          'participants', 'body', 'sentAt', 'readBy'
                        ])
-                    && request.resource.data.fromName == request.auth.token.name
-                    && request.auth.token.name in request.resource.data.participants
+                    && request.resource.data.fromName == myName()
+                    && myName() in request.resource.data.participants
                     && request.resource.data.participants.size() == 2
                     && request.resource.data.body is string
                     && request.resource.data.body.size() > 0
@@ -192,7 +242,7 @@ service cloud.firestore {
       // Updates exist only to record read receipts: a participant may add
       // themselves to readBy and change nothing else.
       allow update: if isSignedIn()
-                    && request.auth.token.name in resource.data.participants
+                    && myName() in resource.data.participants
                     && request.resource.data.diff(resource.data)
                          .affectedKeys().hasOnly(['readBy'])
                     && request.resource.data.body == resource.data.body

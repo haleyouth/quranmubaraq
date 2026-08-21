@@ -5,7 +5,7 @@ import {
   Briefcase, CheckCircle2, ClipboardList, Inbox, Mail, Pencil, Phone,
   RefreshCw, Search, Trash2, TriangleAlert, UserPlus,
 } from "lucide-react";
-import { getSession, type Session } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import { leads as trialSeed, type LeadStatus } from "@/lib/admin/demo-data";
 import {
   deleteLead, listLeads, updateLead, updateLeadStatus,
@@ -101,7 +101,7 @@ const APP_SEED: StoredApplication[] = [
 ];
 
 export default function SubmissionsPage() {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useSession();
   const [rows, setRows] = useState<Row[]>([]);
   const [liveState, setLiveState] = useState<"loading" | "ok" | "denied" | "error">("loading");
   const [query, setQuery] = useState("");
@@ -113,7 +113,6 @@ export default function SubmissionsPage() {
   const [toast, setToast] = useState("");
 
   useEffect(() => {
-    setSession(getSession());
     void load();
   }, []);
 

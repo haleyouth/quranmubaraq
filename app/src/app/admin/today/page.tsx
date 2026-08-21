@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Video } from "lucide-react";
-import { getSession, type Session } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import {
   filterForRole, sessionsForDay, STATUS_LABEL,
   type Attendance, type ClassSession, type SessionStatus,
@@ -27,7 +27,7 @@ const QUICK_NOTES = [
 ];
 
 export default function TodayPage() {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useSession();
   const [rows, setRows] = useState<ClassSession[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [toast, setToast] = useState("");
@@ -35,8 +35,7 @@ export default function TodayPage() {
   const [outcome, setOutcome] = useState<ClassSession | null>(null);
 
   useEffect(() => {
-    const s = getSession();
-    setSession(s);
+    const s = session;
     const all = sessionsForDay(new Date());
     setRows(s ? filterForRole(all, s.role, s.name) : all);
   }, []);

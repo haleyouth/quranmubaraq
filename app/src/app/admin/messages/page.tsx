@@ -4,7 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Info, MessageSquarePlus, Search, Send, ShieldCheck, Wifi, WifiOff,
 } from "lucide-react";
-import { getSession, type Role, type Session } from "@/lib/admin/demo-auth";
+import {
+  type Role, type Session,
+} from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import {
   canMessage, contactsFor, loadMessages, markThreadRead, persistMessage,
   resetMessages, subscribeMessages, threadId, timeAgo,
@@ -28,7 +31,7 @@ const ROLE_TONE = {
 } as const;
 
 export default function MessagesPage() {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [active, setActive] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
@@ -45,15 +48,17 @@ export default function MessagesPage() {
 
   /**
    * Prefer Firestore, which pushes to every device in real time. Fall back to
-   * the local store only when Firestore is unreachable, so the demo still
-   * works before Auth is connected.
+   * the local store only if Firestore is genuinely unreachable.
+   *
+   * Keyed on the signed-in name: Firebase resolves the user asynchronously,
+   * so subscribing before it arrives would always fall back to local.
    */
   useEffect(() => {
-    const s = getSession();
-    setSession(s);
+    const s = session;
     if (!s) return;
 
     const refreshLocal = () => setMessages(loadMessages());
+    let snapshotArrived = false;
     let unsubscribeLive: (() => void) | undefined;
     let unsubscribeLocal: (() => void) | undefined;
     let tick: number | undefined;
@@ -71,6 +76,7 @@ export default function MessagesPage() {
       unsubscribeLive = subscribeToMessages(
         s.name,
         (live) => {
+          snapshotArrived = true;
           liveRef.current = live;
           setTransport("live");
           const now = Date.now();
@@ -92,10 +98,11 @@ export default function MessagesPage() {
       useLocal();
     }
 
-    // If no snapshot arrives promptly, Firestore is unreachable
+    // A snapshot may legitimately be empty, so track arrival rather than
+    // message count; falling back on an empty inbox would be wrong.
     const guard = window.setTimeout(() => {
-      if (liveRef.current.length === 0) useLocal();
-    }, 3500);
+      if (!snapshotArrived) useLocal();
+    }, 5000);
 
     return () => {
       unsubscribeLive?.();
@@ -103,7 +110,7 @@ export default function MessagesPage() {
       window.clearTimeout(guard);
       if (tick) window.clearInterval(tick);
     };
-  }, []);
+  }, [session?.name]);
 
   const contacts = useMemo(
     () => (session ? contactsFor(session.role, session.name) : []),

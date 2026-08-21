@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Download, Send } from "lucide-react";
 import { invoices as invSeed, payouts as poSeed, revenueByMonth, type Invoice } from "@/lib/admin/demo-data";
 import { plans } from "@/lib/content";
-import { getSession, type Session } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import {
   AdminButton, AdminPage, Panel, StatTile, StatusBadge, Table, Td, Tr,
 } from "@/components/admin/ui";
@@ -13,8 +13,7 @@ import { LineChart } from "@/components/admin/Charts";
 const TABS = ["invoices", "payouts", "plans"] as const;
 
 export default function FinancePage() {
-  const [session, setSession] = useState<Session | null>(null);
-  useEffect(() => setSession(getSession()), []);
+  const { session } = useSession();
 
   const [tab, setTab] = useState<(typeof TABS)[number]>("invoices");
   const [invoices, setInvoices] = useState<Invoice[]>([...invSeed]);

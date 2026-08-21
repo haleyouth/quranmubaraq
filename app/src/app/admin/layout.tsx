@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { SessionProvider } from "@/lib/admin/session-context";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,5 +16,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const path = pathname.replace(/\/+$/, "") || "/";
   if (path === "/admin/login") return <>{children}</>;
 
-  return <AdminShell>{children}</AdminShell>;
+  return (
+    <SessionProvider>
+      <AdminShell>{children}</AdminShell>
+    </SessionProvider>
+  );
 }

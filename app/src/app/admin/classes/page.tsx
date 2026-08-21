@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Plus, Video } from "lucide-react";
 import { teachers, students } from "@/lib/admin/demo-data";
 import { classDefs, WEEKDAY_LABEL, type Weekday } from "@/lib/admin/schedule";
-import { getSession, type Session } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import { courses } from "@/lib/content";
 import {
   AdminButton, AdminPage, Badge, Field, Panel, StatTile,
@@ -16,8 +16,7 @@ import { Modal } from "@/components/admin/Modal";
 const DAY_ORDER: Weekday[] = [1, 2, 3, 4, 5, 6, 0];
 
 export default function ClassesPage() {
-  const [session, setSession] = useState<Session | null>(null);
-  useEffect(() => setSession(getSession()), []);
+  const { session } = useSession();
 
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState("");

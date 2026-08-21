@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Download, Eye, FileText, Printer, Send } from "lucide-react";
-import { getSession, type Session } from "@/lib/admin/demo-auth";
+import { useSession } from "@/lib/admin/session-context";
 import {
   REPORTS, buildReport, downloadCsv, type ReportData, type ReportDef,
 } from "@/lib/admin/reports";
@@ -30,7 +30,7 @@ const SEED_REQUESTS: Request[] = [
 ];
 
 export default function ReportsPage() {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useSession();
   const [cat, setCat] = useState("all");
   // Empty until mount, else the export would ship build-time dates
   const [from, setFrom] = useState("");
@@ -41,7 +41,6 @@ export default function ReportsPage() {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    setSession(getSession());
     const n = new Date();
     setNow(n);
     setFrom(addDays(n, -30).toISOString().slice(0, 10));

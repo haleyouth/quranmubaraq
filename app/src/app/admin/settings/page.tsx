@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CheckCircle2, ShieldAlert } from "lucide-react";
 import { site } from "@/lib/content";
-import { DEMO_USERS, ROLE_NAV } from "@/lib/admin/demo-auth";
+import { ROLE_NAV, type Role } from "@/lib/admin/auth";
 import {
   AdminButton, AdminPage, Badge, Field, Panel, Table, Td, Tr, inputClass,
 } from "@/components/admin/ui";
@@ -88,13 +88,20 @@ export default function SettingsPage() {
         <Panel title="Roles & permissions" description="Which modules each role can reach.">
           <div className="overflow-x-auto">
             <Table head={["Role", "Portal", "Modules"]}>
-              {DEMO_USERS.map((u) => (
-                <Tr key={u.role}>
-                  <Td label="Role" className="font-semibold capitalize">{u.role}</Td>
-                  <Td label="Portal" className="text-ink/70">{u.title}</Td>
+              {(
+                [
+                  ["admin", "Super Admin"],
+                  ["principal", "Principal"],
+                  ["teacher", "Quran Teacher"],
+                  ["student", "Student"],
+                ] as [Role, string][]
+              ).map(([role, title]) => (
+                <Tr key={role}>
+                  <Td label="Role" className="font-semibold capitalize">{role}</Td>
+                  <Td label="Portal" className="text-ink/70">{title}</Td>
                   <Td label="Modules">
                     <div className="flex flex-wrap gap-1.5">
-                      {ROLE_NAV[u.role].map((m) => (
+                      {ROLE_NAV[role].map((m) => (
                         <Badge key={m} tone="sage">{m}</Badge>
                       ))}
                     </div>
@@ -105,9 +112,9 @@ export default function SettingsPage() {
           </div>
           <p className="mt-5 flex items-start gap-2 rounded-xl border-2 border-ink bg-gold px-4 py-3 text-sm font-semibold text-ink">
             <ShieldAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            In production these permissions are enforced by Firebase custom claims and
-            Firestore security rules — not by hiding navigation. The current demo hides
-            navigation only, which is not a security boundary.
+            Navigation is hidden per role for clarity, but the boundary is the
+            Firestore security rules, which read each caller&rsquo;s role from
+            their own profile. A user cannot change their own role.
           </p>
         </Panel>
       )}
