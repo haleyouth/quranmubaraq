@@ -218,26 +218,31 @@ export function contactsFromDirectory(
     case "principal":
       return [...teachersList, ...studentsList].map(party);
 
+    /*
+     * Teacher and student reach each other. Assigned pairs are listed first,
+     * because that is who they normally speak to, but the channel is not
+     * withheld when no class has been scheduled yet — a new student needs to
+     * be able to reach a teacher before their timetable is set.
+     *
+     * The safeguarding rule that matters still holds: students never see other
+     * students, and teachers never see other teachers.
+     */
     case "teacher": {
-      // Only students this teacher actually teaches.
       const mine = new Set(
         classes.filter((c) => c.teacherName === name).map((c) => c.studentName),
       );
-      return [
-        ...principals,
-        ...studentsList.filter((p) => mine.has(p.name)),
-      ].map(party);
+      const assigned = studentsList.filter((p) => mine.has(p.name));
+      const rest = studentsList.filter((p) => !mine.has(p.name));
+      return [...principals, ...assigned, ...rest].map(party);
     }
 
     case "student": {
-      // Only the teacher(s) who actually teach this student.
       const mine = new Set(
         classes.filter((c) => c.studentName === name).map((c) => c.teacherName),
       );
-      return [
-        ...teachersList.filter((p) => mine.has(p.name)),
-        ...principals,
-      ].map(party);
+      const assigned = teachersList.filter((p) => mine.has(p.name));
+      const rest = teachersList.filter((p) => !mine.has(p.name));
+      return [...assigned, ...rest, ...principals].map(party);
     }
   }
 }
