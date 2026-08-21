@@ -10,6 +10,7 @@ import {
 import { courses, nav, site, socials } from "@/lib/content";
 import { Container } from "@/components/ui/Section";
 import { Logo } from "@/components/ui/Logo";
+import { FooterAyah } from "@/components/layout/FooterAyah";
 
 const socialIcons = {
   facebook: Facebook,
@@ -128,9 +129,7 @@ export function Footer() {
         </div>
 
         <div className="mt-14 border-t-2 border-cream/20 pt-8">
-          <p className="font-marker text-center text-base text-gold">
-            Start with the Name of Allah
-          </p>
+          <FooterAyah />
 
           <div className="mt-6 flex flex-col items-center gap-4 text-sm text-cream/60 sm:flex-row sm:justify-between">
             <p>

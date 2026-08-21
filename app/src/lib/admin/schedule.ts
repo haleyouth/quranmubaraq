@@ -10,7 +10,7 @@
  * the server — the shapes returned here are the contract.
  */
 
-import { students, teachers } from "./demo-data";
+import { teachers } from "./demo-data";
 
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Sunday
 
@@ -185,14 +185,25 @@ const NOTES_MIXED = [
 /*                             Session expansion                              */
 /* -------------------------------------------------------------------------- */
 
-/** Expands recurring definitions into concrete sessions across a date range. */
-export function expandSessions(from: Date, to: Date, now = new Date()): ClassSession[] {
+/**
+ * Expands recurring definitions into concrete sessions across a date range.
+ *
+ * `defs` defaults to the built-in demo timetable so views that have not yet
+ * subscribed still render. Pass the Firestore-backed classes to show what
+ * staff have actually scheduled.
+ */
+export function expandSessions(
+  from: Date,
+  to: Date,
+  now = new Date(),
+  defs: readonly ClassDef[] = classDefs,
+): ClassSession[] {
   const out: ClassSession[] = [];
 
   for (let d = new Date(from); d <= to; d = addDays(d, 1)) {
     const dow = d.getDay() as Weekday;
 
-    for (const def of classDefs) {
+    for (const def of defs) {
       if (def.status !== "active") continue;
       if (!def.days.includes(dow)) continue;
 
@@ -262,16 +273,25 @@ export function expandSessions(from: Date, to: Date, now = new Date()): ClassSes
   return out.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
 }
 
-export function sessionsForDay(date: Date, now = new Date()) {
+export function sessionsForDay(
+  date: Date,
+  now = new Date(),
+  defs: readonly ClassDef[] = classDefs,
+) {
   const from = new Date(date);
   from.setHours(0, 0, 0, 0);
   const to = new Date(date);
   to.setHours(23, 59, 59, 999);
-  return expandSessions(from, to, now);
+  return expandSessions(from, to, now, defs);
 }
 
-export function sessionsForRange(from: Date, to: Date, now = new Date()) {
-  return expandSessions(from, to, now);
+export function sessionsForRange(
+  from: Date,
+  to: Date,
+  now = new Date(),
+  defs: readonly ClassDef[] = classDefs,
+) {
+  return expandSessions(from, to, now, defs);
 }
 
 /** Filters by the signed-in person, so each portal sees only its own classes. */
@@ -282,11 +302,10 @@ export function filterForRole(
 ): ClassSession[] {
   if (role === "teacher") return sessions.filter((s) => s.teacherName === name);
   if (role === "student") {
-    // Match by name so impersonating another student shows THEIR classes,
-    // not the demo account's. Falls back to the first record only if the
-    // signed-in name matches no student.
-    const me = students.find((s) => s.name === name) ?? students[0];
-    return sessions.filter((s) => s.studentName === me.name);
+    // Match on the signed-in name directly. An earlier version fell back to
+    // the first demo student when the name was unknown, which showed a real
+    // student somebody else's timetable — an empty schedule is correct here.
+    return sessions.filter((s) => s.studentName === name);
   }
   return sessions;
 }

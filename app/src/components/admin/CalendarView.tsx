@@ -11,6 +11,7 @@ import {
   ymd,
   type ClassSession,
 } from "@/lib/admin/schedule";
+import { useClasses } from "@/lib/admin/use-classes";
 import { toHijri } from "@/lib/hijri";
 import { Modal } from "@/components/admin/Modal";
 import { AdminButton, Badge, type BadgeTone } from "@/components/admin/ui";
@@ -40,6 +41,7 @@ export function CalendarView({
 }) {
   const [cursor, setCursor] = useState<Date | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const { defs } = useClasses();
 
   // The static export is built long before it is viewed, so the calendar
   // anchors itself to the viewer's clock after mount rather than build time.
@@ -54,7 +56,7 @@ export function CalendarView({
     const gridStart = addDays(first, -lead);
     const gridEnd = addDays(gridStart, 41); // 6 weeks
 
-    const all = sessionsForRange(gridStart, gridEnd);
+    const all = sessionsForRange(gridStart, gridEnd, new Date(), defs);
     const mine = filter ? all.filter(filter) : all;
 
     const map = new Map<string, ClassSession[]>();
@@ -68,7 +70,7 @@ export function CalendarView({
     for (let i = 0; i < 42; i++) days.push(addDays(gridStart, i));
 
     return { cells: days, byDay: map, todayKey: ymd(new Date()) };
-  }, [cursor, filter]);
+  }, [cursor, filter, defs]);
 
   const selectedSessions = selected ? (byDay.get(selected) ?? []) : [];
 

@@ -35,7 +35,7 @@ type FormType = "trial" | "application";
 
 const TRIAL_STAGES: LeadStatus[] = ["new", "contacted", "trial", "enrolled", "lost"];
 const APP_STAGES: ApplicationStatus[] = ["new", "reviewing", "interview", "hired", "rejected"];
-const OWNERS = ["Unassigned", "Qasim Shafiq Mir", "Bilal Ahmed", "Ayesha Siddiqa"];
+const OWNERS = ["Unassigned", "AdminSuper", "Bilal Ahmed", "Ayesha Siddiqa"];
 
 type Row = {
   id: string;

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Video } from "lucide-react";
 import { useSession } from "@/lib/admin/session-context";
+import { useClasses } from "@/lib/admin/use-classes";
 import {
   filterForRole, sessionsForDay, STATUS_LABEL,
   type Attendance, type ClassSession, type SessionStatus,
@@ -33,12 +34,16 @@ export default function TodayPage() {
   const [toast, setToast] = useState("");
   const [joining, setJoining] = useState<ClassSession | null>(null);
   const [outcome, setOutcome] = useState<ClassSession | null>(null);
+  const { defs } = useClasses();
 
+  // Keyed on the session: Firebase resolves the signed-in user
+  // asynchronously, so an empty dep array would filter before the name
+  // arrived and show every branch's classes to a teacher.
   useEffect(() => {
     const s = session;
-    const all = sessionsForDay(new Date());
+    const all = sessionsForDay(new Date(), new Date(), defs);
     setRows(s ? filterForRole(all, s.role, s.name) : all);
-  }, []);
+  }, [session, defs]);
 
   const shown = useMemo(
     () =>

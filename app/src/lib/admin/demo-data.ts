@@ -126,12 +126,12 @@ export type Teacher = {
 };
 
 export const teachers: readonly Teacher[] = [
-  { id: "T-101", name: "Ustadha Ayesha Siddiqa", email: "ayesha.s@quranmubarak.com", phone: "+92 300 5551201", admin: "Qasim Shafiq Mir", specializations: ["Tajweed", "Hifz"], students: 18, load: 26, rating: 4.9, status: "active", joined: "2019-03-11", gender: "female" },
-  { id: "T-102", name: "Ustadh Bilal Ahmed", email: "bilal.a@quranmubarak.com", phone: "+92 300 5551202", admin: "Qasim Shafiq Mir", specializations: ["Tajweed", "Recitation"], students: 16, load: 24, rating: 4.8, status: "active", joined: "2018-07-02", gender: "male" },
+  { id: "T-101", name: "Ustadha Ayesha Siddiqa", email: "ayesha.s@quranmubarak.com", phone: "+92 300 5551201", admin: "AdminSuper", specializations: ["Tajweed", "Hifz"], students: 18, load: 26, rating: 4.9, status: "active", joined: "2019-03-11", gender: "female" },
+  { id: "T-102", name: "Ustadh Bilal Ahmed", email: "bilal.a@quranmubarak.com", phone: "+92 300 5551202", admin: "AdminSuper", specializations: ["Tajweed", "Recitation"], students: 16, load: 24, rating: 4.8, status: "active", joined: "2018-07-02", gender: "male" },
   { id: "T-103", name: "Ustadha Zainab Ali", email: "zainab.a@quranmubarak.com", phone: "+92 300 5551203", admin: "Bilal Ahmed", specializations: ["Islamic Studies", "Tajweed"], students: 14, load: 21, rating: 4.7, status: "active", joined: "2020-01-20", gender: "female" },
   { id: "T-104", name: "Ustadh Yusuf Qadri", email: "yusuf.q@quranmubarak.com", phone: "+92 300 5551204", admin: "Bilal Ahmed", specializations: ["Tafseer", "Arabic"], students: 12, load: 19, rating: 4.9, status: "active", joined: "2021-05-09", gender: "male" },
   { id: "T-105", name: "Ustadh Imran Malik", email: "imran.m@quranmubarak.com", phone: "+92 300 5551205", admin: "Bilal Ahmed", specializations: ["Tajweed"], students: 9, load: 14, rating: 4.1, status: "active", joined: "2022-09-15", gender: "male" },
-  { id: "T-106", name: "Ustadha Hafsa Noor", email: "hafsa.n@quranmubarak.com", phone: "+92 300 5551206", admin: "Qasim Shafiq Mir", specializations: ["Hifz"], students: 0, load: 0, rating: 4.6, status: "disabled", joined: "2023-02-01", gender: "female" },
+  { id: "T-106", name: "Ustadha Hafsa Noor", email: "hafsa.n@quranmubarak.com", phone: "+92 300 5551206", admin: "AdminSuper", specializations: ["Hifz"], students: 0, load: 0, rating: 4.6, status: "disabled", joined: "2023-02-01", gender: "female" },
 ] as const;
 
 /* ------------------------------- Complaints ------------------------------- */
@@ -143,9 +143,9 @@ export type Complaint = {
 
 export const complaints: readonly Complaint[] = [
   { id: "QM-2026-0041", subject: "Teacher repeatedly late to morning class", category: "Punctuality", raisedBy: "Noor Ahmed (parent)", against: "Ustadh Imran Malik", priority: "urgent", status: "escalated", created: "2026-08-17", sla: "40 min left", assignee: "Bilal Ahmed" },
-  { id: "QM-2026-0040", subject: "Audio quality poor during Zoom sessions", category: "Technical", raisedBy: "Sana Khan (parent)", against: "—", priority: "high", status: "in-review", created: "2026-08-16", sla: "4 h left", assignee: "Qasim Shafiq Mir" },
+  { id: "QM-2026-0040", subject: "Audio quality poor during Zoom sessions", category: "Technical", raisedBy: "Sana Khan (parent)", against: "—", priority: "high", status: "in-review", created: "2026-08-16", sla: "4 h left", assignee: "AdminSuper" },
   { id: "QM-2026-0039", subject: "Requesting change to female teacher", category: "Teaching Quality", raisedBy: "Siddiq Rahman (parent)", against: "—", priority: "medium", status: "open", created: "2026-08-15", sla: "18 h left", assignee: "Unassigned" },
-  { id: "QM-2026-0038", subject: "Invoice charged twice in July", category: "Billing", raisedBy: "Raza Ali (parent)", against: "—", priority: "high", status: "resolved", created: "2026-08-11", sla: "Met", assignee: "Qasim Shafiq Mir" },
+  { id: "QM-2026-0038", subject: "Invoice charged twice in July", category: "Billing", raisedBy: "Raza Ali (parent)", against: "—", priority: "high", status: "resolved", created: "2026-08-11", sla: "Met", assignee: "AdminSuper" },
   { id: "QM-2026-0037", subject: "Student disruptive during group session", category: "Behaviour", raisedBy: "Ustadha Zainab Ali (teacher)", against: "ST-404", priority: "low", status: "resolved", created: "2026-08-09", sla: "Met", assignee: "Bilal Ahmed" },
 ] as const;
 

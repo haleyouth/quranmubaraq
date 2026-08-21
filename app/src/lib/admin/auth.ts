@@ -31,6 +31,8 @@ export type Session = {
   title: string;
   branch: string;
   avatarInitials: string;
+  /** Personal meeting room, used as the default for this person's classes. */
+  meetingUrl?: string;
 };
 
 export type Profile = Omit<Session, "uid">;
@@ -63,6 +65,7 @@ export async function loadProfile(user: User): Promise<Session | null> {
     title: p.title ?? "",
     branch: p.branch ?? "",
     avatarInitials: p.avatarInitials ?? initials(p.name),
+    meetingUrl: p.meetingUrl ?? "",
   };
 }
 
@@ -249,6 +252,7 @@ export async function listUsers(): Promise<DirectoryUser[]> {
       title: p.title ?? "",
       branch: p.branch ?? "",
       avatarInitials: p.avatarInitials ?? initials(p.name ?? ""),
+      meetingUrl: p.meetingUrl ?? "",
     };
   });
 }
@@ -315,4 +319,15 @@ export async function updateAccount(
  *  separately from the Firebase console. */
 export async function deleteAccount(uid: string) {
   return deleteDoc(doc(db, "users", uid));
+}
+
+/**
+ * Saves a person's own default meeting room.
+ *
+ * Anyone may set their own: a teacher hosts their classes, and a principal
+ * hosts meetings too. The rules permit self-edits to every field except role
+ * and status, so no privileged path is involved.
+ */
+export async function setMyMeetingUrl(uid: string, meetingUrl: string) {
+  return updateDoc(doc(db, "users", uid), { meetingUrl: meetingUrl.trim() });
 }

@@ -12,6 +12,7 @@ import {
 import {
   MONTH_LABEL, addDays, sessionsForRange, ymd, type ClassSession,
 } from "@/lib/admin/schedule";
+import { useClasses } from "@/lib/admin/use-classes";
 import { cn } from "@/lib/utils";
 
 const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -85,18 +86,19 @@ function CalendarCard({
 }) {
   const hijriToday = toHijri(now);
   const todayKey = ymd(now);
+  const { defs } = useClasses();
 
   // Both calendars are laid out as Gregorian day cells; only the header,
   // the numbering and the month boundaries differ between tabs.
   const byDay = useMemo(() => {
     const from = addDays(now, -75);
     const to = addDays(now, 75);
-    const all = sessionsForRange(from, to, now);
+    const all = sessionsForRange(from, to, now, defs);
     const mine = filter ? all.filter(filter) : all;
     const map = new Map<string, number>();
     for (const s2 of mine) map.set(s2.date, (map.get(s2.date) ?? 0) + 1);
     return map;
-  }, [now, filter]);
+  }, [now, filter, defs]);
 
   const { cells, heading, subheading } = useMemo(() => {
     if (tab === "gregorian") {

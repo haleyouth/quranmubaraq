@@ -52,7 +52,8 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export const ADMIN_NAME = "Qasim Shafiq Mir";
+/** Display name for the seeded Super Admin in sample threads only. */
+export const ADMIN_NAME = "AdminSuper";
 export const PRINCIPAL_NAME = "Ustadh Bilal Ahmed";
 
 /* -------------------------------------------------------------------------- */
@@ -115,34 +116,50 @@ export function contactsFor(role: Role, name: string): Party[] {
         ...students.map((s) => studentParty(s.name)),
       ];
 
+    /*
+     * The Super Admin is deliberately absent from every list below.
+     * They can open a conversation with anyone, but the account itself is not
+     * discoverable from a lower role — a principal, teacher or student never
+     * sees that it exists. Replies still work: once the admin writes, the
+     * thread is in the recipient's inbox and they answer inside it.
+     */
     case "principal":
-      // Any student or teacher, plus the super admin
+      // Any student or teacher in the academy
       return [
-        adminParty,
         ...teachers.filter((t) => t.status === "active").map((t) => teacherParty(t.name)),
         ...students.map((s) => studentParty(s.name)),
       ];
 
     case "teacher":
-      // Own students, plus staff — never another teacher's student
+      // Own students, plus the principal — never another teacher's student
       return [
-        adminParty,
         principalParty,
         ...studentsForTeacher(name).map(studentParty),
       ];
 
     case "student":
-      // Only their own teacher(s), plus administration for pastoral issues
+      // Only their own teacher(s), plus the principal for pastoral issues
       return [
         ...teachersForStudent(name).map(teacherParty),
         principalParty,
-        adminParty,
       ];
   }
 }
 
-/** Guard used before sending, so the rule is enforced not merely hinted. */
-export function canMessage(role: Role, from: string, toName: string): boolean {
+/**
+ * Guard used before sending, so the rule is enforced not merely hinted.
+ *
+ * `existingThread` covers the reply case: the Super Admin is not listed as a
+ * contact for anyone, so without this a person could receive a message from
+ * administration and be unable to answer it.
+ */
+export function canMessage(
+  role: Role,
+  from: string,
+  toName: string,
+  existingThread = false,
+): boolean {
+  if (existingThread) return true;
   return contactsFor(role, from).some((c) => c.name === toName);
 }
 

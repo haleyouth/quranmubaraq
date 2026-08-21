@@ -343,7 +343,7 @@ function TeacherForm({
 }) {
   const blank: Teacher = {
     id: `T-${Math.floor(Math.random() * 900 + 100)}`,
-    name: "", email: "", phone: "", admin: "Qasim Shafiq Mir",
+    name: "", email: "", phone: "", admin: "AdminSuper",
     specializations: ["Tajweed"], students: 0, load: 0, rating: 0,
     status: "active", joined: new Date().toISOString().slice(0, 10), gender: "male",
   };
@@ -417,7 +417,7 @@ function TeacherForm({
             onChange={(e) => setForm({ ...form, admin: e.target.value })}
             className={inputClass}
           >
-            <option>Qasim Shafiq Mir</option>
+            <option>AdminSuper</option>
             <option>Bilal Ahmed</option>
           </select>
         </Field>

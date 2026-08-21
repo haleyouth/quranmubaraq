@@ -150,6 +150,8 @@ service cloud.firestore {
       // which is what keeps the role lookup above trustworthy.
       // Staff may edit anyone, but only an admin may hand out the admin role
       // or take it away — otherwise a principal could promote themselves.
+      // Self-edits may change anything except role and status — which
+      // includes a teacher setting their own default meeting room.
       allow update: if (isSelf(userId)
                         && !request.resource.data.diff(resource.data)
                              .affectedKeys().hasAny(['role', 'status']))
@@ -180,11 +182,6 @@ service cloud.firestore {
     /* ---------------------------------------------------------------- */
     /* Classes, sessions, attendance                                    */
     /* ---------------------------------------------------------------- */
-
-    match /classes/{classId} {
-      allow read: if isSignedIn();
-      allow write: if isStaff();
-    }
 
     match /sessions/{sessionId} {
       allow read: if isSignedIn();
@@ -218,12 +215,59 @@ service cloud.firestore {
     /* Messages                                                         */
     /* ---------------------------------------------------------------- */
 
+    /**
+     * Scheduled classes.
+     *
+     * Only Admin and Principal may set a timetable — a teacher cannot book
+     * themselves work and a student cannot book a teacher. Both parties can
+     * read their own class so their portal, calendar and today's board work.
+     */
+    match /classes/{classId} {
+      allow read: if isStaff()
+                  || (isSignedIn()
+                      && (resource.data.teacherName == myName()
+                          || resource.data.studentName == myName()));
+
+      allow create: if isStaff()
+                    && request.resource.data.keys().hasOnly([
+                         'studentId', 'studentName', 'teacherId', 'teacherName',
+                         'course', 'days', 'start', 'durationMin', 'zoomUrl',
+                         'status', 'createdBy', 'createdAt'
+                       ])
+                    && request.resource.data.studentName is string
+                    && request.resource.data.studentName.size() > 0
+                    && request.resource.data.teacherName is string
+                    && request.resource.data.teacherName.size() > 0
+                    && request.resource.data.days is list
+                    && request.resource.data.days.size() > 0
+                    && request.resource.data.days.size() <= 7
+                    && request.resource.data.durationMin is int
+                    && request.resource.data.durationMin > 0
+                    && request.resource.data.durationMin <= 240
+                    && request.resource.data.status in ['active', 'paused'];
+
+      allow update: if (isStaff()
+                        && request.resource.data.status in ['active', 'paused'])
+                    // A teacher owns the meeting room for their own class, so
+                    // they may set the link and nothing else. Who teaches whom
+                    // and when stays a staff decision.
+                    || (isSignedIn()
+                        && resource.data.teacherName == myName()
+                        && request.resource.data.diff(resource.data)
+                             .affectedKeys().hasOnly(['zoomUrl']));
+
+      allow delete: if isStaff();
+    }
+
     match /messages/{messageId} {
       // A person may only read threads they are part of. Combined with the
       // participant filter on the client query, nobody can enumerate another
       // person's conversation.
-      allow read: if isSignedIn()
-                  && myName() in resource.data.participants;
+      //
+      // The Super Admin is the exception: oversight of every conversation is
+      // the point of the role, and moderation is impossible without it.
+      allow read: if isAdmin()
+                  || (isSignedIn() && myName() in resource.data.participants);
 
       // The sender must be the signed-in person and must be a participant,
       // so a message cannot be forged in someone else's name.

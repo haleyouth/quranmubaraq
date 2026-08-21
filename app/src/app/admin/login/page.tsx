@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { signIn } from "@/lib/admin/auth";
 import { Logo } from "@/components/ui/Logo";
 import { inputClass } from "@/components/admin/ui";
+import { LoginAside } from "@/components/admin/LoginAside";
 
 /** Firebase error codes, translated into something a person can act on. */
 function friendlyError(code: string, fallback: string) {
@@ -137,46 +138,7 @@ export default function AdminLoginPage() {
         </div>
       </div>
 
-      {/* Reassurance panel */}
-      <div className="islamic-pattern-strong flex items-center justify-center border-t-4 border-ink bg-ink px-6 py-14 lg:border-t-0 lg:border-l-4">
-        <div className="w-full max-w-md">
-          <p className="inline-flex items-center gap-2 rounded-full border-2 border-gold bg-gold px-4 py-1.5 text-sm font-bold text-ink">
-            <ShieldCheck className="size-4" aria-hidden="true" />
-            Secure sign in
-          </p>
-
-          <h2 className="font-display mt-5 text-2xl text-cream">
-            One portal, four roles
-          </h2>
-          <p className="mt-2 text-cream/70">
-            Your account decides what you see. Teachers reach their own classes
-            and students, principals their branch, and administration the whole
-            academy.
-          </p>
-
-          <ul className="mt-6 space-y-3 text-sm text-cream/75">
-            {[
-              ["Administration", "Full oversight across every branch."],
-              ["Principal", "Their branch: teachers, students and schedules."],
-              ["Teacher", "Today's classes, attendance and their students."],
-              ["Student", "Their schedule, progress, invoices and messages."],
-            ].map(([role, detail]) => (
-              <li
-                key={role}
-                className="rounded-xl border-2 border-cream/20 bg-cream/5 px-4 py-3"
-              >
-                <span className="font-display block text-cream">{role}</span>
-                <span className="text-cream/65">{detail}</span>
-              </li>
-            ))}
-          </ul>
-
-          <p className="mt-6 text-sm text-cream/55">
-            Do not have an account? Ask your principal or the academy
-            administration to create one for you.
-          </p>
-        </div>
-      </div>
+      <LoginAside />
     </main>
   );
 }

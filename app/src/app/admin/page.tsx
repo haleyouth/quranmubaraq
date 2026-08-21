@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ArrowRight, CalendarDays, Info, Video } from "lucide-react";
 import { useSession } from "@/lib/admin/session-context";
+import { useClasses } from "@/lib/admin/use-classes";
 import {
   alerts, attendanceTrend, enrolmentFunnel, invoices, kpis,
   leaveRequests, revenueByMonth,
@@ -23,6 +24,7 @@ import { JoinClassDialog } from "@/components/admin/JoinClassDialog";
 export default function AdminDashboard() {
   const { session } = useSession();
   const [joining, setJoining] = useState<ClassSession | null>(null);
+  const { defs } = useClasses();
 
   // Schedule is derived from the current clock, so it is computed after
   // mount only — the static export has no idea what "now" is at view time.
@@ -33,15 +35,15 @@ export default function AdminDashboard() {
 
     const refresh = () => {
       const now = new Date();
-      setToday(sessionsForDay(now, now));
-      setWeek(sessionsForRange(now, addDays(now, 6), now));
+      setToday(sessionsForDay(now, now, defs));
+      setWeek(sessionsForRange(now, addDays(now, 6), now, defs));
     };
     refresh();
 
     // Keeps "live now" accurate as classes start and end
     const id = window.setInterval(refresh, 60_000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [defs]);
 
   const mine = useMemo(
     () => (session ? filterForRole(today, session.role, session.name) : []),

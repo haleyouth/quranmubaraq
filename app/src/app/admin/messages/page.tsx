@@ -160,7 +160,12 @@ export default function MessagesPage() {
 
   function send() {
     if (!session || !current || !draft.trim()) return;
-    if (!canMessage(session.role, session.name, current.contact.name)) return;
+    // A thread that already holds messages is one this person is party to, so
+    // replying is always allowed — this is what lets anyone answer the Super
+    // Admin, who is intentionally absent from every contact list.
+    const isExistingThread = messages.some((m) => m.threadId === current.id);
+    if (!canMessage(session.role, session.name, current.contact.name, isExistingThread))
+      return;
 
     const body = draft.trim();
     setDraft("");

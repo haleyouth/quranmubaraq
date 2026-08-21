@@ -51,7 +51,7 @@ function friendly(err: unknown, fallback: string) {
     case "auth/weak-password":
       return "Password must be at least 6 characters.";
     case "permission-denied":
-      return "Your account is not permitted to make this change.";
+      return "Your account is not permitted to make this change. Only an Admin can modify an Admin account or change anyone's role.";
     case "auth/network-request-failed":
       return "Could not reach the server. Please check your connection.";
     default:
@@ -95,6 +95,12 @@ export default function AccountsPage() {
 
   const canManage = session?.role === "admin" || session?.role === "principal";
   const isAdmin = session?.role === "admin";
+
+  /**
+   * A principal may not modify an Admin account — that is enforced by the
+   * security rules, so the UI has to say so rather than let the save fail.
+   */
+  const mayEdit = (u: DirectoryUser) => isAdmin || u.role !== "admin";
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -173,12 +179,24 @@ export default function AccountsPage() {
     setBusy(true);
 
     try {
-      await updateAccount(editing.uid, {
-        name: editing.name,
-        role: editing.role,
-        title: editing.title,
-        branch: editing.branch,
-      });
+      const before = rows.find((r) => r.uid === editing.uid);
+
+      // Send only what actually moved. Writing `role` on every save makes an
+      // ordinary rename look like a role change to the security rules, which
+      // then refuse edits a principal is otherwise allowed to make.
+      const changes: Parameters<typeof updateAccount>[1] = {};
+      if (editing.name !== before?.name) changes.name = editing.name;
+      if (editing.title !== before?.title) changes.title = editing.title;
+      if (editing.branch !== before?.branch) changes.branch = editing.branch;
+      if (editing.role !== before?.role) changes.role = editing.role;
+
+      if (Object.keys(changes).length === 0) {
+        setEditing(null);
+        setBusy(false);
+        return;
+      }
+
+      await updateAccount(editing.uid, changes);
       setEditing(null);
       flash("Account updated.");
       await refresh();
@@ -344,6 +362,12 @@ export default function AccountsPage() {
                   <AdminButton
                     size="sm"
                     variant="outline"
+                    disabled={!mayEdit(u)}
+                    title={
+                      mayEdit(u)
+                        ? undefined
+                        : "Only an Admin can change an Admin account."
+                    }
                     onClick={() => {
                       setFormError("");
                       setEditing(u);

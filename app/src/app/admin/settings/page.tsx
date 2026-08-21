@@ -11,9 +11,9 @@ import {
 const TABS = ["organisation", "roles", "integrations", "audit"] as const;
 
 const AUDIT = [
-  { at: "2026-08-17 14:22", actor: "Qasim Shafiq Mir", action: "teacher.disable", entity: "T-106 Ustadha Hafsa Noor" },
+  { at: "2026-08-17 14:22", actor: "AdminSuper", action: "teacher.disable", entity: "T-106 Ustadha Hafsa Noor" },
   { at: "2026-08-17 13:05", actor: "Bilal Ahmed", action: "complaint.escalate", entity: "QM-2026-0041" },
-  { at: "2026-08-17 11:48", actor: "Qasim Shafiq Mir", action: "user.impersonate", entity: "T-101 Ustadha Ayesha Siddiqa" },
+  { at: "2026-08-17 11:48", actor: "AdminSuper", action: "user.impersonate", entity: "T-101 Ustadha Ayesha Siddiqa" },
   { at: "2026-08-17 09:30", actor: "System", action: "invoice.generate", entity: "42 invoices for Aug 2026" },
   { at: "2026-08-16 16:12", actor: "Bilal Ahmed", action: "leave.approve", entity: "LV-085" },
 ] as const;
