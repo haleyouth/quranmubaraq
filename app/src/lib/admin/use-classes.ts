@@ -14,6 +14,8 @@ import { subscribeToClasses, type LiveClass } from "./classes-live";
 import { classDefs, type ClassDef } from "./schedule";
 
 export type ClassesState = {
+  /** Only real bookings — empty until staff schedule something. */
+  liveOnly: readonly ClassDef[];
   /** What every schedule view should expand. */
   defs: readonly ClassDef[];
   /** True once Firestore has answered. */
@@ -43,9 +45,15 @@ export function useClasses(): ClassesState {
   }, []);
 
   // Firestore unreachable, or answered with nothing booked yet.
-  if (failed) return { defs: classDefs, ready: true, isDemo: true };
-  if (live === null) return { defs: classDefs, ready: false, isDemo: true };
-  if (live.length === 0) return { defs: classDefs, ready: true, isDemo: true };
+  /*
+   * `liveOnly` never falls back. Schedule views want the sample timetable so a
+   * fresh academy is not staring at an empty calendar, but anything that
+   * decides who may contact whom must use real bookings only — pairing people
+   * off a fictional timetable would open a channel that should not exist.
+   */
+  if (failed) return { defs: classDefs, liveOnly: [], ready: true, isDemo: true };
+  if (live === null) return { defs: classDefs, liveOnly: [], ready: false, isDemo: true };
+  if (live.length === 0) return { defs: classDefs, liveOnly: [], ready: true, isDemo: true };
 
-  return { defs: live, ready: true, isDemo: false };
+  return { defs: live, liveOnly: live, ready: true, isDemo: false };
 }

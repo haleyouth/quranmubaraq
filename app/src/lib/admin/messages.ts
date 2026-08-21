@@ -167,6 +167,81 @@ export function threadId(a: string, b: string) {
   return [a, b].sort().join("::");
 }
 
+
+/* -------------------------------------------------------------------------- */
+/*                        Contacts from real accounts                         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Who this person may contact, derived from the real portal accounts and the
+ * real timetable rather than the sample roster.
+ *
+ * `contactsFor` above is kept for the sample data path; this is what the UI
+ * uses once Firestore has answered, so nobody is ever offered a conversation
+ * with a person who does not have an account.
+ */
+export function contactsFromDirectory(
+  role: Role,
+  name: string,
+  people: readonly {
+    uid: string;
+    name: string;
+    role: Role;
+    title?: string;
+    branch?: string;
+  }[],
+  classes: readonly { teacherName: string; studentName: string }[],
+): Party[] {
+  const party = (p: (typeof people)[number]): Party => ({
+    id: p.uid,
+    name: p.name,
+    role: p.role,
+    subtitle: [p.title, p.branch].filter(Boolean).join(" · ") || p.role,
+    initials: initials(p.name),
+  });
+
+  const others = people.filter((p) => p.name !== name);
+  const teachersList = others.filter((p) => p.role === "teacher");
+  const studentsList = others.filter((p) => p.role === "student");
+  const principals = others.filter((p) => p.role === "principal");
+
+  /*
+   * The Super Admin is deliberately absent from every list below. They can
+   * open a conversation with anyone, but the account is not discoverable from
+   * a lower role. Replies still work: once the admin writes, the thread is in
+   * the recipient's inbox and they answer inside it.
+   */
+  switch (role) {
+    case "admin":
+      return [...principals, ...teachersList, ...studentsList].map(party);
+
+    case "principal":
+      return [...teachersList, ...studentsList].map(party);
+
+    case "teacher": {
+      // Only students this teacher actually teaches.
+      const mine = new Set(
+        classes.filter((c) => c.teacherName === name).map((c) => c.studentName),
+      );
+      return [
+        ...principals,
+        ...studentsList.filter((p) => mine.has(p.name)),
+      ].map(party);
+    }
+
+    case "student": {
+      // Only the teacher(s) who actually teach this student.
+      const mine = new Set(
+        classes.filter((c) => c.studentName === name).map((c) => c.teacherName),
+      );
+      return [
+        ...teachersList.filter((p) => mine.has(p.name)),
+        ...principals,
+      ].map(party);
+    }
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                Seed messages                               */
 /* -------------------------------------------------------------------------- */

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { signIn } from "@/lib/admin/auth";
 import { Logo } from "@/components/ui/Logo";
 import { inputClass } from "@/components/admin/ui";
@@ -35,6 +35,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -85,17 +86,39 @@ export default function AdminLoginPage() {
                 />
               </label>
 
-              <label className="block">
-                <span className="mb-1.5 block font-bold text-ink">Password</span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                  className={inputClass}
-                />
-              </label>
+              <div>
+                <label htmlFor="password" className="mb-1.5 block font-bold text-ink">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                    className={`${inputClass} pr-12`}
+                  />
+                  {/*
+                    Outside the <label> on purpose: nested inside it, clicking
+                    the button would also toggle focus into the input.
+                  */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                    className="absolute top-1/2 right-1 grid size-10 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-ink/55 transition-colors hover:bg-cream-deep hover:text-ink"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-5" aria-hidden="true" />
+                    ) : (
+                      <Eye className="size-5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {error && (

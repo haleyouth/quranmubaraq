@@ -8,8 +8,11 @@ import {
   type Role, type Session,
 } from "@/lib/admin/demo-auth";
 import { useSession } from "@/lib/admin/session-context";
+import { listUsers, type DirectoryUser } from "@/lib/admin/auth";
+import { useClasses } from "@/lib/admin/use-classes";
 import {
-  canMessage, contactsFor, loadMessages, markThreadRead, persistMessage,
+  canMessage, contactsFor, contactsFromDirectory, loadMessages,
+  markThreadRead, persistMessage,
   resetMessages, subscribeMessages, threadId, timeAgo,
   type Message, type Party,
 } from "@/lib/admin/messages";
@@ -44,6 +47,9 @@ export default function MessagesPage() {
    */
   const [transport, setTransport] = useState<"connecting" | "live" | "local">("connecting");
   const liveRef = useRef<LiveMessage[]>([]);
+  const [directory, setDirectory] = useState<DirectoryUser[] | null>(null);
+  // Real bookings only: a teacher-student channel must rest on a real class.
+  const { liveOnly } = useClasses();
   const endRef = useRef<HTMLDivElement>(null);
 
   /**
@@ -112,10 +118,31 @@ export default function MessagesPage() {
     };
   }, [session?.name]);
 
-  const contacts = useMemo(
-    () => (session ? contactsFor(session.role, session.name) : []),
-    [session],
-  );
+  /*
+   * Contacts come from the real portal accounts. The sample roster is only a
+   * fallback for when the directory has not answered yet — offering a
+   * conversation with a person who has no account would be a dead end.
+   */
+  useEffect(() => {
+    if (!session?.uid) return;
+    let cancelled = false;
+    listUsers()
+      .then((list) => {
+        if (!cancelled) setDirectory(list);
+      })
+      .catch(() => {
+        // Leave it null so the sample roster keeps the page usable.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.uid]);
+
+  const contacts = useMemo(() => {
+    if (!session) return [];
+    if (!directory) return contactsFor(session.role, session.name);
+    return contactsFromDirectory(session.role, session.name, directory, liveOnly);
+  }, [session, directory, liveOnly]);
 
   /** Conversations this person is party to, newest first. */
   const conversations = useMemo(() => {
